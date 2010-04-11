@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <boost/bind.hpp>
 
+#include "utility/dump.h"
 #include "algorithms/median.h"
 
 int main( int argc, char** argv )
@@ -17,5 +18,5 @@ int main( int argc, char** argv )
     std::copy( begin, end, std::back_inserter( vec ) );
     std::vector< int >::iterator median = algorithm::median( vec.begin(), vec.end() );
     std::cout << *median << std::endl;
-    std::copy( vec.begin(), vec.end(), std::ostream_iterator< int >( std::cout, " " ) );
+    util::dump_sequence( vec.begin(), vec.end() ); 
 }

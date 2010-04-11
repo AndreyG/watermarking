@@ -65,14 +65,10 @@ namespace algorithm
             typedef typename std::iterator_traits< Iter >::value_type value_type;
             int size = std::distance( p, q );
             value_type middle = *( p + rand() % size );
-            //dump_sequence( p, q );
-            //std::cout << "middle: " << middle << std::endl;
             typedef operator_binder< value_type, Comparator > predicate; 
-            Iter m = std::partition( p, q, predicate( middle, comp ) ); 
-            //std::cout << "bound: " << *m << std::endl;
-            //dump_sequence( p, q );
-            assert( sequence_is_valid( p, q, m, middle, comp ) );
-            return m;
+            Iter bound = std::partition( p, q, predicate( middle, comp ) ); 
+            assert( sequence_is_valid( p, q, bound, middle, comp ) );
+            return bound;
         }
 
         template< class Iter, class Comparator >
@@ -92,7 +88,14 @@ namespace algorithm
     template< class Iter, class Comparator >
     Iter median( Iter p, Iter q, Comparator comp )
     {
-        return kth( p, q, std::distance( p, q) / 2, comp );
+        Iter res = kth( p, q, std::distance( p, q) / 2, comp );
+        assert( ::abs( std::distance( p, res ) - std::distance( res, q ) ) <= 1 );
+        for ( ; p != res; ++p )
+            assert( !comp( *res, *p ) );
+        --q;
+        for ( ; q != res; --q )
+            assert( !comp( *q, *res ) );
+        return res;
     }
 
     template< class Iter >
