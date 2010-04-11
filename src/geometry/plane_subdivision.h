@@ -22,7 +22,7 @@ namespace geometry
     };
 
     template< class Iter >
-    size_t subdivide( Iter p, Iter q, size_t max_subarea_size, bool horizontal, std::vector< size_t > & index, size_t existing_areas_num )
+    size_t subdivide_plane( Iter p, Iter q, size_t max_subarea_size, bool horizontal, std::vector< size_t > & index, size_t existing_areas_num )
     {
         size_t size = std::distance( p, q );
         if ( size <= max_subarea_size )
@@ -35,8 +35,8 @@ namespace geometry
         {
             typedef point_comparator< typename std::iterator_traits< Iter >::value_type > point_comparator;
             Iter m = algorithm::median( p, q, point_comparator( horizontal ) );
-            existing_areas_num = subdivide( p, m, max_subarea_size, !horizontal, index, existing_areas_num );
-            return subdivide( boost::next( m ), q, max_subarea_size, !horizontal, index, existing_areas_num );
+            existing_areas_num = subdivide_plane( p, m, max_subarea_size, !horizontal, index, existing_areas_num );
+            return subdivide_plane( boost::next( m ), q, max_subarea_size, !horizontal, index, existing_areas_num );
         }
     }
 }
