@@ -3,6 +3,7 @@
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
+#include <boost/tuple/tuple.hpp>
 
 #include "spectral_analysis.h"
 #include "../geometry/plane_subdivision.h"
@@ -10,6 +11,8 @@
 namespace watermarking
 {
     const size_t MAX_PATCH_SIZE = 1000;
+
+    using boost::tie;
 
     template< class Point >
     struct planar_graph
@@ -37,24 +40,15 @@ namespace watermarking
             build_trgs( subareas_num );
             foreach ( CDT const & trg, trgs_ )
             {
-                std::map< CDT::Vertex_handle, size_t > trg_vertex_to_index;
-                typedef typename graph_t::vertices_t vertices_t;
-                vertices_t vertices( trg.number_of_vertices() );
-                size_t i = 0;
-                typedef CDT::Finite_vertices_iterator vertices_iterator;
-                for ( vertices_iterator v = trg.vertices_begin(); v != trg.vertices_end(); ++v )
-                {
-                    trg_vertex_to_index.insert( std::make_pair( v, i ) );
-                    vertices.push_back( v->point() );
-                    ++i;
-                }
-                vertices_t r = spectral_coefficients( incidence_graph( trg, trg_vertex_to_index ), vertices );
+                vertices_t v, r;
+                tie( v, r ) = vertices_and_coefficients( trg );
             }
         }
 
     private:
         typedef CGAL::Exact_predicates_inexact_constructions_kernel     Kernel;
         typedef CGAL::Constrained_Delaunay_triangulation_2< Kernel >    CDT;
+        typedef typename graph_t::vertices_t                            vertices_t;
 
         size_t subdivide_plane( size_t max_subarea_size )
         {
@@ -86,7 +80,23 @@ namespace watermarking
                 }
             }
         }        
-        
+                
+        std::pair< vertices_t, vertices_t > vertices_and_coefficients( CDT const & trg ) const
+        {
+            vertices_t vertices( trg.number_of_vertices() );
+            std::map< CDT::Vertex_handle, size_t > trg_vertex_to_index;
+            size_t i = 0;
+            typedef CDT::Finite_vertices_iterator vertices_iterator;
+            for ( vertices_iterator v = trg.vertices_begin(); v != trg.vertices_end(); ++v )
+            {
+                trg_vertex_to_index.insert( std::make_pair( v, i ) );
+                vertices.push_back( v->point() );
+                ++i;
+            }
+            vertices_t r = spectral_coefficients( incidence_graph( trg, trg_vertex_to_index ), vertices );
+            return std::make_pair( vertices, r );
+        }
+
         struct incidence_graph
         {
         private:
