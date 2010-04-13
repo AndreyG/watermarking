@@ -36,9 +36,13 @@ namespace watermarking
         {
             size_t subareas_num = subdivide_plane( MAX_PATCH_SIZE );
             build_trgs( subareas_num );
-            foreach ( CDT const & trg, trgs_ )
+            for ( size_t i = 0; i != subareas_num; ++i )
             {
-                vertices_t r = coefficients( trg );
+                vertices_t r = coefficients( i );
+                //  
+                //  TODO modify coefficients
+                //
+                modified_vertices_[i] = analysers_[i]->get_vertices( r );
             }
         }
 
@@ -67,7 +71,10 @@ namespace watermarking
 
         void build_trgs( size_t subareas_num )
         {
-            trgs_.resize( subareas_num );
+            trgs_.resize                ( subareas_num );
+            analysers_.resize           ( subareas_num );
+            modified_vertices_.resize   ( subareas_num );    
+            
             foreach ( typename graph_t::edge_t const & edge, graph_.edges )
             {
                 size_t begin = index_[edge.first], end = index_[edge.second];
@@ -78,8 +85,9 @@ namespace watermarking
             }
         }        
                 
-        vertices_t coefficients( CDT const & trg ) const
+        vertices_t coefficients( size_t subarea ) 
         {
+            CDT const & trg = trgs_[subarea];
             vertices_t vertices( trg.number_of_vertices() );
             std::map< CDT::Vertex_handle, size_t > trg_vertex_to_index;
             size_t i = 0;
@@ -90,14 +98,19 @@ namespace watermarking
                 vertices.push_back( v->point() );
                 ++i;
             }
-            typedef geometry::triangulation_graph< CDT > incidence_graph;
-            return  spectral_coefficients( incidence_graph( trg, trg_vertex_to_index ), vertices );
+            analysers_[i].reset( new spectral_analyser< incidence_graph >( incidence_graph( trg, trg_vertex_to_index ) ) ); 
+            return  analysers_[i]->get_coefficients( vertices );
         }
 
-        std::vector< size_t >   index_;
-        graph_t                 graph_;
-        std::vector< CDT >      trgs_;
-        std::vector< size_t >   subdivision_;
+        typedef geometry::triangulation_graph< CDT >                        incidence_graph;
+        typedef boost::shared_ptr< spectral_analyser< incidence_graph > >   analyser_ptr;
+
+        std::vector< size_t >               index_;
+        graph_t                             graph_;
+        std::vector< CDT >                  trgs_;
+        std::vector< size_t >               subdivision_;
+        std::vector< vertices_t >           modified_vertices_;
+        std::vector< analyser_ptr >         analysers_;
     };
     
     template< class Point >

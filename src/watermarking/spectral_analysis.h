@@ -10,6 +10,32 @@ namespace watermarking
     {
         typedef TNT::Array2D< double > matrix_t;
 
+        template< class Iter >
+            typename std::iterator_traits< Iter >::value_type 
+                norm( Iter begin, Iter end )
+        {
+            typename std::iterator_traits< Iter >::value_type res = 0;
+            for ( ; begin != end; ++end )
+                res += ( *begin ) * ( *begin );
+            return res;
+        }
+
+        template< class Iter >
+        void normalize( Iter begin, Iter end )
+        {
+            typename std::iterator_traits< Iter >::value_type n = norm( begin, end );
+            for ( ; begin != end; ++begin )
+                *begin /= n;
+        }
+
+        void normalize( matrix_t & a )
+        {
+            for ( size_t i = 0; i != a.dim1(); ++i )
+            {
+                normalize( &a[i][0], &a[i][0] + a.dim2() );
+            }
+        }
+
         template< class Graph >
         matrix_t adjacency_matrix( Graph const & graph )
         {
@@ -46,15 +72,49 @@ namespace watermarking
         }
     }
 
-    template< class Graph, class Points >
-    Points spectral_coefficients( Graph const & graph, Points const & vertices )
+    template< class Graph >
+    struct spectral_analyser
     {
-        matrix_t a = adjacency_matrix( graph );
-        const size_t N = graph.vertices_num();
-        matrix_t w( N, N );
-        JAMA::Eigenvalue< double >( a ).getV( w );
-        return spectral_coefficients( vertices, w );
-    }
+        spectral_analyser( Graph const & graph )
+                : e_( graph.vertices_num(), graph.vertices_num() )
+        {
+            matrix_t a = adjacency_matrix( graph );             
+            JAMA::Eigenvalue< double >( a ).getV( e_ );
+            normalize( e_ );
+        }
+
+        template< class Points >
+        Points get_coefficients( Points const & vertices ) const
+        {
+            return spectral_coefficients( vertices, e_ );
+        }
+
+        template< class Points >
+        Points get_vertices( Points const & coefficients ) const
+        {
+            const size_t N = coefficients.size();
+            assert( N == e_.dim1() );
+            assert( N == e_.dim2() );
+            Points vertices( N );
+            for ( size_t i = 0; i != N; ++i )
+            {
+                typedef typename Points::value_type point_t;
+                point_t const & r = coefficients[i];
+                double const * e = e_[i];
+                double x = 0, y = 0;
+                for ( size_t j = 0; j != N; ++j )
+                {
+                    x += r.x() * e[j];
+                    y += r.y() * e[j];
+                }
+                vertices[i] = point_t( x, y );
+            }
+        }
+
+    private:
+        matrix_t e_;
+    };
+
 }
 
 #endif /* _SPECTRAL_ANALYSIS_H_ */
