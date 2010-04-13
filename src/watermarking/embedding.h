@@ -3,16 +3,14 @@
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
-#include <boost/tuple/tuple.hpp>
 
 #include "spectral_analysis.h"
 #include "../geometry/plane_subdivision.h"
+#include "../geometry/triangulation_graph.h"
 
 namespace watermarking
 {
     const size_t MAX_PATCH_SIZE = 1000;
-
-    using boost::tie;
 
     template< class Point >
     struct planar_graph
@@ -40,8 +38,7 @@ namespace watermarking
             build_trgs( subareas_num );
             foreach ( CDT const & trg, trgs_ )
             {
-                vertices_t v, r;
-                tie( v, r ) = vertices_and_coefficients( trg );
+                vertices_t r = coefficients( trg );
             }
         }
 
@@ -81,7 +78,7 @@ namespace watermarking
             }
         }        
                 
-        std::pair< vertices_t, vertices_t > vertices_and_coefficients( CDT const & trg ) const
+        vertices_t coefficients( CDT const & trg ) const
         {
             vertices_t vertices( trg.number_of_vertices() );
             std::map< CDT::Vertex_handle, size_t > trg_vertex_to_index;
@@ -93,55 +90,9 @@ namespace watermarking
                 vertices.push_back( v->point() );
                 ++i;
             }
-            vertices_t r = spectral_coefficients( incidence_graph( trg, trg_vertex_to_index ), vertices );
-            return std::make_pair( vertices, r );
+            typedef geometry::triangulation_graph< CDT > incidence_graph;
+            return  spectral_coefficients( incidence_graph( trg, trg_vertex_to_index ), vertices );
         }
-
-        struct incidence_graph
-        {
-        private:
-            typedef std::vector< size_t >   edges_t;
-            
-        public:
-            typedef edges_t::const_iterator edges_iterator;
-
-            incidence_graph( CDT const & trg, std::map< typename CDT::Vertex_handle, size_t > & index )
-                    : edges_( trg.number_of_vertices() )
-            {
-                for ( CDT::Finite_vertices_iterator v = trg.vertices_begin(); v != trg.vertices_end(); ++v )
-                {
-                    edges_t & edges = edges_[index[v]];
-                    CDT::Vertex_circulator vc = trg.incident_vertices( v ), done( vc );
-                    do 
-                    {
-                        edges.push_back( index[vc] );
-                    } while ( ++vc != done );
-                }
-            }
-
-            size_t vertices_num() const
-            {
-                return edges_.size();
-            }
-
-            size_t degree( size_t v ) const
-            {
-                return edges_[v].size();
-            }
-
-            edges_iterator edges_begin( size_t v ) const
-            {
-                return edges_[v].begin();
-            }
-
-            edges_iterator edges_end( size_t v ) const
-            {
-                return edges_[v].end();
-            }
-
-        private:
-            std::vector< edges_t > edges_; 
-        };
 
         std::vector< size_t >   index_;
         graph_t                 graph_;
