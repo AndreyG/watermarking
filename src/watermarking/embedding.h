@@ -31,7 +31,7 @@ namespace watermarking
     {
         typedef planar_graph< Point > graph_t;
 
-        embedding_impl( graph_t const & graph, message_t const & message )
+        embedding_impl( graph_t const & graph, message_t const & message, int chip_rate, int key, double alpha )
                 : graph_( graph )
         {
             size_t subareas_num = subdivide_plane( MAX_PATCH_SIZE );
@@ -39,9 +39,18 @@ namespace watermarking
             for ( size_t i = 0; i != subareas_num; ++i )
             {
                 vertices_t r = coefficients( i );
-                //  
-                //  TODO modify coefficients
-                //
+                
+                srand( key );
+                for ( size_t i = 0, k = 0; i != message.size(); ++i )
+                {
+                    for ( size_t j = 0; j != chip_rate; ++j, ++k )
+                    {
+                        int p = ( rand() % 2 ) * 2 - 1;
+                        int b = message[i] * 2 - 1; 
+                        r[k] += b * p * alpha;
+                    }
+                }
+
                 modified_vertices_[i] = analysers_[i]->get_vertices( r );
             }
         }
