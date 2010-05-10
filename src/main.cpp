@@ -14,6 +14,7 @@
 #include "utility/dump.h"
 #include "algorithms/median.h"
 #include "watermarking/embedding.h"
+#include "visualization/visualizer.h"
 
 int main( int argc, char** argv )
 {
