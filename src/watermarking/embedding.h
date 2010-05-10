@@ -2,6 +2,7 @@
 #define _EMBEDDING_H_
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
 
 #include "spectral_analysis.h"
@@ -36,9 +37,9 @@ namespace watermarking
         {
             size_t subareas_num = subdivide_plane( MAX_PATCH_SIZE );
             build_trgs( subareas_num );
-            for ( size_t i = 0; i != subareas_num; ++i )
+            for ( size_t s = 0; s != subareas_num; ++s )
             {
-                vertices_t r = coefficients( i );
+                vertices_t r = coefficients( s );
                 
                 srand( key );
                 for ( size_t i = 0, k = 0; i != message.size(); ++i )
@@ -47,17 +48,20 @@ namespace watermarking
                     {
                         int p = ( rand() % 2 ) * 2 - 1;
                         int b = message[i] * 2 - 1; 
-                        r[k] += b * p * alpha;
+                        r[k] = Point(   r[k].x() + b * p * alpha,
+                                        r[k].y() + b * p * alpha );
                     }
                 }
 
-                modified_vertices_[i] = analysers_[i]->get_vertices( r );
+                modified_vertices_[s] = analysers_[s]->get_vertices( r );
             }
         }
 
     private:
         typedef CGAL::Exact_predicates_inexact_constructions_kernel     Kernel;
+        typedef CGAL::Delaunay_triangulation_2< Kernel >                DT;
         typedef CGAL::Constrained_Delaunay_triangulation_2< Kernel >    CDT;
+        typedef DT                                                      trg_t;
         typedef typename graph_t::vertices_t                            vertices_t;
 
         size_t subdivide_plane( size_t max_subarea_size )
@@ -84,6 +88,11 @@ namespace watermarking
             analysers_.resize           ( subareas_num );
             modified_vertices_.resize   ( subareas_num );    
             
+            for ( size_t i = 0; i != graph_.vertices.size(); ++i )
+            {
+                trgs_[subdivision_[i]].insert( graph_.vertices[i] );
+            }
+            /*
             foreach ( typename graph_t::edge_t const & edge, graph_.edges )
             {
                 size_t begin = index_[edge.first], end = index_[edge.second];
@@ -92,15 +101,16 @@ namespace watermarking
                     trgs_[subdivision_[begin]].insert_constraint( graph_.vertices[begin], graph_.vertices[end] );
                 }
             }
+            */
         }        
                 
         vertices_t coefficients( size_t subarea ) 
         {
-            CDT const & trg = trgs_[subarea];
+            trg_t const & trg = trgs_[subarea];
             vertices_t vertices( trg.number_of_vertices() );
-            std::map< CDT::Vertex_handle, size_t > trg_vertex_to_index;
+            std::map< trg_t::Vertex_handle, size_t > trg_vertex_to_index;
             size_t i = 0;
-            typedef CDT::Finite_vertices_iterator vertices_iterator;
+            typedef trg_t::Finite_vertices_iterator vertices_iterator;
             for ( vertices_iterator v = trg.vertices_begin(); v != trg.vertices_end(); ++v )
             {
                 trg_vertex_to_index.insert( std::make_pair( v, i ) );
@@ -111,12 +121,12 @@ namespace watermarking
             return  analysers_[i]->get_coefficients( vertices );
         }
 
-        typedef geometry::triangulation_graph< CDT >                        incidence_graph;
+        typedef geometry::triangulation_graph< DT >                         incidence_graph;
         typedef boost::shared_ptr< spectral_analyser< incidence_graph > >   analyser_ptr;
 
         std::vector< size_t >               index_;
         graph_t                             graph_;
-        std::vector< CDT >                  trgs_;
+        std::vector< trg_t >                trgs_;
         std::vector< size_t >               subdivision_;
         std::vector< vertices_t >           modified_vertices_;
         std::vector< analyser_ptr >         analysers_;
@@ -125,7 +135,7 @@ namespace watermarking
     template< class Point >
     std::auto_ptr< embedding_impl< Point > > embed( planar_graph< Point > const & graph, message_t const & message )
     {
-        return std::auto_ptr< embedding_impl< Point > >( new embedding_impl< Point >( graph, message ) );
+        return std::auto_ptr< embedding_impl< Point > >( new embedding_impl< Point >( graph, message, 3, 239, 1.5 ) );
     }
 }
 

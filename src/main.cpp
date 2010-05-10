@@ -17,7 +17,8 @@
 
 int main( int argc, char** argv )
 {
-    typedef watermarking::planar_graph< CGAL::Exact_predicates_inexact_constructions_kernel::Point_2 > graph_t;
+    typedef CGAL::Exact_predicates_inexact_constructions_kernel::Point_2 point_t; 
+    typedef watermarking::planar_graph< point_t > graph_t;
     typedef std::auto_ptr< watermarking::embedding_impl< graph_t::vertex_t > > embedded_watermark_t;
     embedded_watermark_t ew = watermarking::embed( graph_t(), watermarking::message_t() ); 
 }
