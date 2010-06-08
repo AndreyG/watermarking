@@ -11,7 +11,7 @@
 
 namespace watermarking
 {
-    const size_t MAX_PATCH_SIZE = 1000;
+    const size_t MAX_PATCH_SIZE = 100;
 
     template< class Point >
     struct planar_graph
@@ -36,9 +36,12 @@ namespace watermarking
                 : graph_( graph )
         {
             size_t subareas_num = subdivide_plane( MAX_PATCH_SIZE );
+            std::cout << "subareas num = " << subareas_num << std::endl;
             build_trgs( subareas_num );
+            /*
             for ( size_t s = 0; s != subareas_num; ++s )
             {
+                std::cout << "embedding message in subarea " << s << std::endl;
                 vertices_t r = coefficients( s );
                 
                 srand( key );
@@ -55,9 +58,9 @@ namespace watermarking
 
                 modified_vertices_[s] = analysers_[s]->get_vertices( r );
             }
+            */
         }
 
-    private:
         typedef CGAL::Exact_predicates_inexact_constructions_kernel     Kernel;
         typedef CGAL::Delaunay_triangulation_2< Kernel >                DT;
         typedef CGAL::Constrained_Delaunay_triangulation_2< Kernel >    CDT;
@@ -84,6 +87,7 @@ namespace watermarking
 
         void build_trgs( size_t subareas_num )
         {
+            std::cout << "build_triangulations\n"; 
             trgs_.resize                ( subareas_num );
             analysers_.resize           ( subareas_num );
             modified_vertices_.resize   ( subareas_num );    

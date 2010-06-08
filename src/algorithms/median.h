@@ -19,23 +19,29 @@ namespace algorithm
         template< class Iter, class Comparator, class ValueType >
         bool sequence_is_valid( Iter p, Iter q, Iter m, ValueType const & value, Comparator comp )
         {
+            if ( comp( *m, value ) )
+            {
+                std::cout << "checker, value of bound = " << value << std::endl; 
+                std::cout   << *prior( m )    << "\n" 
+                            << *m             << "\n"  
+                            << *next( m )     << std::endl;
+                return false;
+            }
             for ( ; p != m; ++p )
             {
                 if ( !comp( *p, value ) )
                 {
-                    std::cout   << "checker: " 
-                                << *p << "\t" << value << std::endl;
-
+                    std::cout   << "checker, left part:\n" 
+                                << *p << "\n" << value << std::endl;
                     return false;
                 }
             }
-            --q;
-            for ( ; q != m; --q )
+            for ( ; m != q; ++m )
             {
-                if ( comp( *q, value ) )
+                if ( comp( *m, value ) )
                 {
-                    std::cout   << "checker, right part: " 
-                                << *q << "\t" << value << std::endl;
+                    std::cout   << "checker, right part:\n" 
+                                << *m << "\n" << value << std::endl;
                     return false;
                 }
             }
@@ -67,20 +73,31 @@ namespace algorithm
             value_type middle = *( p + rand() % size );
             typedef operator_binder< value_type, Comparator > predicate; 
             Iter bound = std::partition( p, q, predicate( middle, comp ) ); 
-            assert( sequence_is_valid( p, q, bound, middle, comp ) );
+            assert( sequence_is_valid( p, q, bound, middle, comp ) );            
             return bound;
         }
 
         template< class Iter, class Comparator >
         Iter kth( Iter p, Iter q, size_t k, Comparator comp )
         {
+            size_t dist = std::distance( p, q );
+            if ( dist == 1 )
+                return p;
+            if ( dist == 2 )
+            {
+                if ( comp( *next( p ), *p ) )
+                    std::swap( *p, *next( p ) );
+                return p + k;
+            }
             Iter m = part( p, q, comp );
-            size_t dist = std::distance( p, m );
+            dist = std::distance( p, m );
             if ( dist == k )
+            {
                 return m;
+            }
             else if ( dist > k )
                 return kth( p, m, k, comp );
-            else 
+            else
                 return kth( m, q, k - dist, comp );
         }
     }
@@ -88,13 +105,26 @@ namespace algorithm
     template< class Iter, class Comparator >
     Iter median( Iter p, Iter q, Comparator comp )
     {
-        Iter res = kth( p, q, std::distance( p, q) / 2, comp );
+        Iter res = kth( p, q, std::distance( p, q ) / 2, comp );
         assert( ::abs( std::distance( p, res ) - std::distance( res, q ) ) <= 1 );
+        typedef typename std::iterator_traits< Iter >::value_type value_type;
         for ( ; p != res; ++p )
-            assert( !comp( *res, *p ) );
+        {
+            if ( comp( *next( res ), *p ) )
+            {
+                std::cout << std::setprecision( 32 ) << *p << "\n" << *res << "\n" << *next( res ) << std::endl;
+                assert( false );
+            }
+        }
         --q;
         for ( ; q != res; --q )
-            assert( !comp( *q, *res ) );
+        {
+            if ( comp( *q, *prior( res ) ) )
+            {
+                std::cout << std::setprecision( 32 ) << *res << "\n" << *q << std::endl;
+                assert( false );
+            }
+        }
         return res;
     }
 

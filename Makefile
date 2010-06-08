@@ -1,6 +1,6 @@
 CC = g++
 
-LIBS = -lCGAL
+LIBS = -lCGAL -lGL -lGLU -lglut
 
 all : compile
     
@@ -11,4 +11,4 @@ run : main
 	main
 
 compile : src/main.cpp
-	$(CC) -o main $< $(LIBS)
+	$(CC) -o viewer $< $(LIBS)
