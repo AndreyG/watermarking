@@ -42,7 +42,8 @@ namespace watermarking
             SUBDIVIDE_PLANE, BUILD_TRIANGULATIONS, MODIFY_VERTICES, STEP_SIZE
         };
         
-        embedding_impl( graph_t const & graph, message_t const & message, int chip_rate, int key, double alpha, bool step_by_step = false )
+        embedding_impl( graph_t const & graph, message_t const & message,
+						size_t chip_rate, int key, double alpha, bool step_by_step )
                 : graph_( graph )
                 , message_( message )
                 , chip_rate_( chip_rate )
@@ -50,7 +51,8 @@ namespace watermarking
                 , alpha_( alpha )
         {
             step_ = SUBDIVIDE_PLANE;
-            while ( step_by_step && next_step() );
+            if ( !step_by_step )
+            	while ( next_step() );
         }
 
         bool next_step()
@@ -69,8 +71,9 @@ namespace watermarking
                 modify_vertices( subareas_num_, message_, chip_rate_, key_, alpha_ );
                 step_ = STEP_SIZE;
                 return true;
+            default:
+            	return false;
             }
-            return false;
         }
 
 //    private:
@@ -84,7 +87,10 @@ namespace watermarking
                 old_index.insert( std::make_pair( v, i ) );
                 ++i;
             }
-            size_t res = geometry::subdivide_plane( graph_.vertices.begin(), graph_.vertices.end(), max_subarea_size, true, subdivision_, 0 );
+            size_t res = geometry::subdivide_plane( graph_.vertices.begin(), graph_.vertices.end(),
+													max_subarea_size, true, subdivision_, 0 );
+            std::ofstream out( "dump.txt" );
+            util::dump_sequence( subdivision_.begin(), subdivision_.end(), out );
             index_.resize( graph_.vertices.size() );
             for ( i = 0; i != index_.size(); ++i )
             {
@@ -93,7 +99,7 @@ namespace watermarking
             return res;
         }
 
-        void modify_vertices( size_t subareas_num, message_t const & message, int chip_rate, int key, double alpha )
+        void modify_vertices( size_t subareas_num, message_t const & message, size_t chip_rate, int key, double alpha )
         {
             for ( size_t s = 0; s != subareas_num; ++s )
             {
@@ -131,7 +137,7 @@ namespace watermarking
             foreach ( typename graph_t::edge_t const & edge, graph_.edges )
             {
                 size_t begin = index_[edge.first], end = index_[edge.second];
-                if ( subdivision_[begin] == index_[end] )
+                if ( subdivision_[begin] == subdivision_[end] )
                 {
                     trgs_[subdivision_[begin]].insert_constraint( graph_.vertices[begin], graph_.vertices[end] );
                 }
@@ -169,15 +175,18 @@ namespace watermarking
         step_t                              step_;
 
         message_t                           message_;
-        int                                 chip_rate_;
+        size_t                              chip_rate_;
         int                                 key_;
         double                              alpha_;
     };
 
     template< class Point >
-    std::auto_ptr< embedding_impl< Point > > embed( planar_graph< Point > const & graph, message_t const & message )
+    std::auto_ptr< embedding_impl< Point > > embed( planar_graph< Point > const & graph,
+													message_t const & message,
+													bool step_by_step = false )
     {
-        return std::auto_ptr< embedding_impl< Point > >( new embedding_impl< Point >( graph, message, 3, 239, 1.5 ) );
+        return std::auto_ptr< embedding_impl< Point > >(
+        		new embedding_impl< Point >( graph, message, 3, 239, 1.5, step_by_step ) );
     }
 }
 

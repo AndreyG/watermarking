@@ -34,8 +34,8 @@ Stream & read_points( Stream & in, std::vector< Point > & out )
         middle_x += x;
         middle_y += y;
         out.push_back( Point( x, y ) );
-        if ( out.size() == 10000 )
-            break;
+//        if ( out.size() == 10000 )
+//			break;
     }
     middle_x /= out.size();
     middle_y /= out.size();
@@ -48,19 +48,19 @@ Stream & read_points( Stream & in, std::vector< Point > & out )
 
 int main( int argc, char** argv )
 {
-    typedef CGAL::Exact_predicates_inexact_constructions_kernel::Point_2 point_t; 
     assert( argc == 2 );
     std::ifstream in( argv[1] );
     
+    typedef CGAL::Exact_predicates_inexact_constructions_kernel::Point_2 point_t; 
     typedef watermarking::planar_graph< point_t > graph_t;
+
     graph_t graph;
     read_points( in, graph.vertices );
-    std::cout << "vertices num = " << graph.vertices.size() << std::endl;
     
     typedef std::auto_ptr< watermarking::embedding_impl< graph_t::vertex_t > > embedded_watermark_t;
     std::string message_text( "Very long message" );
     watermarking::message_t message( message_text.begin(), message_text.end() );
-    embedded_watermark_t ew = watermarking::embed( graph, message ); 
+    embedded_watermark_t ew = watermarking::embed( graph, message, true );
     
     typedef my_visualizer< embedded_watermark_t::element_type > visualizer_t; 
     visualizer_t v( ew.get() ); 
