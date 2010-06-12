@@ -16,16 +16,17 @@ namespace geometry
         triangulation_graph( Triangulation const & trg, std::map< vertex_t, size_t > & index )
                     : edges_( trg.number_of_vertices() )
         {
+            std::cout << "triangulation_graph::ctor" << std::endl;
             typedef typename Triangulation::Finite_vertices_iterator    vertices_iterator;
             typedef typename Triangulation::Vertex_circulator           vertex_circulator;
             for ( vertices_iterator v = trg.vertices_begin(); v != trg.vertices_end(); ++v )
             {
                 edges_t & edges = edges_[index[v]];
-                vertex_circulator vc = trg.incident_vertices( v ), done( vc );
+                vertex_circulator vc_begin = trg.incident_vertices( v ), vc( vc_begin );
                 do 
                 {
                     edges.push_back( index[vc] );
-                } while ( ++vc != done );
+                } while ( ++vc != vc_begin );
             }
         }
 

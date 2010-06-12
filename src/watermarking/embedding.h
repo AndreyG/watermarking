@@ -97,11 +97,15 @@ namespace watermarking
 
         void modify_vertices( size_t subareas_num, message_t const & message, size_t chip_rate, int key, double alpha )
         {
+            analysers_.resize           ( subareas_num );
+            modified_vertices_.resize   ( subareas_num );
+
             for ( size_t s = 0; s != subareas_num; ++s )
             {
                 std::cout << "embedding message in subarea " << s << std::endl;
                 vertices_t r = coefficients( s );
 
+                std::cout << "midifying coefficients" << std::endl;
                 srand( key );
                 for ( size_t i = 0, k = 0; i != message.size(); ++i )
                 {
@@ -121,9 +125,7 @@ namespace watermarking
         void build_trgs( size_t subareas_num )
         {
             std::cout << "build_triangulations\n";
-            trgs_.resize                ( subareas_num );
-            analysers_.resize           ( subareas_num );
-            modified_vertices_.resize   ( subareas_num );
+            trgs_.resize( subareas_num );
 
             for ( size_t i = 0; i != graph_.vertices.size(); ++i )
             {
@@ -143,8 +145,9 @@ namespace watermarking
 
         vertices_t coefficients( size_t subarea )
         {
+            std::cout << "coefficients" << std::endl;
             trg_t const & trg = trgs_[subarea];
-            vertices_t vertices( trg.number_of_vertices() );
+            vertices_t vertices;
             std::map< trg_t::Vertex_handle, size_t > trg_vertex_to_index;
             size_t i = 0;
             typedef trg_t::Finite_vertices_iterator vertices_iterator;
@@ -154,8 +157,8 @@ namespace watermarking
                 vertices.push_back( v->point() );
                 ++i;
             }
-            analysers_[i].reset( new spectral_analyser< incidence_graph >( incidence_graph( trg, trg_vertex_to_index ) ) );
-            return  analysers_[i]->get_coefficients( vertices );
+            analysers_[subarea].reset( get_spectral_analyser( incidence_graph( trg, trg_vertex_to_index ) ) );
+            return  analysers_[subarea]->get_coefficients( vertices );
         }
 
         typedef geometry::triangulation_graph< DT >                         incidence_graph;

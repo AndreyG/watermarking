@@ -60,7 +60,7 @@ int main( int argc, char** argv )
     typedef std::auto_ptr< watermarking::embedding_impl< graph_t::vertex_t > > embedded_watermark_t;
     std::string message_text( "Very long message" );
     watermarking::message_t message( message_text.begin(), message_text.end() );
-    embedded_watermark_t ew = watermarking::embed( graph, message, true );
+    embedded_watermark_t ew = watermarking::embed( graph, message, false );
     
     typedef my_visualizer< embedded_watermark_t::element_type > visualizer_t; 
     visualizer_t v( ew.get() ); 
