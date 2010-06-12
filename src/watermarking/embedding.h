@@ -11,7 +11,7 @@
 
 namespace watermarking
 {
-    const size_t MAX_PATCH_SIZE = 100;
+    const size_t MAX_PATCH_SIZE = 1000;
 
     template< class Point >
     struct planar_graph
@@ -80,6 +80,7 @@ namespace watermarking
 
         size_t subdivide_plane( size_t max_subarea_size )
         {
+        	std::cout << "subdivide plane" << std::endl;
             std::map< Point, size_t > old_index;
             size_t i = 0;
             foreach ( typename graph_t::vertex_t const & v, graph_.vertices )
@@ -91,11 +92,6 @@ namespace watermarking
 													max_subarea_size, true, subdivision_, 0 );
             std::ofstream out( "dump.txt" );
             util::dump_sequence( subdivision_.begin(), subdivision_.end(), out );
-            index_.resize( graph_.vertices.size() );
-            for ( i = 0; i != index_.size(); ++i )
-            {
-                index_[old_index[graph_.vertices[i]]] = i;
-            }
             return res;
         }
 

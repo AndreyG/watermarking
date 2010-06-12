@@ -37,15 +37,17 @@ namespace geometry
     // [p, q) -- sequence of points
     // max_subarea_size -- maximal number of points in one subarea
     // horizontal -- horizontal or vertical line will be used to sibdivide at this step
+    // returns number of new subareas
     template< class Iter >
-    size_t subdivide_plane( Iter p, Iter q, size_t max_subarea_size, bool horizontal, std::vector< size_t > & index, size_t existing_areas_num )
+    size_t subdivide_plane( Iter p, Iter q, size_t max_subarea_size, bool horizontal,
+							std::vector< size_t > & index, size_t existing_areas_num )
     {
         size_t size = std::distance( p, q );
         if ( size <= max_subarea_size )
         {
             for ( size_t i = 0; i != size; ++i )
                 index.push_back( existing_areas_num );
-            return existing_areas_num + 1;
+            return 1;
         }
         else
         {
@@ -53,8 +55,10 @@ namespace geometry
             typedef point_comparator< point_t > point_comparator;
             point_comparator comp( horizontal ); 
             Iter m = algorithm::median( p, q, comp );
-            existing_areas_num = subdivide_plane( p, m, max_subarea_size, !horizontal, index, existing_areas_num );
-            return subdivide_plane( boost::next( m ), q, max_subarea_size, !horizontal, index, existing_areas_num );
+            size_t tmp = subdivide_plane( 	p, m, max_subarea_size, !horizontal, index,
+											existing_areas_num );
+            return tmp + subdivide_plane( 	m, q, max_subarea_size, !horizontal, index,
+											existing_areas_num + tmp );
         }
     }
 }

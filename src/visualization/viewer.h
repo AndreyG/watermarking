@@ -16,7 +16,6 @@ void* fake_viewer;
 template< class Viewer >
 void display_func()
 {
-	std::cout << "visualization::details::display_func\n";
 	( (Viewer *) fake_viewer )->render();
 }
 
@@ -27,7 +26,6 @@ double center_x = 0, center_y = 0;
 
 void change_size( GLsizei screen_w, GLsizei screen_h )
 {
-	std::cout << "visualization::details::change_size\n";
 	if ( screen_h == 0 )
 		screen_h = 1;
 	glViewport( 0, 0, screen_w, screen_h );
@@ -55,7 +53,6 @@ void change_zoom( bool inc )
 	{
 		zoom /= 0.9;
 	}
-	std::cout << "zoom = " << zoom << std::endl;
 	int screen_width  = glutGet( GLUT_WINDOW_WIDTH  );
 	int screen_height = glutGet( GLUT_WINDOW_HEIGHT );
 	change_size( screen_width, screen_height );
@@ -91,7 +88,7 @@ void keyboard_special_func( int key, int x, int y )
 	case GLUT_KEY_UP:
 		center_y += (zoom * height) / 10;
 		break;
-	case GLUTLKEY_DOWN:
+	case GLUT_KEY_DOWN:
 		center_y -= (zoom * height) / 10;
 		break;
 	default:
@@ -181,8 +178,6 @@ private:
 
 		void render()
 		{
-			std::cout << "simple_device_context::render, points_num = " << points_.size() <<"\tlines_num = " << lines_.size() << std::endl;
-			std::cout << "events_num = " << color_events_.size() << std::endl;
 			glClear( GL_COLOR_BUFFER_BIT );
 			glColor3f( 1.0f, 1.0f, 1.0f );
 			if ( color_events_.empty() )
