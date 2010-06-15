@@ -1,13 +1,27 @@
 #ifndef _TRIANGULATION_GRAPH_H_
 #define _TRIANGULATION_GRAPH_H_
 
+namespace graph
+{
+    struct edge_t
+    {
+        double weight;
+        size_t end;
+
+        edge_t( size_t e, double w )
+            : end( e )
+            , weight( w )
+        {}
+    };
+}
+
 namespace geometry
 {
     template< class Triangulation >
     struct triangulation_graph
     {
     private:
-        typedef std::vector< size_t >                   edges_t;
+        typedef std::vector< graph::edge_t >            edges_t;
         typedef typename Triangulation::Vertex_handle   vertex_t;
             
     public:
@@ -16,7 +30,6 @@ namespace geometry
         triangulation_graph( Triangulation const & trg, std::map< vertex_t, size_t > & index )
                     : edges_( trg.number_of_vertices() )
         {
-            std::cout << "triangulation_graph::ctor" << std::endl;
             typedef typename Triangulation::Finite_vertices_iterator    vertices_iterator;
             typedef typename Triangulation::Vertex_circulator           vertex_circulator;
             for ( vertices_iterator v = trg.vertices_begin(); v != trg.vertices_end(); ++v )
@@ -25,7 +38,7 @@ namespace geometry
                 vertex_circulator vc_begin = trg.incident_vertices( v ), vc( vc_begin );
                 do 
                 {
-                    edges.push_back( index[vc] );
+                    edges.push_back( graph::edge_t( index[vc], 1 ) );
                 } while ( ++vc != vc_begin );
             }
         }

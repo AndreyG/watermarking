@@ -5,6 +5,10 @@
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
 
+#include <boost/lexical_cast.hpp>
+
+using boost::lexical_cast;
+
 #include "spectral_analysis.h"
 #include "../geometry/plane_subdivision.h"
 #include "../geometry/triangulation_graph.h"
@@ -62,6 +66,7 @@ namespace watermarking
             case SUBDIVIDE_PLANE:
                 subareas_num_ = subdivide_plane( MAX_PATCH_SIZE );
                 step_ = BUILD_TRIANGULATIONS;
+                std::cout << "number of subareas " << subareas_num_ << std::endl;
                 return true;
             case BUILD_TRIANGULATIONS:
                 build_trgs( subareas_num_ );
@@ -80,7 +85,7 @@ namespace watermarking
 
         size_t subdivide_plane( size_t max_subarea_size )
         {
-        	std::cout << "subdivide plane" << std::endl;
+            util::stopwatch _( "subidivide plane" );
             std::map< Point, size_t > old_index;
             size_t i = 0;
             foreach ( typename graph_t::vertex_t const & v, graph_.vertices )
@@ -90,8 +95,6 @@ namespace watermarking
             }
             size_t res = geometry::subdivide_plane( graph_.vertices.begin(), graph_.vertices.end(),
 													max_subarea_size, true, subdivision_, 0 );
-            std::ofstream out( "dump.txt" );
-            util::dump_sequence( subdivision_.begin(), subdivision_.end(), out );
             return res;
         }
 
@@ -102,11 +105,12 @@ namespace watermarking
 
             for ( size_t s = 0; s != subareas_num; ++s )
             {
-                std::cout << "embedding message in subarea " << s << std::endl;
+                util::stopwatch _( ( std::string("embedding message in subarea ") + lexical_cast< std::string >( s ) ).c_str() );
                 vertices_t r = coefficients( s );
 
-                std::cout << "midifying coefficients" << std::endl;
+                /*
                 srand( key );
+                assert( chip_rate * message.size() <= r.size() );
                 for ( size_t i = 0, k = 0; i != message.size(); ++i )
                 {
                     for ( size_t j = 0; j != chip_rate; ++j, ++k )
@@ -117,6 +121,7 @@ namespace watermarking
                                         r[k].y() + b * p * alpha );
                     }
                 }
+                */
 
                 modified_vertices_[s] = analysers_[s]->get_vertices( r );
             }
@@ -124,7 +129,7 @@ namespace watermarking
 
         void build_trgs( size_t subareas_num )
         {
-            std::cout << "build_triangulations\n";
+            util::stopwatch _( "build_triangulations" );
             trgs_.resize( subareas_num );
 
             for ( size_t i = 0; i != graph_.vertices.size(); ++i )
@@ -145,7 +150,6 @@ namespace watermarking
 
         vertices_t coefficients( size_t subarea )
         {
-            std::cout << "coefficients" << std::endl;
             trg_t const & trg = trgs_[subarea];
             vertices_t vertices;
             std::map< trg_t::Vertex_handle, size_t > trg_vertex_to_index;
@@ -157,12 +161,12 @@ namespace watermarking
                 vertices.push_back( v->point() );
                 ++i;
             }
-            analysers_[subarea].reset( get_spectral_analyser( incidence_graph( trg, trg_vertex_to_index ) ) );
+            analysers_[subarea].reset( new spectral_analyser( incidence_graph( trg, trg_vertex_to_index ) ) );
             return  analysers_[subarea]->get_coefficients( vertices );
         }
 
-        typedef geometry::triangulation_graph< DT >                         incidence_graph;
-        typedef boost::shared_ptr< spectral_analyser< incidence_graph > >   analyser_ptr;
+        typedef geometry::triangulation_graph< DT >        incidence_graph;
+        typedef boost::shared_ptr< spectral_analyser >   analyser_ptr;
 
         size_t                              subareas_num_;
         std::vector< size_t >               index_;

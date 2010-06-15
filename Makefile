@@ -7,8 +7,8 @@ all : compile
 clean : 
 	rm -f main
 
-run : main
-	main
+run : viewer
+	./viewer input/test.txt
 
 compile : src/main.cpp
-	$(CC) -o viewer $< $(LIBS)
+	$(CC) -O3 -o viewer $< $(LIBS)

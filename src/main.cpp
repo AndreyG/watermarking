@@ -15,7 +15,8 @@
 #define foreach BOOST_FOREACH
 
 #include "utility/dump.h"
-#include "algorithms/median.h"
+#include "utility/stopwatch.h"
+
 #include "watermarking/embedding.h"
 #include "visualization/my_visualizer.h"
 
@@ -34,8 +35,8 @@ Stream & read_points( Stream & in, std::vector< Point > & out )
         middle_x += x;
         middle_y += y;
         out.push_back( Point( x, y ) );
-//        if ( out.size() == 10000 )
-//			break;
+        if ( out.size() == 100000 )
+			break;
     }
     middle_x /= out.size();
     middle_y /= out.size();

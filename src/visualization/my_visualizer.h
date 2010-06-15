@@ -17,7 +17,7 @@ struct my_visualizer
 {
 	enum DRAW
 	{
-		VERTICES, EDGES, SPLIT_LINES, SUBAREA_VERTICES, DRAW_SIZE
+		VERTICES, EDGES, SPLIT_LINES, SUBAREA_VERTICES, MODIFIED_VERTICES, DRAW_SIZE
 	};
 
 	my_visualizer( Data * data )
@@ -29,6 +29,7 @@ struct my_visualizer
 		key2draw_['v'] = VERTICES;
 		key2draw_['s'] = SPLIT_LINES;
 		key2draw_['p'] = SUBAREA_VERTICES;
+        key2draw_['m'] = MODIFIED_VERTICES;
 
 		current_subarea_ = -1;
 	}
@@ -45,6 +46,13 @@ struct my_visualizer
 			dc.set_color( 0, 1, 0 );
 			foreach ( typename vertices_t::value_type const & v, vertices )
 				draw_vertex( dc, v, 2 );
+		}
+		if ( draw_[MODIFIED_VERTICES] )
+		{
+			dc.set_color( 0.7, 0.7, 0 );
+            foreach ( vertices_t const & vertices, data_.modified_vertices_ )
+			    foreach ( typename vertices_t::value_type const & v, vertices )
+				    draw_vertex( dc, v, 2 );
 		}
 		if ( draw_[SUBAREA_VERTICES] )
 		{
