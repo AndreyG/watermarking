@@ -26,7 +26,7 @@ namespace watermarking
         typedef std::vector< edge_t >       edges_t;
 
         vertices_t   vertices;
-        edges_t     edges;
+        edges_t      edges;
     };
 
     typedef std::vector< int > message_t;
@@ -108,7 +108,6 @@ namespace watermarking
                 util::stopwatch _( ( std::string("embedding message in subarea ") + lexical_cast< std::string >( s ) ).c_str() );
                 vertices_t r = coefficients( s );
 
-                /*
                 srand( key );
                 assert( chip_rate * message.size() <= r.size() );
                 for ( size_t i = 0, k = 0; i != message.size(); ++i )
@@ -121,7 +120,6 @@ namespace watermarking
                                         r[k].y() + b * p * alpha );
                     }
                 }
-                */
 
                 modified_vertices_[s] = analysers_[s]->get_vertices( r );
             }
@@ -188,8 +186,9 @@ namespace watermarking
 													message_t const & message,
 													bool step_by_step = false )
     {
+        util::stopwatch _("embed watermarking");
         return std::auto_ptr< embedding_impl< Point > >(
-        		new embedding_impl< Point >( graph, message, 3, 239, 1.5, step_by_step ) );
+        		new embedding_impl< Point >( graph, message, 3, 239, 0.5, step_by_step ) );
     }
 }
 

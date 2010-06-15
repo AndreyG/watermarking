@@ -43,6 +43,23 @@ void change_size( GLsizei screen_w, GLsizei screen_h )
 	glLoadIdentity();
 }
 
+void mouse_motion( int x, int y )
+{
+    GLdouble modelview[16];
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+    GLdouble projection[16];
+    glGetDoublev( GL_PROJECTION_MATRIX, projection );
+    GLint viewport[4];
+    glGetIntegerv( GL_VIEWPORT, viewport );
+    GLdouble real_x, real_y, real_z;
+    gluUnProject( x, y, 0, modelview, projection, viewport, 
+                    &real_x, &real_y, &real_z );  
+
+    std::stringstream ss;
+    ss << "(" << real_x << ", " << real_y << ')';
+    std::cout << ss.str().c_str() << std::endl;
+}
+
 void change_zoom( bool inc )
 {
 	if ( inc )
@@ -113,7 +130,7 @@ struct viewer
 	typedef viewer< Controller > self_t;
 
 	viewer( Controller * controller, const char * name, int* argcp, char** argv )
-	: controller_( *controller )
+	    : controller_( *controller )
 	{
 		glutInit( argcp, argv );
 		glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA );
@@ -125,6 +142,7 @@ struct viewer
 		glutSpecialFunc( &details::keyboard_special_func );
 		glutReshapeFunc( &details::change_size );
 		glutMouseWheelFunc( &details::mouse_wheel );
+        glutPassiveMotionFunc( &details::mouse_motion );
 
 		glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 		glutMainLoop();

@@ -45,6 +45,7 @@ namespace watermarking
                 LaVectorDouble e(N);
                 for ( size_t j = 0; j != N; ++j)
                     e(j) = eigen_vectors(j, i);
+                assert( abs( Blas_Norm2( e ) - 1.0 ) < 1e-5 );
                 coefficients[i] = point_t(  Blas_Dot_Prod( x, e ),
                                             Blas_Dot_Prod( y, e ) );
             }
@@ -60,11 +61,10 @@ namespace watermarking
         {
             util::stopwatch _("calculating eigenvectors");
             const size_t N = graph.vertices_num();
-            LaSpdMatDouble A(N, N);
-            fill_adjacency_matrix( graph, A );
+            fill_adjacency_matrix( graph, e_ );
 
-            LaVectorDouble lambda_real(N), lambda_imag(N);
-            LaEigSolve( A, lambda_real, lambda_imag, e_ );
+            LaVectorDouble lambda(N);
+            LaEigSolveSymmetricVecIP( e_, lambda );
         }
 
         template< class Points >

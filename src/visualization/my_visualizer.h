@@ -17,7 +17,7 @@ struct my_visualizer
 {
 	enum DRAW
 	{
-		VERTICES, EDGES, SPLIT_LINES, SUBAREA_VERTICES, MODIFIED_VERTICES, DRAW_SIZE
+		VERTICES, EDGES, TRIANGULATION, SPLIT_LINES, SUBAREA_VERTICES, MODIFIED_VERTICES, DRAW_SIZE
 	};
 
 	my_visualizer( Data * data )
@@ -30,6 +30,7 @@ struct my_visualizer
 		key2draw_['s'] = SPLIT_LINES;
 		key2draw_['p'] = SUBAREA_VERTICES;
         key2draw_['m'] = MODIFIED_VERTICES;
+        key2draw_['t'] = TRIANGULATION;
 
 		current_subarea_ = -1;
 	}
@@ -74,10 +75,21 @@ struct my_visualizer
 			    draw_vertex( dc, *p, 4 );
 			}
 		}
-		if ( draw_[EDGES] )
+        if ( draw_[EDGES] )
+        {
+            dc.set_color( 0, 1, 0 );
+            typedef typename Data::graph_t::edge_t edge_t; 
+            foreach ( edge_t const & e, data_.graph_.edges )
+            {
+                typename Data::graph_t::vertex_t const & v1 = vertices[e.first];
+                typename Data::graph_t::vertex_t const & v2 = vertices[e.second];
+                dc.draw_line( v1.x(), v1.y(), v2.x(), v2.y() );
+            }
+        }
+		if ( draw_[TRIANGULATION] )
 		{
 			dc.set_color( 1, 0, 0 );
-			draw_edges( dc );
+			draw_triangulation( dc );
 		}
 		if ( draw_[SPLIT_LINES] )
 		{
@@ -109,7 +121,7 @@ struct my_visualizer
 	}
 
 private:
-	void draw_edges( device_context & dc ) const
+	void draw_triangulation( device_context & dc ) const
 	{
 		typedef typename Data::trg_t trg_t;
 		typedef typename trg_t::Finite_vertices_iterator vertices_iterator;
