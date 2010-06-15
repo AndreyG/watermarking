@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/scoped_array.hpp>
 
 #define foreach BOOST_FOREACH
 
