@@ -43,16 +43,11 @@ namespace watermarking
 
         enum step_t
         {
-            SUBDIVIDE_PLANE, BUILD_TRIANGULATIONS, MODIFY_VERTICES, STEP_SIZE
+            SUBDIVIDE_PLANE, BUILD_TRIANGULATIONS, FACTORIZE, STEP_SIZE
         };
         
-        embedding_impl( graph_t const & graph, message_t const & message,
-						size_t chip_rate, int key, double alpha, bool step_by_step )
+        embedding_impl( graph_t const & graph, bool step_by_step )
                 : graph_( graph )
-                , message_( message )
-                , chip_rate_( chip_rate )
-                , key_( key )
-                , alpha_( alpha )
         {
             step_ = SUBDIVIDE_PLANE;
             if ( !step_by_step )
@@ -70,10 +65,10 @@ namespace watermarking
                 return true;
             case BUILD_TRIANGULATIONS:
                 build_trgs( subareas_num_ );
-                step_ = MODIFY_VERTICES;
+                step_ = FACTORIZE;
                 return true;
-            case MODIFY_VERTICES:
-                modify_vertices( subareas_num_, message_, chip_rate_, key_, alpha_ );
+            case FACTORIZE:
+                factorize( subareas_num_ );
                 step_ = STEP_SIZE;
                 return true;
             default:
@@ -110,14 +105,25 @@ namespace watermarking
             return res;
         }
 
-        void modify_vertices( size_t subareas_num, message_t const & message, size_t chip_rate, int key, double alpha )
+        void factorize( size_t subareas_num )
         {
-            analysers_.resize           ( subareas_num );
-
+            analysers_.resize( subareas_num );
+            coefficients_.resize( subareas_num );
             for ( size_t s = 0; s != subareas_num; ++s )
             {
+                util::stopwatch _( ( std::string("factorize coordinate vectors in subarea ") + lexical_cast< std::string >( s ) ).c_str() );
+                coefficients_[s] = coefficients( s );
+            }
+        }
+
+        void modify_vertices( message_t const & message, size_t chip_rate, int key, double alpha )
+        {
+            modified_vertices_.clear();
+
+            for ( size_t s = 0; s != subareas_num_; ++s )
+            {
                 util::stopwatch _( ( std::string("embedding message in subarea ") + lexical_cast< std::string >( s ) ).c_str() );
-                vertices_t r = coefficients( s );
+                vertices_t r = coefficients_[s];
 
                 srand( key );
                 assert( chip_rate * message.size() <= r.size() );
@@ -185,25 +191,16 @@ namespace watermarking
         std::vector< size_t >               subdivision_;
         vertices_t                          modified_vertices_;
         std::vector< analyser_ptr >         analysers_;
+        std::vector< vertices_t >           coefficients_;
         step_t                              step_;
-
-        message_t                           message_;
-        size_t                              chip_rate_;
-        int                                 key_;
-        double                              alpha_;
     };
 
     template< class Point >
     std::auto_ptr< embedding_impl< Point > > embed( planar_graph< Point > const & graph,
-													message_t const & message,
-                                                    size_t chip_rate,
-                                                    int key,
-                                                    double alpha,
 													bool step_by_step = false )
     {
-        util::stopwatch _("embed watermarking");
-        return std::auto_ptr< embedding_impl< Point > >(
-        		new embedding_impl< Point >( graph, message, chip_rate, key, alpha, step_by_step ) );
+        util::stopwatch _("watermarking generator creation");
+        return std::auto_ptr< embedding_impl< Point > >( new embedding_impl< Point >( graph, step_by_step ) );
     }
 }
 

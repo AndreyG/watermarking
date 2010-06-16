@@ -116,7 +116,7 @@ void fix_graph( Graph & g )
 
 int main( int argc, char** argv )
 {
-    assert( argc == 2 );
+    assert( argc == 3 );
     std::ifstream in( argv[1] );
     
     typedef CGAL::Exact_predicates_inexact_constructions_kernel::Point_2 point_t; 
@@ -126,31 +126,9 @@ int main( int argc, char** argv )
     read_graph( graph, in );
     fix_graph( graph );
     
-    size_t chip_rate;
-    int key;
-    double alpha;
-    bool step_by_step;
-
-    std::ifstream conf( "config.txt" );
-    char buffer[1024];
-    conf.getline( buffer, 1024 );
-    std::string message_text( buffer );
-    conf >> chip_rate >> key >> alpha >> step_by_step;
-    std::cout << message_text << std::endl << chip_rate << std::endl << key << std::endl << alpha << std::endl << step_by_step << std::endl;
-
-    watermarking::message_t message( message_text.size() * 7 );
-    for ( size_t i = 0; i != message_text.size(); ++i )
-    {
-        unsigned char c = message_text[i];
-        for ( size_t j = 0; j != 7; ++j )
-        {
-            message[i * 7 + j] = c % 2;
-            c /= 2;
-        }
-    }
-
     typedef std::auto_ptr< watermarking::embedding_impl< graph_t::vertex_t > > embedded_watermark_t;
-    embedded_watermark_t ew = watermarking::embed( graph, message, chip_rate, key, alpha, step_by_step );
+    bool step_by_step = std::string( argv[2] ) == std::string( "yes" );
+    embedded_watermark_t ew = watermarking::embed( graph, step_by_step );
     
     typedef my_visualizer< embedded_watermark_t::element_type > visualizer_t; 
     visualizer_t v( ew.get() ); 

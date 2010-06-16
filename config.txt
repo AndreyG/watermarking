@@ -2,4 +2,3 @@ Very long message
 3
 239
 0.5
-0

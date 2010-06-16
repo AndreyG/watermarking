@@ -115,6 +115,32 @@ public:
 			if ( current_subarea_ == data_.graph_.vertices.size() )
 				current_subarea_ = -1;
 			return true;
+        case 'r':
+            {
+                size_t chip_rate;
+                int key;
+                double alpha;
+
+                std::ifstream conf( "config.txt" );
+                char buffer[1024];
+                conf.getline( buffer, 1024 );
+                std::string message_text( buffer );
+    
+                watermarking::message_t message( message_text.size() * 7 );
+                for ( size_t i = 0; i != message_text.size(); ++i )
+                {
+                    unsigned char c = message_text[i];
+                    for ( size_t j = 0; j != 7; ++j )
+                    {
+                        message[i * 7 + j] = c % 2;
+                        c /= 2;
+                    }
+                }
+    
+                conf >> chip_rate >> key >> alpha;
+
+                data_.modify_vertices( message, chip_rate, key, alpha );
+            }
 		}
 		std::map< unsigned char, size_t >::const_iterator it = key2draw_.find( key );
 		if ( it != key2draw_.end() )

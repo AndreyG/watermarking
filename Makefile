@@ -8,7 +8,7 @@ clean :
 	rm -f main
 
 run : viewer
-	./viewer input/formatted-test.txt
+	./viewer input/formatted-test.txt yes
 
 compile : src/main.cpp
 	$(CC) -O3 -I /usr/local/include/lapackpp -o viewer $< $(LIBS)
