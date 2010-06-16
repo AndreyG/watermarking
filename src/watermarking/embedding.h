@@ -93,15 +93,26 @@ namespace watermarking
                 old_index.insert( std::make_pair( v, i ) );
                 ++i;
             }
+
             size_t res = geometry::subdivide_plane( graph_.vertices.begin(), graph_.vertices.end(),
 													max_subarea_size, true, subdivision_, 0 );
+            std::vector< size_t > old2new( graph_.vertices.size() );
+            for ( size_t i = 0; i != old2new.size(); ++i )
+            {
+                old2new[old_index[graph_.vertices[i]]] = i;
+            }
+            typedef typename graph_t::edge_t edge_t; 
+            foreach( edge_t & e, graph_.edges )
+            {
+                e.first = old2new[e.first];
+                e.second = old2new[e.second];
+            }
             return res;
         }
 
         void modify_vertices( size_t subareas_num, message_t const & message, size_t chip_rate, int key, double alpha )
         {
             analysers_.resize           ( subareas_num );
-            modified_vertices_.resize   ( subareas_num );
 
             for ( size_t s = 0; s != subareas_num; ++s )
             {
@@ -121,7 +132,8 @@ namespace watermarking
                     }
                 }
 
-                modified_vertices_[s] = analysers_[s]->get_vertices( r );
+                vertices_t new_vertices = analysers_[s]->get_vertices( r );
+                std::copy( new_vertices.begin(), new_vertices.end(), std::back_inserter( modified_vertices_ ) ); 
             }
         }
 
@@ -171,7 +183,7 @@ namespace watermarking
         graph_t                             graph_;
         std::vector< trg_t >                trgs_;
         std::vector< size_t >               subdivision_;
-        std::vector< vertices_t >           modified_vertices_;
+        vertices_t                          modified_vertices_;
         std::vector< analyser_ptr >         analysers_;
         step_t                              step_;
 
@@ -184,11 +196,14 @@ namespace watermarking
     template< class Point >
     std::auto_ptr< embedding_impl< Point > > embed( planar_graph< Point > const & graph,
 													message_t const & message,
+                                                    size_t chip_rate,
+                                                    int key,
+                                                    double alpha,
 													bool step_by_step = false )
     {
         util::stopwatch _("embed watermarking");
         return std::auto_ptr< embedding_impl< Point > >(
-        		new embedding_impl< Point >( graph, message, 3, 239, 0.5, step_by_step ) );
+        		new embedding_impl< Point >( graph, message, chip_rate, key, alpha, step_by_step ) );
     }
 }
 

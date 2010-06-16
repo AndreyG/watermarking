@@ -15,11 +15,17 @@ namespace
 template< class Data >
 struct my_visualizer
 {
+private:
+	typedef typename Data::graph_t::vertices_t  vertices_t;
+    typedef typename Data::graph_t::edges_t     edges_t;
+
 	enum DRAW
 	{
-		VERTICES, EDGES, TRIANGULATION, SPLIT_LINES, SUBAREA_VERTICES, MODIFIED_VERTICES, DRAW_SIZE
+		VERTICES, EDGES, TRIANGULATION, SPLIT_LINES, SUBAREA_VERTICES, 
+        MODIFIED_VERTICES, MODIFIED_EDGES, DRAW_SIZE
 	};
 
+public:
 	my_visualizer( Data * data )
 			: data_( *data )
 	{
@@ -30,6 +36,7 @@ struct my_visualizer
 		key2draw_['s'] = SPLIT_LINES;
 		key2draw_['p'] = SUBAREA_VERTICES;
         key2draw_['m'] = MODIFIED_VERTICES;
+        key2draw_['o'] = MODIFIED_EDGES;
         key2draw_['t'] = TRIANGULATION;
 
 		current_subarea_ = -1;
@@ -51,9 +58,8 @@ struct my_visualizer
 		if ( draw_[MODIFIED_VERTICES] )
 		{
 			dc.set_color( 0.7, 0.7, 0 );
-            foreach ( vertices_t const & vertices, data_.modified_vertices_ )
-			    foreach ( typename vertices_t::value_type const & v, vertices )
-				    draw_vertex( dc, v, 2 );
+			foreach ( typename vertices_t::value_type const & v, data_.modified_vertices_ )
+				draw_vertex( dc, v, 2 );
 		}
 		if ( draw_[SUBAREA_VERTICES] )
 		{
@@ -78,13 +84,12 @@ struct my_visualizer
         if ( draw_[EDGES] )
         {
             dc.set_color( 0, 1, 0 );
-            typedef typename Data::graph_t::edge_t edge_t; 
-            foreach ( edge_t const & e, data_.graph_.edges )
-            {
-                typename Data::graph_t::vertex_t const & v1 = vertices[e.first];
-                typename Data::graph_t::vertex_t const & v2 = vertices[e.second];
-                dc.draw_line( v1.x(), v1.y(), v2.x(), v2.y() );
-            }
+            draw_edges( dc, vertices, data_.graph_.edges );
+        }
+        if ( draw_[MODIFIED_EDGES] )
+        {
+            dc.set_color( 0.7, 0.7, 0 );
+            draw_edges( dc, data_.modified_vertices_, data_.graph_.edges );
         }
 		if ( draw_[TRIANGULATION] )
 		{
@@ -142,6 +147,15 @@ private:
 		}
 	}
 
+    void draw_edges( device_context & dc, vertices_t const & vertices, edges_t const & edges ) const
+    {
+        foreach ( typename edges_t::value_type const & e, edges )
+        {
+            dc.draw_line(   vertices[e.first].x(), vertices[e.first].y(), 
+                            vertices[e.second].x(), vertices[e.second].y() );
+        }
+    }
+
     template< class Iter >
     void draw_split_lines( device_context & dc, Iter p, Iter q ) const
     {
@@ -183,7 +197,6 @@ private:
 	}
 
 private:
-	typedef typename Data::graph_t::vertices_t vertices_t;
 
 	Data & data_;
 

@@ -126,8 +126,18 @@ int main( int argc, char** argv )
     read_graph( graph, in );
     fix_graph( graph );
     
-    typedef std::auto_ptr< watermarking::embedding_impl< graph_t::vertex_t > > embedded_watermark_t;
-    std::string message_text( "Very long message" );
+    size_t chip_rate;
+    int key;
+    double alpha;
+    bool step_by_step;
+
+    std::ifstream conf( "config.txt" );
+    char buffer[1024];
+    conf.getline( buffer, 1024 );
+    std::string message_text( buffer );
+    conf >> chip_rate >> key >> alpha >> step_by_step;
+    std::cout << message_text << std::endl << chip_rate << std::endl << key << std::endl << alpha << std::endl << step_by_step << std::endl;
+
     watermarking::message_t message( message_text.size() * 7 );
     for ( size_t i = 0; i != message_text.size(); ++i )
     {
@@ -138,7 +148,9 @@ int main( int argc, char** argv )
             c /= 2;
         }
     }
-    embedded_watermark_t ew = watermarking::embed( graph, message, true );
+
+    typedef std::auto_ptr< watermarking::embedding_impl< graph_t::vertex_t > > embedded_watermark_t;
+    embedded_watermark_t ew = watermarking::embed( graph, message, chip_rate, key, alpha, step_by_step );
     
     typedef my_visualizer< embedded_watermark_t::element_type > visualizer_t; 
     visualizer_t v( ew.get() ); 
