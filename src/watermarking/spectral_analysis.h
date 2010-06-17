@@ -18,11 +18,17 @@ namespace watermarking
             {
                 for ( size_t u = 0; u != N; ++u )
                     a(v, u) = 0;
-                a(v, v) = 1;
-                double d = graph.degree( v );
+                a(v, v) = graph.degree( v );
                 for ( typename Graph::edges_iterator e = graph.edges_begin( v ); e != graph.edges_end( v ); ++e )
-                    a(v, e->end) = -e->weight / d;
+                    a(v, e->end) = -e->weight;
             }
+            for ( size_t v = 0; v + 1 != N; ++v )
+            {
+                for ( size_t u = v + 1; u != N; ++u )
+                    assert( a(v, u) == a(u, v) );
+            }
+            std::ofstream out("tmp.txt");
+            out << a;
         }
 
         template< class Points, class Matrix >

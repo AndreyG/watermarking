@@ -7,14 +7,16 @@
 #include <boost/utility.hpp>
 #include <assert.h>
 #include <boost/bind.hpp>
-#include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/optional.hpp>
 
+#include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
+
+#include <boost/program_options.hpp>
 
 #include "utility/dump.h"
 #include "utility/stopwatch.h"
@@ -115,10 +117,30 @@ void fix_graph( Graph & g )
     g.edges.swap( new_edges );
 }
 
+boost::program_options::variables_map read_params()
+{
+    namespace po = boost::program_options;
+
+    std::ifstream conf("common.conf");
+    po::options_description desc;
+    desc.add_options()
+        ( "step-by-step", po::value<bool>() )
+        ( "weighted",     po::value<bool>() )
+        ( "use-edges",    po::value<bool>() )
+        ( "input-data",   po::value<std::string>() )
+    ;
+    
+    po::variables_map vm;       
+    po::store(po::parse_config_file(conf, desc), vm);
+
+    return vm;
+}
+
 int main( int argc, char** argv )
 {
-    assert( argc == 3 );
-    std::ifstream in( argv[1] );
+    boost::program_options::variables_map params = read_params();
+
+    std::ifstream in( params["input-data"].as< std::string >().c_str() );
     
     typedef CGAL::Exact_predicates_inexact_constructions_kernel::Point_2 point_t; 
     typedef watermarking::planar_graph< point_t > graph_t;
@@ -129,7 +151,9 @@ int main( int argc, char** argv )
     
     typedef std::auto_ptr< watermarking::embedding_impl< graph_t::vertex_t > > embedded_watermark_t;
     bool step_by_step = std::string( argv[2] ) == std::string( "yes" );
-    embedded_watermark_t ew = watermarking::embed( graph, step_by_step );
+    embedded_watermark_t ew = watermarking::embed( graph,   params["step-by-step"].as< bool >(),
+                                                            params["weighted"].as< bool >(),
+                                                            params["use-edges"].as< bool >() );
     
     typedef my_visualizer< embedded_watermark_t::element_type > visualizer_t; 
     visualizer_t v( ew.get() ); 

@@ -36,9 +36,8 @@ namespace watermarking
     {
         typedef planar_graph< Point > graph_t;
         typedef CGAL::Exact_predicates_inexact_constructions_kernel     Kernel;
-        typedef CGAL::Delaunay_triangulation_2< Kernel >                DT;
         typedef CGAL::Constrained_Delaunay_triangulation_2< Kernel >    CDT;
-        typedef DT                                                      trg_t;
+        typedef CDT                                                     trg_t;
         typedef typename graph_t::vertices_t                            vertices_t;
 
         enum step_t
@@ -46,8 +45,10 @@ namespace watermarking
             SUBDIVIDE_PLANE, BUILD_TRIANGULATIONS, FACTORIZE, STEP_SIZE
         };
         
-        embedding_impl( graph_t const & graph, bool step_by_step )
+        embedding_impl( graph_t const & graph, bool weighted, bool use_edges, bool step_by_step )
                 : graph_( graph )
+                , weighted_( weighted )
+                , use_edges_( use_edges )
         {
             step_ = SUBDIVIDE_PLANE;
             if ( !step_by_step )
@@ -154,16 +155,17 @@ namespace watermarking
             {
                 trgs_[subdivision_[i]].insert( graph_.vertices[i] );
             }
-            /*
-            foreach ( typename graph_t::edge_t const & edge, graph_.edges )
+            if ( use_edges_ )
             {
-                size_t begin = index_[edge.first], end = index_[edge.second];
-                if ( subdivision_[begin] == subdivision_[end] )
+                foreach ( typename graph_t::edge_t const & edge, graph_.edges )
                 {
-                    trgs_[subdivision_[begin]].insert_constraint( graph_.vertices[begin], graph_.vertices[end] );
+                    size_t begin = index_[edge.first], end = index_[edge.second];
+                    if ( subdivision_[begin] == subdivision_[end] )
+                    {
+                        trgs_[subdivision_[begin]].insert_constraint( graph_.vertices[begin], graph_.vertices[end] );
+                    }
                 }
-            }
-            */
+            }            
         }
 
         vertices_t coefficients( size_t subarea )
@@ -173,18 +175,19 @@ namespace watermarking
             std::map< trg_t::Vertex_handle, size_t > trg_vertex_to_index;
             size_t i = 0;
             typedef trg_t::Finite_vertices_iterator vertices_iterator;
-            for ( vertices_iterator v = trg.vertices_begin(); v != trg.vertices_end(); ++v )
+            for ( vertices_iterator v = trg.finite_vertices_begin(); v != trg.finite_vertices_end(); ++v )
             {
                 trg_vertex_to_index.insert( std::make_pair( v, i ) );
                 vertices.push_back( v->point() );
                 ++i;
             }
-            analysers_[subarea].reset( new spectral_analyser( incidence_graph( trg, trg_vertex_to_index ) ) );
+            analysers_[subarea].reset( new spectral_analyser( incidence_graph( trg, trg_vertex_to_index, weighted_ ) ) );
             return  analysers_[subarea]->get_coefficients( vertices );
         }
 
-        typedef geometry::triangulation_weighted_graph< DT >        incidence_graph;
-        typedef boost::shared_ptr< spectral_analyser >   analyser_ptr;
+        typedef geometry::triangulation_graph< trg_t >       incidence_graph;
+        typedef boost::shared_ptr< spectral_analyser >      analyser_ptr;
+
 
         size_t                              subareas_num_;
         std::vector< size_t >               index_;
@@ -195,14 +198,17 @@ namespace watermarking
         std::vector< analyser_ptr >         analysers_;
         std::vector< vertices_t >           coefficients_;
         step_t                              step_;
+
+        bool                                weighted_;
+        bool                                use_edges_;
     };
 
     template< class Point >
-    std::auto_ptr< embedding_impl< Point > > embed( planar_graph< Point > const & graph,
+    std::auto_ptr< embedding_impl< Point > > embed( planar_graph< Point > const & graph, bool weighted, bool use_edges, 
 													bool step_by_step = false )
     {
         util::stopwatch _("watermarking generator creation");
-        return std::auto_ptr< embedding_impl< Point > >( new embedding_impl< Point >( graph, step_by_step ) );
+        return std::auto_ptr< embedding_impl< Point > >( new embedding_impl< Point >( graph, step_by_step, weighted, use_edges ) );
     }
 }
 
