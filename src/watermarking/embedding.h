@@ -42,7 +42,7 @@ namespace watermarking
 
         enum step_t
         {
-            SUBDIVIDE_PLANE, BUILD_TRIANGULATIONS, FACTORIZE, STEP_SIZE
+            SUBDIVIDE_PLANE, BUILD_TRIANGULATIONS, FACTORIZE, MODIFY_VERTICES, STEP_SIZE
         };
         
         embedding_impl( graph_t const & graph, bool weighted, bool use_edges, bool step_by_step )
@@ -70,7 +70,7 @@ namespace watermarking
                 return true;
             case FACTORIZE:
                 factorize( subareas_num_ );
-                step_ = STEP_SIZE;
+                step_ = MODIFY_VERTICES;
                 return true;
             default:
             	return false;
@@ -106,6 +106,28 @@ namespace watermarking
             return res;
         }
 
+        void build_trgs( size_t subareas_num )
+        {
+            util::stopwatch _( "build_triangulations" );
+            trgs_.resize( subareas_num );
+
+            for ( size_t i = 0; i != graph_.vertices.size(); ++i )
+            {
+                trgs_[subdivision_[i]].insert( graph_.vertices[i] );
+            }
+            if ( use_edges_ )
+            {
+                foreach ( typename graph_t::edge_t const & edge, graph_.edges )
+                {
+                    size_t begin = index_[edge.first], end = index_[edge.second];
+                    if ( subdivision_[begin] == subdivision_[end] )
+                    {
+                        trgs_[subdivision_[begin]].insert_constraint( graph_.vertices[begin], graph_.vertices[end] );
+                    }
+                }
+            }            
+        }
+
         void factorize( size_t subareas_num )
         {
             util::stopwatch _("coordinate vectors factorization");
@@ -121,6 +143,7 @@ namespace watermarking
 
         void modify_vertices( message_t const & message, size_t chip_rate, int key, double alpha )
         {
+            step_ = STEP_SIZE;
             modified_vertices_.clear();
 
             for ( size_t s = 0; s != subareas_num_; ++s )
@@ -146,28 +169,6 @@ namespace watermarking
             }
         }
 
-        void build_trgs( size_t subareas_num )
-        {
-            util::stopwatch _( "build_triangulations" );
-            trgs_.resize( subareas_num );
-
-            for ( size_t i = 0; i != graph_.vertices.size(); ++i )
-            {
-                trgs_[subdivision_[i]].insert( graph_.vertices[i] );
-            }
-            if ( use_edges_ )
-            {
-                foreach ( typename graph_t::edge_t const & edge, graph_.edges )
-                {
-                    size_t begin = index_[edge.first], end = index_[edge.second];
-                    if ( subdivision_[begin] == subdivision_[end] )
-                    {
-                        trgs_[subdivision_[begin]].insert_constraint( graph_.vertices[begin], graph_.vertices[end] );
-                    }
-                }
-            }            
-        }
-
         vertices_t coefficients( size_t subarea )
         {
             trg_t const & trg = trgs_[subarea];
@@ -185,8 +186,8 @@ namespace watermarking
             return  analysers_[subarea]->get_coefficients( vertices );
         }
 
-        typedef geometry::triangulation_graph< trg_t >       incidence_graph;
-        typedef boost::shared_ptr< spectral_analyser >      analyser_ptr;
+        typedef geometry::triangulation_graph< trg_t > incidence_graph;
+        typedef boost::shared_ptr< spectral_analyser > analyser_ptr;
 
 
         size_t                              subareas_num_;

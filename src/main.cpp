@@ -150,11 +150,10 @@ int main( int argc, char** argv )
     fix_graph( graph );
     
     typedef std::auto_ptr< watermarking::embedding_impl< graph_t::vertex_t > > embedded_watermark_t;
-    bool step_by_step = std::string( argv[2] ) == std::string( "yes" );
-    embedded_watermark_t ew = watermarking::embed( graph,   params["step-by-step"].as< bool >(),
-                                                            params["weighted"].as< bool >(),
-                                                            params["use-edges"].as< bool >() );
-    
+    embedded_watermark_t ew = watermarking::embed( graph,   params["weighted"].as< bool >(),
+                                                            params["use-edges"].as< bool >(),
+                                                            params["step-by-step"].as< bool >() );
+                                                             
     typedef my_visualizer< embedded_watermark_t::element_type > visualizer_t; 
     visualizer_t v( ew.get() ); 
     visualization::viewer< visualizer_t > viewer( &v, "Watermarking", &argc, argv );

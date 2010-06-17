@@ -27,8 +27,6 @@ namespace watermarking
                 for ( size_t u = v + 1; u != N; ++u )
                     assert( a(v, u) == a(u, v) );
             }
-            std::ofstream out("tmp.txt");
-            out << a;
         }
 
         template< class Points, class Matrix >
