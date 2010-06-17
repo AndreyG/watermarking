@@ -12,6 +12,7 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/optional.hpp>
 
 #define foreach BOOST_FOREACH
 

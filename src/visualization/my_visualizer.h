@@ -116,6 +116,8 @@ public:
 				current_subarea_ = -1;
 			return true;
         case 'r':
+            if ( data_.step_ != Data::STEP_SIZE )
+                return false;
             {
                 size_t chip_rate;
                 int key;

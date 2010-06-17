@@ -107,6 +107,8 @@ namespace watermarking
 
         void factorize( size_t subareas_num )
         {
+            util::stopwatch _("coordinate vectors factorization");
+
             analysers_.resize( subareas_num );
             coefficients_.resize( subareas_num );
             for ( size_t s = 0; s != subareas_num; ++s )
@@ -181,7 +183,7 @@ namespace watermarking
             return  analysers_[subarea]->get_coefficients( vertices );
         }
 
-        typedef geometry::triangulation_graph< DT >        incidence_graph;
+        typedef geometry::triangulation_weighted_graph< DT >        incidence_graph;
         typedef boost::shared_ptr< spectral_analyser >   analyser_ptr;
 
         size_t                              subareas_num_;
