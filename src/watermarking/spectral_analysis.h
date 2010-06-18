@@ -33,8 +33,8 @@ namespace watermarking
         Points spectral_coefficients( Points const & vertices, Matrix const & eigen_vectors )
         {
             const size_t N = vertices.size();
-            assert( eigen_vectors.cols() == N );
-            assert( eigen_vectors.rows() == N );
+            assert( eigen_vectors.cols() == (int) N );
+            assert( eigen_vectors.rows() == (int) N );
 
             LaVectorDouble x(N), y(N);
             for ( size_t i = 0; i != N; ++i )
@@ -83,8 +83,8 @@ namespace watermarking
             typedef typename Points::value_type point_t;
             
             const size_t N = coefficients.size();
-            assert( N == e_.rows() );
-            assert( N == e_.cols() );
+            assert( (int) N == e_.rows() );
+            assert( (int) N == e_.cols() );
             
             Points vertices( N );
             for ( size_t i = 0; i != N; ++i )

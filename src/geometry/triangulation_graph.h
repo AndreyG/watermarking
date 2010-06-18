@@ -5,8 +5,8 @@ namespace graph
 {
     struct edge_t
     {
-        double weight;
         size_t end;
+        double weight;
 
         edge_t( size_t e, double w )
             : end( e )

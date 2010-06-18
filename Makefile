@@ -1,11 +1,11 @@
 CC = g++
 
-LIBS = -lboost_program_options -lCGAL -lGL -lGLU -lglut -llapackpp
+LIBS = -lboost_program_options-mt -lCGAL -lGL -lGLU -lglut  
 
 all : compile
     
 clean : 
-	rm -f main
+	rm -f viewer
 
 compile : src/main.cpp
-	$(CC) -O3 -I /usr/local/include/lapackpp -o viewer $< $(LIBS)
+	$(CC) -Wall -O3 -I /usr/local/include/lapackpp `pkg-config lapackpp --libs` -o viewer $< $(LIBS) 
