@@ -35,10 +35,18 @@ namespace watermarking
     struct embedding_impl
     {
         typedef planar_graph< Point > graph_t;
-        typedef CGAL::Exact_predicates_inexact_constructions_kernel     Kernel;
-        typedef CGAL::Constrained_Delaunay_triangulation_2< Kernel >    CDT;
-        typedef CDT                                                     trg_t;
-        typedef typename graph_t::vertices_t                            vertices_t;
+        typedef CGAL::Exact_predicates_inexact_constructions_kernel     Gt;
+        
+        typedef 
+            CGAL::Triangulation_data_structure_2<   CGAL::Triangulation_vertex_base_2<Gt>, 
+                                                    CGAL::Constrained_triangulation_face_base_2<Gt> >
+            Tds;
+
+        typedef 
+            CGAL::Constrained_Delaunay_triangulation_2< Gt, Tds, CGAL::Exact_predicates_tag>
+            trg_t;
+
+        typedef typename graph_t::vertices_t vertices_t;
 
         enum step_t
         {
@@ -117,9 +125,10 @@ namespace watermarking
             }
             if ( use_edges_ )
             {
+                util::stopwatch _( "insert constraints" );
                 foreach ( typename graph_t::edge_t const & edge, graph_.edges )
                 {
-                    size_t begin = index_[edge.first], end = index_[edge.second];
+                    size_t begin = edge.first, end = edge.second;
                     if ( subdivision_[begin] == subdivision_[end] )
                     {
                         trgs_[subdivision_[begin]].insert_constraint( graph_.vertices[begin], graph_.vertices[end] );
@@ -191,7 +200,6 @@ namespace watermarking
 
 
         size_t                              subareas_num_;
-        std::vector< size_t >               index_;
         graph_t                             graph_;
         std::vector< trg_t >                trgs_;
         std::vector< size_t >               subdivision_;
@@ -209,7 +217,7 @@ namespace watermarking
 													bool step_by_step = false )
     {
         util::stopwatch _("watermarking generator creation");
-        return std::auto_ptr< embedding_impl< Point > >( new embedding_impl< Point >( graph, step_by_step, weighted, use_edges ) );
+        return std::auto_ptr< embedding_impl< Point > >( new embedding_impl< Point >( graph, weighted, use_edges, step_by_step ) );
     }
 }
 

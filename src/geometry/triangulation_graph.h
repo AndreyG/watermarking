@@ -27,9 +27,16 @@ namespace geometry
             double x2 = q.x() - p2.x();
             double y2 = q.y() - p2.y();
 
-            double cos = x1 * x2 + y1 * y2;
+            double c = x1 * x2 + y1 * y2;
             double len_sqr = (x1 * x1 + y1 * y1) * (x2 * x2 + y2 * y2);
-            return cos / sqrt(len_sqr - cos * cos);
+            if ( ( len_sqr - c * c ) <= 0 )
+            {
+                if ( c > 0 )
+                    return std::numeric_limits< double >::max();
+                else
+                    return -std::numeric_limits< double >::max();
+            }
+            return c / sqrt(len_sqr - c * c);
         }
     }
     
@@ -102,8 +109,13 @@ namespace geometry
                         }
                         else
                         {
-                            w = (   ctg( b->point(), a->point(), c->point() ) +
-                                    ctg( b->point(), d->point(), c->point() ) ) / 2;
+                            double w1 = ctg( b->point(), a->point(), c->point() );
+                            double w2 = ctg( b->point(), d->point(), c->point() ); 
+                            w = ( w1 + w2 ) / 2.0;
+                            if ( w < -1e-5 )
+                            {
+                                std::cout << w1 << "\t" << w2 << std::endl;
+                            }
                             assert( w >= -1e-5 );
                         }
                     }
