@@ -147,6 +147,8 @@ public:
                 data_.modify_vertices( message, vm["chip-rate"].as< size_t >(),
                                                 vm["key"].as< int >(),
                                                 vm["alpha"].as< double >() );
+
+                return true;
             }
 		}
 		std::map< unsigned char, size_t >::const_iterator it = key2draw_.find( key );

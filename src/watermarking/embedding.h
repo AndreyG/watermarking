@@ -144,12 +144,14 @@ namespace watermarking
 
         void modify_vertices( message_t const & message, size_t chip_rate, int key, double alpha )
         {
+            util::stopwatch _("embedding message");
+
             step_ = STEP_SIZE;
             modified_vertices_.clear();
 
             for ( size_t s = 0; s != subareas_num_; ++s )
             {
-                util::stopwatch _( ( std::string("embedding message in subarea ") + lexical_cast< std::string >( s ) ).c_str() );
+                //util::stopwatch _( ( std::string("embedding message in subarea ") + lexical_cast< std::string >( s ) ).c_str() );
                 vertices_t r = coefficients_[s];
 
                 srand( key );

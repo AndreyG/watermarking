@@ -1,7 +1,7 @@
 #ifndef _STOPWATCH_H_
 #define _STOPWATCH_H_
 
-#include <time.h>
+#include <ctime>
 
 namespace util
 {
@@ -17,7 +17,7 @@ namespace util
                 std::cout << "\t";
             std::cout << message << "..." << std::endl;
             ++tabs_num;
-            time( &start );
+            start = clock();
         }
 
         ~stopwatch()
@@ -25,13 +25,12 @@ namespace util
             --tabs_num;
             for ( size_t i = 0; i != tabs_num; ++i )
                 std::cout << "\t";
-            time_t end;
-            time( &end );
-            std::cout << difftime( end, start ) << " sec" << std::endl;
+            clock_t end = clock();
+            std::cout << double(end - start) / CLOCKS_PER_SEC << " sec" << std::endl;
         }
 
     private:
-        time_t start;
+        clock_t start;
     };
 
     size_t stopwatch::tabs_num = 0;

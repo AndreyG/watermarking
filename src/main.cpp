@@ -17,6 +17,7 @@
 #define foreach BOOST_FOREACH
 
 #include <boost/program_options.hpp>
+#include <boost/format.hpp>
 
 #include "utility/dump.h"
 #include "utility/stopwatch.h"
@@ -150,11 +151,12 @@ int main( int argc, char** argv )
     fix_graph( graph );
     
     typedef std::auto_ptr< watermarking::embedding_impl< graph_t::vertex_t > > embedded_watermark_t;
-    embedded_watermark_t ew = watermarking::embed( graph,   params["weighted"].as< bool >(),
-                                                            params["use-edges"].as< bool >(),
-                                                            params["step-by-step"].as< bool >() );
+    bool weighted = params["weighted"].as< bool >();
+    bool use_edges = params["use-edges"].as< bool >();
+    embedded_watermark_t ew = watermarking::embed( graph, weighted, use_edges, params["step-by-step"].as< bool >() );
                                                              
     typedef my_visualizer< embedded_watermark_t::element_type > visualizer_t; 
     visualizer_t v( ew.get() ); 
-    visualization::viewer< visualizer_t > viewer( &v, "Watermarking", &argc, argv );
+    boost::format title("W: weighted = %1%, use-edges = %2%");
+    visualization::viewer< visualizer_t > viewer( &v, ( title % weighted % use_edges ).str().c_str(), &argc, argv );
 }
