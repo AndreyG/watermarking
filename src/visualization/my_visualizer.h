@@ -112,7 +112,7 @@ public:
 				current_subarea_ = -1;
 			return true;
         case 'r':
-            if ( data_.step_ != Data::STEP_SIZE )
+            if ( data_.step_ < Data::MODIFY_VERTICES )
                 return false;
             {
                 namespace po = boost::program_options;
@@ -122,8 +122,8 @@ public:
                 po::options_description desc;
                 desc.add_options()
                     ( "message", po::value< std::string >() )
-                    ( "key",     po::value< size_t>() )
-                    ( "chip-rate", po::value< int >() )
+                    ( "key",     po::value< int >() )
+                    ( "chip-rate", po::value< size_t >() )
                     ( "alpha",   po::value< double >() )
                 ;
 

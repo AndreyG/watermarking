@@ -36,15 +36,7 @@ namespace watermarking
     {
         typedef planar_graph< Point > graph_t;
         typedef CGAL::Exact_predicates_inexact_constructions_kernel     Gt;
-        
-        typedef 
-            CGAL::Triangulation_data_structure_2<   CGAL::Triangulation_vertex_base_2<Gt>, 
-                                                    CGAL::Constrained_triangulation_face_base_2<Gt> >
-            Tds;
-
-        typedef 
-            CGAL::Constrained_Delaunay_triangulation_2< Gt, Tds, CGAL::Exact_predicates_tag>
-            trg_t;
+        typedef CGAL::Constrained_Delaunay_triangulation_2< Gt > trg_t;
 
         typedef typename graph_t::vertices_t vertices_t;
 
