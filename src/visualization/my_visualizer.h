@@ -22,7 +22,8 @@ private:
 	enum DRAW
 	{
 		VERTICES, EDGES, TRIANGULATION, SPLIT_LINES, SUBAREA_VERTICES, 
-        MODIFIED_VERTICES, MODIFIED_EDGES, DRAW_SIZE
+        MODIFIED_VERTICES, MODIFIED_EDGES, 
+        NOISED_VERTICES, NOISED_EDGES, DRAW_SIZE
 	};
 
 public:
@@ -38,6 +39,8 @@ public:
         key2draw_['m'] = MODIFIED_VERTICES;
         key2draw_['o'] = MODIFIED_EDGES;
         key2draw_['t'] = TRIANGULATION;
+        key2draw_['q'] = NOISED_VERTICES;
+        key2draw_['w'] = NOISED_EDGES;
 
 		current_subarea_ = -1;
 	}
@@ -56,6 +59,19 @@ public:
         {
             dc.set_color( 0, 1, 0 );
             draw_edges( dc, vertices, data_.graph_.edges );
+        }
+        if ( draw_[NOISED_VERTICES] )
+        {
+            dc.set_color( 0, 0.7, 0.7 );
+            foreach( typename Data::graph_t::vertex_t const & v, noised_graph_.vertices )
+            {
+                draw_vertex( dc, v, 2 );
+            }
+        }
+        if ( draw_[NOISED_EDGES] )
+        {
+            dc.set_color( 0, 0.7, 0.7 );
+            draw_edges( dc, noised_graph_.vertices, noised_graph_.edges );
         }
 		if ( draw_[SUBAREA_VERTICES] && ( data_.step_ > Data::SUBDIVIDE_PLANE ) )
 		{
@@ -111,6 +127,23 @@ public:
 			if ( current_subarea_ == data_.graph_.vertices.size() )
 				current_subarea_ = -1;
 			return true;
+        case 'a':
+            {
+                namespace po = boost::program_options;
+
+                std::ifstream conf("noise.conf");
+                
+                po::options_description desc;
+                desc.add_options()
+                    ( "epsilon",   po::value< double >() )
+                ;
+
+                po::variables_map vm;       
+                po::store( po::parse_config_file( conf, desc ), vm );
+
+                noised_graph_ = watermarking::add_noise( data_.modified_graph(), vm["epsilon"].as< double >() );
+            } 
+            return false;
         case 'r':
             if ( data_.step_ < Data::MODIFY_VERTICES )
                 return false;
@@ -234,6 +267,7 @@ private:
 private:
 
 	Data & data_;
+    typename Data::graph_t noised_graph_;
 
 	bool draw_[DRAW_SIZE];
 	std::map< unsigned char, size_t > key2draw_;
