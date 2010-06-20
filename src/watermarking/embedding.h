@@ -128,9 +128,12 @@ namespace watermarking
             }
         }
 
-        graph_t const & modified_graph() const
+        graph_t modified_graph() const
         {
-            return graph_;
+            graph_t res;
+            res.vertices = modified_vertices_;
+            res.edges = graph_.edges;
+            return res;
         }
 
         vertices_t coefficients( size_t subarea )

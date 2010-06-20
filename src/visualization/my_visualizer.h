@@ -183,6 +183,57 @@ public:
 
                 return true;
             }
+        case 'g':
+            {
+                namespace po = boost::program_options;
+
+                std::ifstream common_conf("common.conf");
+                
+                po::options_description common_desc;
+                common_desc.add_options()
+                    ( "step-by-step", po::value<bool>() )
+                    ( "weighted",     po::value<bool>() )
+                    ( "use-edges",    po::value<bool>() )
+                    ( "max-subarea-size", po::value< size_t >() )
+                    ( "input-data",   po::value<std::string>() )
+                ;
+                po::variables_map common_vm;
+                po::store( po::parse_config_file( common_conf, common_desc ), common_vm );
+
+                
+                std::ifstream embed_conf("embedding.conf");
+                
+                po::options_description embed_desc;
+                embed_desc.add_options()
+                    ( "key",     po::value< int >() )
+                    ( "chip-rate", po::value< size_t >() )
+                    ( "message", po::value< std::string >() )
+                    ( "alpha", po::value < double >() )
+                ;
+
+                po::variables_map embed_vm;       
+                po::store( po::parse_config_file( embed_conf, embed_desc ), embed_vm );
+                
+                watermarking::message_t message = watermarking::extract(    noised_graph_, 
+                                                                            common_vm["max-subarea-size"].as< size_t >(), 
+                                                                            common_vm["weighted"].as< bool >() )->extract( 
+                                                        embed_vm["key"].as< int >(), 
+                                                        embed_vm["chip-rate"].as< size_t >(), 
+                                                        data_.coefficients_, 
+                                                        embed_vm["message"].as< std::string >().size() );
+
+                for ( size_t i = 0; i != message.size(); )
+                {
+                    unsigned char c = 0;
+                    int pow = 1;
+                    for ( size_t j = 0; j != 7; ++j, ++i, pow *= 2 )
+                    {
+                        c += message[i] * pow;
+                    }
+                    std::cout << c;
+                }
+                std::cout << std::endl;
+            }
 		}
 		std::map< unsigned char, size_t >::const_iterator it = key2draw_.find( key );
 		if ( it != key2draw_.end() )
