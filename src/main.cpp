@@ -23,6 +23,7 @@
 #include "utility/stopwatch.h"
 
 #include "watermarking/embedding.h"
+#include "watermarking/extracting.h"
 #include "visualization/my_visualizer.h"
 
 template< class Stream, class Point >
@@ -128,6 +129,7 @@ boost::program_options::variables_map read_params()
         ( "step-by-step", po::value<bool>() )
         ( "weighted",     po::value<bool>() )
         ( "use-edges",    po::value<bool>() )
+        ( "max-subarea-size", po::value< size_t >() )
         ( "input-data",   po::value<std::string>() )
     ;
     
@@ -153,7 +155,8 @@ int main( int argc, char** argv )
     typedef std::auto_ptr< watermarking::embedding_impl< graph_t::vertex_t > > embedded_watermark_t;
     bool weighted = params["weighted"].as< bool >();
     bool use_edges = params["use-edges"].as< bool >();
-    embedded_watermark_t ew = watermarking::embed( graph, weighted, use_edges, params["step-by-step"].as< bool >() );
+    size_t max_subarea_size = params["max-subarea-size"].as< size_t >();
+    embedded_watermark_t ew = watermarking::embed( graph, max_subarea_size, weighted, use_edges, params["step-by-step"].as< bool >() );
                                                              
     typedef my_visualizer< embedded_watermark_t::element_type > visualizer_t; 
     visualizer_t v( ew.get() ); 
