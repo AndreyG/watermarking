@@ -111,7 +111,11 @@ namespace watermarking
                 vertices_t r = coefficients_[s];
 
                 srand( key );
-                assert( chip_rate * message.size() <= r.size() );
+                if ( chip_rate * message.size() > r.size() )
+                {
+                    std::cout << chip_rate * message.size() << "\t" << r.size() << std::endl;
+                    assert( false );
+                }
                 for ( size_t i = 0, k = 0; i != message.size(); ++i )
                 {
                     for ( size_t j = 0; j != chip_rate; ++j, ++k )

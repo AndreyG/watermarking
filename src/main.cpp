@@ -183,31 +183,48 @@ int main( int argc, char** argv )
         for ( size_t j = 0; j != 7; ++j )
         {
             message[i * 7 + j] = c % 2;
+            std::cout << message[i * 7 + j];
             c /= 2;
         }
     }
+    std::cout << std::endl;
     
     ew->modify_vertices( message,   vm["chip-rate"].as< size_t >(),
                                     vm["key"].as< int >(),
                                     vm["alpha"].as< double >() );
     graph_t modified_graph = ew->modified_graph();
+    std::vector< std::vector< point_t > > old_coefficients = ew->coefficients_;
+    ew.reset();
     for ( double radius = 0.1; radius <= 1.0; radius += 0.1 )
     {
         graph_t noised_graph = watermarking::add_noise( modified_graph, radius );
-        watermarking::message_t message = watermarking::extract( noised_graph, 
-                                                                 max_subarea_size,
-                                                                 weighted )->extract( vm["chip_rate"].as< size_t >(), vm["key"].as< int >(), ew->coefficients_, message_text.size() ); 
-        std::cout << "Extracted message: ";
+        watermarking::message_t ex_message = watermarking::extract( noised_graph, 
+                                                                    max_subarea_size,
+                                                                    weighted )->extract( vm["key"].as< int >(), vm["chip-rate"].as< size_t >(), old_coefficients, message.size() ); 
+        std::cout << "Embedded message:  ";
         for ( size_t i = 0; i != message.size(); )
+        {
+            for ( size_t j = 0; j != 7; ++j, ++i )
+                std::cout << message[i];
+            std::cout << " ";
+        }
+
+        std::cout << "Extracted message: ";
+        std::vector< unsigned char > mes;
+        for ( size_t i = 0; i != ex_message.size(); )
         {
             unsigned char c = 0;
             int pow = 1;
             for ( size_t j = 0; j != 7; ++j, ++i, pow *= 2 )
             {
-                c += message[i] * pow;
+                std::cout << ex_message[i];
+                c += ex_message[i] * pow;
             }
-            std::cout << c;
+            std::cout << " ";
+            mes.push_back( c );
         }
+        std::cout << std::endl;
+        std::copy( mes.begin(), mes.end(), std::ostream_iterator< char >( std::cout, "" ) );
         std::cout << std::endl;
     }
 
