@@ -3,9 +3,9 @@
 #include <cassert>
 #include <sstream>
 #include <iostream>
-
 #include <boost/foreach.hpp>
-#define foreach BOOST_FOREACH
+
+#define BOOST_FOREACH foreach
 
 int main( int argc, char** argv )
 {
@@ -56,9 +56,11 @@ int main( int argc, char** argv )
         edges.push_back( edge_t( start_idx, vertices.size() - 1 ) );
     }
     out << vertices.size() << "\t" << edges.size() << std::endl;
-    foreach( vertex_t const & v, vertices )
+    foreach ( vertex_t const & v : vertices )
         out << "(" << v.first << ", " << v.second << ")" << "\n";
     out << std::endl;
-    foreach( edge_t const & e, edges )
+    foreach ( edge_t const & e : edges )
         out << e.first << "\t" << e.second << "\n";
+
+    return EXIT_SUCCESS;
 }

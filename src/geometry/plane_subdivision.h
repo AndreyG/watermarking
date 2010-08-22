@@ -37,6 +37,8 @@ namespace geometry
     // [p, q) -- sequence of points
     // max_subarea_size -- maximal number of points in one subarea
     // horizontal -- horizontal or vertical line will be used to sibdivide at this step
+    // index -- is filled by indices of zone in which point will be laid.
+    //
     // returns number of new subareas
     template< class Iter >
     size_t subdivide_plane( Iter p, Iter q, size_t max_subarea_size, bool horizontal,
@@ -53,6 +55,7 @@ namespace geometry
         {
             typedef typename std::iterator_traits< Iter >::value_type point_t;            
             typedef point_comparator< point_t > point_comparator;
+            
             point_comparator comp( horizontal ); 
             Iter m = algorithm::median( p, q, comp );
             size_t tmp = subdivide_plane( 	p, m, max_subarea_size, !horizontal, index,

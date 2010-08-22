@@ -8,27 +8,6 @@ namespace watermarking
     
     namespace
     {
-        template< class Graph, class Matrix >
-        void fill_adjacency_matrix( Graph const & graph, Matrix & a )
-        {
-            util::stopwatch _("creation of adjacency matrix");
-            const size_t N = graph.vertices_num();
-
-            for ( size_t v = 0; v != N; ++v )
-            {
-                for ( size_t u = 0; u != N; ++u )
-                    a(v, u) = 0;
-                a(v, v) = graph.degree( v );
-                for ( typename Graph::edges_iterator e = graph.edges_begin( v ); e != graph.edges_end( v ); ++e )
-                    a(v, e->end) = -e->weight;
-            }
-            for ( size_t v = 0; v + 1 != N; ++v )
-            {
-                for ( size_t u = v + 1; u != N; ++u )
-                    assert( a(v, u) == a(u, v) );
-            }
-        }
-
         template< class Points, class Matrix >
         Points spectral_coefficients( Points const & vertices, Matrix const & eigen_vectors )
         {
@@ -57,15 +36,66 @@ namespace watermarking
         }
     }
 
+    namespace details
+    {
+        template< class Maxtrix >
+        void check_symmetry( Matrix const & a )
+        {
+            for ( size_t v = 0; v + 1 != N; ++v )
+            {
+                for ( size_t u = v + 1; u != N; ++u )
+                    assert( a(v, u) == a(u, v) );
+            }
+        }
+
+        template< class Graph, class Matrix >
+        void fill_maxtrix_by_chen( Graph const & graph, Matrix & a )
+        {
+            util::stopwatch _("creation of adjacency matrix");
+            const size_t N = graph.vertices_num();
+
+            for ( size_t v = 0; v != N; ++v )
+            {
+                for ( size_t u = 0; u != N; ++u )
+                    a(v, u) = 0;
+                a(v, v) = graph.degree( v );
+                for ( typename Graph::edges_iterator e = graph.edges_begin( v ); e != graph.edges_end( v ); ++e )
+                    a(v, e->end) = -e->weight;
+                check_symmetry( a );
+            }
+        }
+
+        template< class Graph, class Matrix >
+        void fill_maxtrix_by_obuchi( Graph const & graph, Matrix & a )
+        {
+            util::stopwatch _("creation of adjacency matrix");
+            const size_t N = graph.vertices_num();
+
+            for ( size_t v = 0; v != N; ++v )
+            {
+                for ( size_t u = 0; u != N; ++u )
+                    a(v, u) = 0;
+                a(v, v) = 1;
+                double d = graph.degree( v );
+                for ( typename Graph::edges_iterator e = graph.edges_begin( v ); e != graph.edges_end( v ); ++e )
+                    a(v, e->end) = -e->weigh / d;
+                check_symmetry( a );
+            }
+        }
+    }
+         
     struct spectral_analyser
     {
+        typedef LaGenMatDouble matrix_t;
+
         template< class Graph >
-        spectral_analyser( Graph const & graph )
+        spectral_analyser(  Graph const & graph, boost::function< void (Graph const &, matrix_t &) > fill_maxtrix = 
+                                                    boost::bind( &details::fill_maxtrix_by_obuchi, _1, _2 ) )
                 : e_( graph.vertices_num(), graph.vertices_num() )
         {
             util::stopwatch _("calculating eigenvectors");
             const size_t N = graph.vertices_num();
-            fill_adjacency_matrix( graph, e_ );
+            fill_matrix( graph, e_ );
 
             LaVectorDouble lambda(N);
             LaEigSolveSymmetricVecIP( e_, lambda );
@@ -103,7 +133,6 @@ namespace watermarking
         }
 
     private:
-        typedef LaGenMatDouble matrix_t;
         matrix_t e_;
     };
 }

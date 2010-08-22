@@ -1,0 +1,22 @@
+\documentclass{article}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+
+\usepackage[a4paper,left=20mm,right=20mm,top=20mm,bottom=20mm]{geometry}
+\begin{document}
+\section{Алгоритм внедрения watermark'а}
+
+\begin{itemize}
+    \item На вход алгоритму подается облако точек.
+
+    Экземпляр класса \texttt{watermarking::planar\_graph} [watermarking/common.h].
+
+    \item Плоскость разбивается на прямоугольные ячейки с примерно одинаковым количеством вершин не превышающее определенную величину.
+
+    \texttt{watermarking::embedding\_impl::subdivide\_plane} [watermarking/embedding.h] куда в качестве параметра \texttt{max\_subarea\_size} передается параметр конструктора \texttt{watermarking::embedding\_impl::embedding\_impl(...)} \texttt{max\_patch\_size}.
+
+\end{itemize}
+
+\end{document}

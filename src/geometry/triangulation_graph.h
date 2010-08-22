@@ -128,7 +128,7 @@ namespace geometry
             }
             for ( size_t v = 0; v != degree_.size(); ++v )
             {
-                foreach( graph::edge_t const & e, edges_[v] )
+                foreach ( graph::edge_t const & e, edges_[v] )
                     degree_[v] += e.weight;
                 assert( degree_[v] > 0 );
             }    
