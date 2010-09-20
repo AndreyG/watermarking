@@ -1,0 +1,4 @@
+#!/bin/sh
+
+export name=$1
+pdflatex $name.tex && xpdf $name.pdf
