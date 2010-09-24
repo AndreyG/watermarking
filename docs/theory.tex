@@ -22,27 +22,146 @@
     
     \item Для того, чтобы задать PLIS нам нало для начала задаться триангуляцией $V$. А какой именно триангуляцией? 
     Rippa говорит нам, что реальные пацаны используют для подобных целей триангуляцию Делоне, так как для нее погрешность интерполяции минимальна. 
-    А что есть согласно Rippa погрешность интерполяции (roughness)? Барабанная дробь -- энергия Дирихле $$E_D(f_c) = \int_{\Omega}{||{\nabla{f_c}}||^2 d\Omega}$$.
+    А что есть согласно Rippa погрешность интерполяции (roughness)? Барабанная дробь -- энергия Дирихле $$E_D(f_c) = \int_{\Omega}{||{\nabla{f_c}}||^2 d\Omega}.$$
     
     \item \label{Criterion}
     Теперь у нас есть триангуляция $\mathfrak{T}$ множества точек $V$ и функция $f_c: \Omega \to \mathbb{R}^2$ . Давайте определимcя, чего же мы хотим от $f_c$.
     Можно, конечно, в качестве $f_c$ взять функцию, переводящую наши данные в надпись ''здесь был \%username\%'', тогда мы всем сможем потом доказать, 
     что это именно наши данные, но как-то многовато мы при этом информации потеряем. То есть, мы хотим минимизировать потерю информации, 
     то есть некоторую функцию от $f_c$. Я утверждаю, что эта самая загадочная функция, которую мы хотим минимизировать есть, барабанная дробь,
-    энергия Дирихле $$E_D(f_c) = \int_{\Omega}{||{\nabla{f_c}}||^2 d\Omega}$$.
+    энергия Дирихле $$E_D(f_c) = \int_{\Omega}{||{\nabla{f_c}}||^2 d\Omega}.$$
     
     \item \label{PoithlerTheorem}
     Давайте теперь вернемся с просторов непрерывных небес на нашу бренную дискретныую землю. Итак, мы хотим минимизировать $E_D(f_c)$. 
     Как выразить это в терминах $f_d$? Мудрый Poithler утвержает, что $E_D(f_c)$ при заданной триангуляции $\mathfrak{T}$ выражается как 
         \begin{multline}
-            E_D(f_c) = \frac{1}{4} \sum_{\left(i, j, k \right) \in \mathfrak{T}}{\ctg{\alpha_{ij}}||f_i - f_j||^2 + \ctg{\alpha_{jk}}||f_j - f_k||^2 + \ctg{\alpha_{ki}}||f_k - f_i||^2} = \\
+        \label{EnergyDiscretization}
+            E_D(f_c) = \frac{1}{4} \sum_{\left(i, j, k \right) \in \mathfrak{T}}{\ctg{\alpha_{ij}}||f_i - f_j||^2 + 
+            \ctg{\alpha_{jk}}||f_j - f_k||^2 + \ctg{\alpha_{ki}}||f_k - f_i||^2} = \\
             = \frac{1}{2} \sum_{\left( i, j \right) \in E\left(\mathfrak{T}\right)}{w_{ij} ||f_i - f_j||^2} \mbox{, где } w_{ij} = 
             \frac{1}{2}\left(\ctg\alpha_{ij} + \ctg\alpha_{ji}\right).
         \end{multline}
     Точнее утверждает он это про скаляро-значную функцию $f$, но я искренне надеюсь, что это без труда обобщается на векторо-значную.
 
-    \item Обозначенному нами в пункте~\ref{Criterion} критерию качества прекрасно удолетворяет $f_d = const$. 
-    Действительно, $\nabla{f} = 0 \Rightarrow E_D(f) = 0$, жаль только информации таким образом не закодируешь. А хотелось бы нам закодировать $k$ бит.
+    Истинная мудрость проявленная Poithler'ом заключается в том, что он доказал формулу~(\ref{EnergyDiscretization}) в куда более общем случае.
+    В случае же когда $\Omega$ есть выпуклая оболочка множества точек плоскости и $f_c$ есть PLIS $f_d$ по триангуляции $\mathfrak{T}$ можно посчитать $E_D(f)$ по рабоче-крестьянски.
+    \begin{multline*}
+        E_D(f) = \frac{1}{2} \int_{\Omega}{||\nabla{f}||^2 d\Omega} = \frac{1}{2} \sum_{T \in \mathfrak{T}}\int_{T}{||\nabla{f|_T}||^2 dT}; 
+        \mbox{ } T = \triangle ABC; \mbox{ } A=(x_1, y_1), B=(x_2, y_2), C=(x_3, y_3); \\
+        f|_T = f(x, y), f(A) = f_1, f(B) = f_2, f(C) = f_3; \int_{T}{||\nabla{f|_T}||^2 dT} = 
+        \int_{T}{\left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] dx dy} \\
+    \end{multline*}
+    Перейдем к барицентрическим координатам $u, v$: $T = \left\{(u, v)\mbox{ } | \mbox{ } (u, v) \in \left[0, 1 \right]^2 ,\mbox{ } u + v <= 1 \right\}$. 
+    \begin{multline*}
+        \begin{cases}
+            x = x_1 u + x_2 v + (1-u-v) x_3 = (x_1 - x_3) u + (x_2 - x_3) v \\
+            y = y_1 u + y_2 v + (1-u-v) y_3 = (y_1 - y_3) u + (y_2 - y_3) v
+        \end{cases} 
+        \Leftrightarrow
+        \begin{pmatrix}
+            x_1 - x_3 & x_2 - x_3 \\
+            y_1 - y_3 & y_2 - y_3 
+        \end{pmatrix} 
+        \begin{pmatrix}
+            u \\
+            v
+        \end{pmatrix} 
+        =
+        \begin{pmatrix}
+            x \\
+            y
+        \end{pmatrix} \\
+        \Delta = (x_1 - x_3) (y_2 - y_3) - (x_2 - x_3) (y_2 - y_3) \\ 
+        \Delta_u = (y_2 - y_3) x - (x_2 - x_3) y, \mbox{ } \Delta_v = -(y_1 - y_3) x + (x_1 - x_3) y \\
+        u = \frac{\Delta_u}{\Delta}, \mbox{ } v = \frac{\Delta_v}{\Delta} \mbox{, } dxdy = |\Delta| dudv \\
+        \frac{\partial u}{\partial x} = \frac{1}{\Delta}(y_2 - y_3), \mbox{ } \frac{\partial u}{\partial y} = -\frac{1}{\Delta}(x_2 - x_3) \mbox{; }
+        \frac{\partial v}{\partial x} = -\frac{1}{\Delta}(y_1 - y_3), \mbox{ } \frac{\partial v}{\partial y} = \frac{1}{\Delta}(x_1 - x_3) \\
+        f(u, v) = f_1 u + f_2 v + f_3(1-u-v) = (f_1 - f_3) u + (f_2 - f_3) v \\
+        \frac{\partial f}{\partial u} = f_1 - f_3 \mbox{, } \frac{\partial f}{\partial v} = f_2 - f_3. 
+    \end{multline*}
+    \begin{multline*}
+        \frac{\partial f}{\partial x} = \frac{\partial f}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial f}{\partial v} \frac{\partial v}{\partial x} = 
+            \frac{1}{\Delta}(y_2 - y_3)(f_1 - f_3) - \frac{1}{\Delta}(y_1 - y_3)(f_2 - f_3) = \\
+            \frac{1}{\Delta}\left[(y_2 - y_3)(f_1 - f_3) - (y_1 - y_3)(f_2 - f_3)\right]. 
+    \end{multline*}
+    \begin{multline*}
+        \frac{\partial f}{\partial y} = \frac{\partial f}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial f}{\partial v} \frac{\partial v}{\partial y} = 
+            -\frac{1}{\Delta}(x_2 - y_3)(f_1 - f_3) + \frac{1}{\Delta}(x_1 - x_3)(f_2 - f_3) = \\
+            \frac{1}{\Delta}\left[-(x_2 - x_3)(f_1 - f_3) + (x_1 - x_3)(f_2 - f_3)\right]. 
+    \end{multline*}
+    \begin{multline*}
+        \left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] = 
+        \frac{1}{\Delta^2} 
+        [
+            (f_1 - f_3)^2 [(y_2 - y_3)^2 + (x_2 - x_3)^2] + (f_1 - f_3)^2 [(y_1 - y_3)^2 + (x_1 - x_3)^2] - \\
+            - 2 (f_1 - f_3)(f_2 - f_3)((y_2 - y_3)(y_1 - y_3) + (x_2 - x_3)(x_1 - x_3))
+        ]
+    \end{multline*}
+    Введем обозначения: $\vec{AB} = \vec{c}$, $\vec{BC} = \vec{a}$, $\vec{CA} = \vec{b}$. Тогда предыдущую формулу можно записать следующим образом.
+    \begin{multline*}
+        \left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] = 
+        \frac{1}{\Delta^2} 
+        \left[
+            (f_1 - f_3)^2 a^2 + (f_1 - f_3)^2 b^2 - 2 (f_1 - f_3)(f_2 - f_3)(\vec{a}, \vec{b}) 
+        \right] = \\
+        = \frac{1}{\Delta^2} 
+        \left[
+            (f_1 - f_3)^2 a^2 + (f_1 - f_3)^2 b^2 - (f_1 - f_3)(f_2 - f_3)(a^2 + b^2 - c^2) 
+        \right] = \\
+        = \frac{1}{\Delta^2} 
+        \left[
+            a^2 (f_1 - f_3)^2 + b^2 (f_1 - f_3)^2 - (a^2 + b^2 - c^2)(f_1 f_2 - f_3(f_1 + f_2) + f_3^2)
+        \right] = \\
+        = \frac{1}{2 \Delta^2} 
+        \left[
+            2 a^2 (f_1 - f_3)^2 + 2 b^2 (f_1 - f_3)^2 - (a^2 + b^2 - c^2)([2 f_1 f_2 - f_1^2 - f_2 ^ 2] + 
+            [f_1 ^2 - 2 f_3 f_1 + f_3 ^ 2] + [f_2^2 - 2 f_3 f_2 + f_3^2])
+        \right] = \\
+        = \frac{1}{2 \Delta^2} 
+        \left[
+            2 a^2 (f_1 - f_3)^2 + 2 b^2 (f_1 - f_3)^2 - 
+            \left( a^2 + b^2 - c^2 \right) \left(-(f_1 - f_2)^2 + (f_1 - f_3)^2 + (f_2 - f_3)^2 \right)
+        \right] = \\
+        = \frac{1}{2 \Delta^2} 
+        \left[
+            (a^2 + b^2 - c^2)(f_1 - f_2)^2 + (a^2 + c^2 - b^2)(f_1 - f_3)^2 + (b^2 + c^2 - a^2)(f_2 - f_3)^2 
+        \right] = \\
+        = \frac{1}{\Delta^2} 
+        \left[
+            ab \cos{(\gamma)} (f_1 - f_2)^2 + ac \cos{(\beta)}(f_1 - f_3)^2 + bc \cos{(\alpha)}(f_2 - f_3)^2 
+        \right] = \\
+        = \frac{2S(T)}{\Delta^2} 
+        \left[
+            \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 
+        \right].
+    \end{multline*}
+    \begin{multline*}
+        \int_{T}{\left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] dx dy} 
+        = \int\limits_0^1\int\limits_0^{1-u} \frac{2S(T)}{\Delta^2} 
+        \left[
+            \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 
+        \right] 
+        |\Delta| du dv = \\
+        = \frac{2S(T)}{|\Delta|} 
+        \left[
+            \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 
+        \right]
+        \int\limits_0^1\int\limits_0^{1-u} du dv = \\ 
+        = \frac{S(T)}{|\Delta|} 
+        \left[
+            \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 
+        \right].
+    \end{multline*}
+    Осталось заметить, что $|\Delta| = 2S(T)$. Окончательно получаем 
+    $$
+        \int_T ||\nabla{f}||^2 dT = \frac{1}{2} \left[ \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 \right] 
+    $$
+    $$ 
+        E_D(f) = \frac{1}{4} \sum_{T \in \mathfrak{T}} \left[ \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 \right].
+    $$     
+
+    \item Обозначенному нами в пункте~\ref{Criterion} критерию качества прекрасно удолетворяет $f_d~=~const$. 
+    Действительно, $\nabla{f}~=~0 \Rightarrow E_D(f) = 0$, жаль только информации таким образом не закодируешь. А хотелось бы нам закодировать $k$ бит.
     Obuchi предлагает следующее: выберем какие-нибудь линейно независимые $k$ векторов $\left\{ e^i \right\}_{i=1}^k$ и пусть $f_d = \sum_{i=1}^{k}{m_i e^i}$,
     где $m_i \in \left\{ -1, 1 \right\}$. Если $e^i$ ортогональны, то из $f_d$ однозначно восстанавливается watermark: $m_i = (f_d, e_i)$.
 
