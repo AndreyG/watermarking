@@ -93,18 +93,23 @@ namespace watermarking
 
         template< class Graph >
         spectral_analyser(  Graph const & graph, boost::function< void (Graph const &, matrix_t &) > fill_matrix )
-                : e_( graph.vertices_num(), graph.vertices_num() )
+                : lambda_( graph.vertices_num() )
+                , e_( graph.vertices_num(), graph.vertices_num() )
         {
             util::stopwatch _("calculating eigenvectors");
             const size_t N = graph.vertices_num();
             fill_matrix( graph, e_ );
 
-            LaVectorDouble lambda(N);
-            LaEigSolveSymmetricVecIP( e_, lambda );
-            for ( int i = 0; i + 1 != N; ++i )
+            LaEigSolveSymmetricVecIP( e_, lambda_ );
+            for ( size_t i = 0; i + 1 != N; ++i )
             {
-                assert( lambda(i) <= lambda(i + 1) );
+                assert( lambda_(i) <= lambda_(i + 1) );
             }
+        }
+
+        double get_lambda( size_t i ) const
+        {
+            return lambda_( i );
         }
 
         template< class Points >
@@ -139,6 +144,7 @@ namespace watermarking
         }
 
     private:
+        LaVectorDouble lambda_;
         matrix_t e_;
     };
 }
