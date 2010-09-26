@@ -3,13 +3,16 @@
 #include "utility/dump.h"
 #include "utility/stopwatch.h"
 
+/*
 #include "watermarking/embedding.h"
 #include "watermarking/extracting.h"
 #include "visualization/my_visualizer.h"
+*/
 #include "data_reading.h"
 
 int main( int argc, char** argv )
 {
+/*
     namespace po = boost::program_options;
 
     po::variables_map params = read_params();
@@ -102,4 +105,5 @@ int main( int argc, char** argv )
 //    visualizer_t v( ew.get() ); 
 //    boost::format title("W: weighted = %1%, use-edges = %2%");
 //    visualization::viewer< visualizer_t > viewer( &v, ( title % weighted % use_edges ).str().c_str(), &argc, argv );
+*/
 }

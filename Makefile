@@ -1,14 +1,13 @@
 CC = g++
 
-LIBS = -lboost_program_options-mt -lCGAL -lGL -lGLU -lglut  
+LIBS = -lboost_program_options-mt -lCGAL -lGL -lGLU -lglut -llapackpp 
 
-all : precompile compile
+all : compile-main compile-white-noise
     
 clean : 
 	rm -f viewer
 
-compile : src/main.cpp
-	$(CC) -std=c++0x -Wall -O3 -I /usr/local/include/lapackpp -o viewer $< $(LIBS) 
-
-precompile : src/stdafx.h  
-	$(CC) -c src/stdafx.h -o src/stdafx.h.gch
+compile-main : src/main.cpp
+    $(CC) -std=c++0x -Wall -O3 -I /usr/local/include/lapackpp -o viewer $< $(LIBS) 
+compile-white-noise: src/experiments/white-noise.cpp
+	$(CC) -std=c++0x -Wall -O3 -I /usr/local/include/lapackpp -o white-noise $< $(LIBS) 

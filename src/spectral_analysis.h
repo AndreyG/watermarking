@@ -3,6 +3,8 @@
 
 #include <lapackpp.h>
 
+#include "utility/stopwatch.h"
+
 namespace watermarking
 {
     
@@ -38,9 +40,10 @@ namespace watermarking
 
     namespace details
     {
-        template< class Maxtrix >
+        template< class Matrix >
         void check_symmetry( Matrix const & a )
         {
+            const size_t N = a.rows();
             for ( size_t v = 0; v + 1 != N; ++v )
             {
                 for ( size_t u = v + 1; u != N; ++u )
@@ -49,7 +52,7 @@ namespace watermarking
         }
 
         template< class Graph, class Matrix >
-        void fill_maxtrix_by_chen( Graph const & graph, Matrix & a )
+        void fill_matrix_by_chen( Graph const & graph, Matrix & a )
         {
             util::stopwatch _("creation of adjacency matrix");
             const size_t N = graph.vertices_num();
@@ -66,7 +69,7 @@ namespace watermarking
         }
 
         template< class Graph, class Matrix >
-        void fill_maxtrix_by_obuchi( Graph const & graph, Matrix & a )
+        void fill_matrix_by_obuchi( Graph const & graph, Matrix & a )
         {
             util::stopwatch _("creation of adjacency matrix");
             const size_t N = graph.vertices_num();
@@ -89,8 +92,7 @@ namespace watermarking
         typedef LaGenMatDouble matrix_t;
 
         template< class Graph >
-        spectral_analyser(  Graph const & graph, boost::function< void (Graph const &, matrix_t &) > fill_maxtrix = 
-                                                    boost::bind( &details::fill_maxtrix_by_obuchi, _1, _2 ) )
+        spectral_analyser(  Graph const & graph, boost::function< void (Graph const &, matrix_t &) > fill_matrix )
                 : e_( graph.vertices_num(), graph.vertices_num() )
         {
             util::stopwatch _("calculating eigenvectors");

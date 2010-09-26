@@ -1,3 +1,5 @@
+#include "utility/dump.h"
+
 template< class Stream, class Point >
 void read_points( Stream & in, const size_t N, Point * out )
 {

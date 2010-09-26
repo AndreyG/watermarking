@@ -86,9 +86,7 @@ namespace geometry
                     double w = -1;
                     if ( trg.is_infinite( neighbor ) )
                     {
-                        w = ctg( b->point(), a->point(), c->point() );
-                        if ( w < 0 )
-                            w = 1;
+                        w = ctg( b->point(), a->point(), c->point() ) / 2;
                     }   
                     else 
                     {

@@ -7,7 +7,7 @@
 
 #include "../utility/random_generator.h"
 #include "../geometry/plane_subdivision.h"
-#include "spectral_analysis.h"
+#include "../spectral_analysis.h"
 #include "../geometry/triangulation_graph.h"
 
 namespace watermarking
