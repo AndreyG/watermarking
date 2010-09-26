@@ -64,8 +64,8 @@ namespace watermarking
                 a(v, v) = graph.degree( v );
                 for ( typename Graph::edges_iterator e = graph.edges_begin( v ); e != graph.edges_end( v ); ++e )
                     a(v, e->end) = -e->weight;
-                check_symmetry( a );
             }
+            check_symmetry( a );
         }
 
         template< class Graph, class Matrix >
@@ -82,8 +82,8 @@ namespace watermarking
                 double d = graph.degree( v );
                 for ( typename Graph::edges_iterator e = graph.edges_begin( v ); e != graph.edges_end( v ); ++e )
                     a(v, e->end) = -e->weigh / d;
-                check_symmetry( a );
             }
+            check_symmetry( a );
         }
     }
          
@@ -101,6 +101,10 @@ namespace watermarking
 
             LaVectorDouble lambda(N);
             LaEigSolveSymmetricVecIP( e_, lambda );
+            for ( int i = 0; i + 1 != N; ++i )
+            {
+                assert( lambda(i) <= lambda(i + 1) );
+            }
         }
 
         template< class Points >
