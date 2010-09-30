@@ -28,6 +28,19 @@ namespace watermarking
 
         bool next_step();
 
+        graph_t modified_graph() const
+        {
+            graph_t res;
+            res.vertices = modified_vertices_;
+            res.edges = graph_.edges;
+            return res;
+        }
+
+        std::vector< analyser_ptr > get_analysers() const
+        {
+            return analysers_;
+        }
+
 //    private:
 
         size_t subdivide_plane( size_t max_subarea_size );
@@ -38,14 +51,6 @@ namespace watermarking
 
         void modify_vertices( message_t const & message, size_t chip_rate, int key, double alpha );
  
-        graph_t modified_graph() const
-        {
-            graph_t res;
-            res.vertices = modified_vertices_;
-            res.edges = graph_.edges;
-            return res;
-        }
-
 
         size_t                              subareas_num_;
         graph_t                             graph_;
@@ -100,15 +105,24 @@ namespace watermarking
         }
     }
 
+    // vector subdivision_ will be filled by indices of zone in which graph_.vertices[i] will be laid.
     template< class Point >
     size_t embedding_impl< Point >::subdivide_plane( size_t max_subarea_size )
     {
         util::stopwatch _( "subidivide plane" );
 
-        typedef typename Graph::vertex_t vertex_t;
+        // ----------- types -------------
+        typedef typename graph_t::vertex_t vertex_t;
+        typedef typename graph_t::edge_t edge_t;
+        // -------------------------------
+
+        // --------- constants -----------
+        const size_t N = vertices_num( graph_ );
+        // -------------------------------
+        
         std::map< vertex_t, size_t > old_index;
         size_t i = 0;
-        foreach ( vertex_t const & v, graph.vertices )
+        foreach ( vertex_t const & v, graph_.vertices )
         {
             old_index.insert( std::make_pair( v, i ) );
             ++i;
@@ -116,15 +130,13 @@ namespace watermarking
 
         size_t res = geometry::subdivide_plane( graph_.vertices.begin(), graph_.vertices.end(), max_subarea_size, true, subdivision_, 0 );
 
-        const size_t N = graph.vertices.size();
         std::vector< size_t > old2new( N );
         for ( size_t i = 0; i != N; ++i )
         {
-            old2new[old_index[graph.vertices[i]]] = i;
+            old2new[old_index[graph_.vertices[i]]] = i;
         }
 
-        typedef typename Graph::edge_t edge_t; 
-        foreach ( edge_t & e, graph.edges )
+        foreach ( edge_t & e, graph_.edges )
         {
             e.first = old2new[e.first];
             e.second = old2new[e.second];
@@ -195,6 +207,12 @@ namespace watermarking
     {
         util::stopwatch _("coordinate vectors factorization");
 
+        // ----------- types -------------
+        typedef geometry::triangulation_graph< trg_t >      incidence_graph;
+        typedef typename trg_t::Vertex_handle               trg_vertex; 
+        typedef typename trg_t::Finite_vertices_iterator    trg_vertices_iterator;
+        // -------------------------------
+
         analysers_.resize( subareas_num );
         coefficients_.resize( subareas_num );
         for ( size_t s = 0; s != subareas_num; ++s )
@@ -204,21 +222,23 @@ namespace watermarking
             util::stopwatch _( step_title.c_str() );
 
             trg_t const &   trg         = trgs_[s];
-            analyser_ptr    analyser    = analysers_[s];
+            analyser_ptr &  analyser    = analysers_[s];
 
             vertices_t vertices;        
-            std::map< typename trg_t::Vertex_handle, size_t > trg_vertex_to_index;
+            std::map< trg_vertex, size_t > trg_vertex_to_index;
             size_t i = 0;
 
-            for ( typename trg_t::Finite_vertices_iterator v = trg.finite_vertices_begin(); v != trg.finite_vertices_end(); ++v )
+            for ( trg_vertices_iterator v = trg.finite_vertices_begin(); v != trg.finite_vertices_end(); ++v )
             {
-                trg_vertex_to_index.insert( std::make_pair( v, i ) );
+                trg_vertex_to_index[v] = i;
                 vertices.push_back( v->point() );
                 ++i;
             }
-
-            typedef geometry::triangulation_graph< trg_t > incidence_graph;
-            analyser.reset( new spectral_analyser( incidence_graph( trg, trg_vertex_to_index, weighted_ ) ) );
+            
+            incidence_graph graph( trg, trg_vertex_to_index, weighted_ );
+            boost::function< void (incidence_graph const &, spectral_analyser::matrix_t &) > fill_matrix =
+                boost::bind( &watermarking::details::fill_matrix_by_chen< incidence_graph, spectral_analyser::matrix_t >, _1, _2 ); 
+            analyser.reset( new spectral_analyser( graph, fill_matrix ) );
         
             coefficients_[s] = analyser->get_coefficients( vertices );
         }

@@ -2,14 +2,12 @@
 #define _MEDIAN_H_
 
 #include <algorithm>
+#include <boost/utility.hpp>
 
 namespace algorithm
 {
     namespace 
     {
-        using boost::next;
-        using boost::prior;
-
         template< class Iter >
         struct default_comparator_f
         {
@@ -21,18 +19,12 @@ namespace algorithm
         {
             if ( comp( *m, value ) )
             {
-                std::cout << "checker, value of bound = " << value << std::endl; 
-                std::cout   << *prior( m )    << "\n" 
-                            << *m             << "\n"  
-                            << *next( m )     << std::endl;
                 return false;
             }
             for ( ; p != m; ++p )
             {
                 if ( !comp( *p, value ) )
                 {
-                    std::cout   << "checker, left part:\n" 
-                                << *p << "\n" << value << std::endl;
                     return false;
                 }
             }
@@ -40,8 +32,6 @@ namespace algorithm
             {
                 if ( comp( *m, value ) )
                 {
-                    std::cout   << "checker, right part:\n" 
-                                << *m << "\n" << value << std::endl;
                     return false;
                 }
             }
@@ -110,20 +100,12 @@ namespace algorithm
         typedef typename std::iterator_traits< Iter >::value_type value_type;
         for ( ; p != res; ++p )
         {
-            if ( comp( *next( res ), *p ) )
-            {
-                std::cout << std::setprecision( 32 ) << *p << "\n" << *res << "\n" << *next( res ) << std::endl;
-                assert( false );
-            }
+            assert( !comp( *boost::next( res ), *p ) );
         }
         --q;
         for ( ; q != res; --q )
         {
-            if ( comp( *q, *prior( res ) ) )
-            {
-                std::cout << std::setprecision( 32 ) << *res << "\n" << *q << std::endl;
-                assert( false );
-            }
+            assert( !comp( *q, *boost::prior( res ) ) );
         }
         return res;
     }

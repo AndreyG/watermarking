@@ -57,24 +57,38 @@ void read_graph( Graph & graph, Stream & in )
     read_edges( in, m, &graph.edges[0] );
 }
 
-boost::program_options::variables_map read_params()
+struct message_params_t
 {
+    std::string text;
+    size_t      chip_rate;
+    int         key;
+    double      alpha;
+};
+
+message_params_t read_message_params()
+{
+    std::ifstream conf("conf/embedding.conf");
+                
     namespace po = boost::program_options;
 
-    std::ifstream conf("common.conf");
     po::options_description desc;
     desc.add_options()
-        ( "step-by-step", po::value<bool>() )
-        ( "weighted",     po::value<bool>() )
-        ( "use-edges",    po::value<bool>() )
-        ( "max-subarea-size", po::value< size_t >() )
-        ( "input-data",   po::value<std::string>() )
+        ( "message", po::value< std::string >() )
+        ( "key",     po::value< int >() )
+        ( "chip-rate", po::value< size_t >() )
+        ( "alpha",   po::value< double >() )
     ;
-    
-    po::variables_map vm;       
-    po::store(po::parse_config_file(conf, desc), vm);
 
-    return vm;
+    po::variables_map vm;       
+    po::store( po::parse_config_file( conf, desc ), vm );
+
+    message_params_t params;
+    params.text = vm["message"].as< std::string >();
+    params.key  = vm["key"].as< int >();
+    params.chip_rate = vm["chip-rate"].as< size_t >();
+    params.alpha = vm["alpha"].as< double >();
+
+    return params;
 }
 
 template< class Graph >

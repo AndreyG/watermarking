@@ -24,6 +24,12 @@ namespace watermarking
         edges_t      edges;
     };
 
+    template< class Point >
+    size_t vertices_num( planar_graph< Point > const & graph )
+    {
+        return graph.vertices.size();
+    }
+
     typedef std::vector< int > message_t;
 
     template< class Point >
@@ -39,12 +45,6 @@ namespace watermarking
             v = vertex_t( v.x() + cos( a ) * r, v.y() + sin( a ) * r );
         }
         return g;
-    }
-
-    // vector subdivision will be filled by indices of zone in which graph.vertices[i] will be laid.
-    template< class Graph >
-    size_t subdivide_plane( Graph & graph, size_t max_subarea_size, std::vector< size_t > & subdivision )
-    {
     }
 
     typedef boost::shared_ptr< spectral_analyser > analyser_ptr;
