@@ -36,9 +36,19 @@ namespace watermarking
             return res;
         }
 
-        std::vector< analyser_ptr > get_analysers() const
+        graph_t const & rearranged_graph() const
+        {
+            return graph_;
+        }
+
+        std::vector< analyser_ptr > const & get_analysers() const
         {
             return analysers_;
+        }
+
+        std::vector< size_t > const & get_subdivision() const
+        {
+            return subdivision_;
         }
 
 //    private:

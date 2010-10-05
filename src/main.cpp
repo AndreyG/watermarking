@@ -51,13 +51,14 @@ namespace
 {
     watermarking::message_t encode( std::string const & text )
     {
-        watermarking::message_t message( text.size() * 7 );
-        for ( size_t i = 0; i != text.size(); ++i )
+        watermarking::message_t message;
+        message.resize(text.size() * 7);
+        for ( int i = 0; i != text.size(); ++i )
         {
             unsigned char c = text[i];
-            for ( size_t j = 0; j != 7; ++j )
+            for ( int j = 6; j >= 0; --j )
             {
-                message[i * 7 + 6 - j] = c % 2;
+                message[i * 7 + j] = c % 2;
                 c /= 2;
             }
         }
@@ -67,61 +68,65 @@ namespace
     std::string decode( watermarking::message_t const & message )
     {
         assert( message.size() % 7 == 0 );
-        std::vector< unsigned char > text( message.size() / 7 );
+        std::vector< char > text( message.size() / 7 );
         for ( size_t i = 0; i != text.size(); ++i )
         {
             text[i] = 0;
             unsigned char power = 1;
-            for ( size_t j = 0; j != 7; ++j )
+            for ( int j = 6; j >= 0; --j )
             {
-                text[i] += power * message[i * 7 + 6 - j];
+                text[i] += power * message[i * 7 + j];
                 power *= 2;
             }
         }
         return std::string( text.begin(), text.end() );
     }
-}
 
+    template< class Stream >
+    void write_encoded_message( Stream & out, watermarking::message_t const & message )
+    {
+        assert(message.size() % 7 == 0);
+        for ( size_t i = 0; i != message.size(); )
+        {
+            for ( size_t j = 0; j != 7; ++j, ++i )
+                out << message[i];
+            out << " ";
+        }
+        out << std::endl;
+    }
+}
 
 int main( int argc, char** argv )
 {
     assert( argc >= 2 );
-    auto graph  = create_graph( argv[1] );
-    auto ew     = create_embedding( graph );
 
     auto message_params = read_message_params();
     auto message = encode( message_params.text );
+    std::cout << decode( message ) << std::endl;
+    write_encoded_message( std::cout, message );
     
+    auto graph  = create_graph( argv[1] );
+    auto ew     = create_embedding( graph );
+
     ew->modify_vertices( message, message_params.chip_rate, message_params.key, message_params.alpha );
 
+    graph_t const & rearranged_graph = ew->rearranged_graph();
     graph_t modified_graph = ew->modified_graph();
     
     std::vector< watermarking::analyser_ptr > analyser_vec = ew->get_analysers();
+    std::vector< size_t > const & subdivision = ew->get_subdivision();
     for ( double radius = 0.0; radius <= 1.0; radius += 0.1 )
     {
         graph_t noised_graph = watermarking::add_noise( modified_graph, radius );
-        watermarking::message_t ex_message = watermarking::extract( graph, noised_graph, analyser_vec, message_params.key,
+        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 
+                                                                    analyser_vec, message_params.key, 
                                                                     message_params.chip_rate, message.size() ); 
         std::cout << "Embedded message:  ";
-        for ( size_t i = 0; i != message.size(); ++i )
-        {
-            for ( size_t j = 0; j != 7; ++j, ++i )
-                std::cout << message[i];
-            std::cout << " ";
-        }
-        std::cout << std::endl;
-
+        write_encoded_message( std::cout, message );
         std::cout << "Extracted message: ";
-        for ( size_t i = 0; i != ex_message.size(); )
-        {
-            for ( size_t j = 0; j != 7; ++j, ++i )
-                std::cout << ex_message[i];
-            std::cout << " ";
-        }
-        std::cout << std::endl;
+        write_encoded_message( std::cout, ex_message );
         std::cout << decode( ex_message ) << std::endl;
     }
-
  
 //    typedef my_visualizer< embedded_watermark_t::element_type > visualizer_t; 
 //    visualizer_t v( ew.get() ); 
