@@ -81,9 +81,8 @@ namespace watermarking
                 a(v, v) = 1;
                 double d = graph.degree( v );
                 for ( typename Graph::edges_iterator e = graph.edges_begin( v ); e != graph.edges_end( v ); ++e )
-                    a(v, e->end) = -e->weigh / d;
+                    a(v, e->end) = -e->weight / d;
             }
-            check_symmetry( a );
         }
     }
          
@@ -106,6 +105,51 @@ namespace watermarking
                 assert( lambda_(i) <= lambda_(i + 1) );
             }
         }
+
+        template< class Stream >
+        void dump( Stream & out ) const
+        {
+            const int N = lambda_.size();
+            out << N << std::endl;
+            for (int i = 0; i != N; ++i) 
+            {
+                for (int j = 0; j != N; ++j) 
+                {
+                    out << e_(i, j) << " ";
+                }
+                out << std::endl;
+            }
+            for (int i = 0; i != N; ++i)
+                out << lambda_(i) << " ";
+        }
+
+    private:
+        template< class Stream >
+        int read_size( Stream & in )
+        {
+            int s;
+            in >> s;
+            return s;
+        }
+    public:
+
+        template< class Stream >
+        explicit spectral_analyser( Stream & in )
+                : lambda_( read_size(in) )
+                , e_(lambda_.size(), lambda_.size())
+        {
+            util::stopwatch _("spectral analyser: reading from file");
+
+            const int N = lambda_.size();
+            for (int i = 0; i != N; ++i)
+            {
+                for (int j = 0; j != N; ++j)
+                    in >> e_(i, j);
+            }
+            for (int i = 0; i != N; ++i)
+                in >> lambda_(i);
+        }
+
 
         double get_lambda( size_t i ) const
         {

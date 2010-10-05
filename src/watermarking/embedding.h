@@ -9,6 +9,8 @@ using boost::lexical_cast;
 
 namespace watermarking
 {
+    enum FILL_MATRIX_TYPE { CHEN, OBUCHI };
+
     template< class Point >
     struct embedding_impl
     {
@@ -24,8 +26,14 @@ namespace watermarking
         };
         
         embedding_impl( graph_t const & graph, size_t max_patch_size, 
-                        bool weighted, bool use_edges, bool step_by_step );
+                        bool weighted, bool use_edges, bool step_by_step, FILL_MATRIX_TYPE );
 
+        template< class Stream >
+        explicit embedding_impl( Stream & in );
+
+        template< class Stream >
+        void dump( Stream & out ) const;
+        
         bool next_step();
 
         graph_t modified_graph() const
@@ -57,7 +65,7 @@ namespace watermarking
 
         void build_trgs( size_t subareas_num );
 
-        void factorize( size_t subareas_num );
+        void factorize( size_t subareas_num, FILL_MATRIX_TYPE fill_matrix );
 
         void modify_vertices( message_t const & message, size_t chip_rate, int key, double alpha );
  
@@ -74,6 +82,7 @@ namespace watermarking
         size_t                              max_patch_size_;
         bool                                weighted_;
         bool                                use_edges_;
+        FILL_MATRIX_TYPE                    fill_matrix_;
     };
 
 
@@ -81,15 +90,61 @@ namespace watermarking
 
     template< class Point >
     embedding_impl< Point >::embedding_impl(    graph_t const & graph, size_t max_patch_size, 
-                                                bool weighted, bool use_edges, bool step_by_step )
+                                                bool weighted, bool use_edges, bool step_by_step,
+                                                FILL_MATRIX_TYPE fill_matrix )
             : graph_( graph )
             , max_patch_size_( max_patch_size )
             , weighted_( weighted )
             , use_edges_( use_edges )
+            , fill_matrix_( fill_matrix )
     {
         step_ = SUBDIVIDE_PLANE;
         if ( !step_by_step )
             while ( next_step() );
+    }
+
+    template< class Point >
+    template< class Stream >
+    embedding_impl< Point >::embedding_impl( Stream & in )
+    {
+        util::stopwatch _("embedding_impl: reading from file");
+
+        in >> subareas_num_;
+        analysers_.resize( subareas_num_ );
+        foreach (analyser_ptr & analyser, analysers_ )
+        {
+            analyser.reset( new spectral_analyser( in ) );
+        }
+        read_graph( graph_, in );
+        subdivision_.resize( vertices_num( graph_ ) );
+        foreach ( size_t & s, subdivision_ )
+        {
+            in >> s;
+        }
+        std::vector< vertices_t > vertices( subareas_num_ );
+        for ( size_t i = 0; i != graph_.vertices.size(); ++i )
+        {
+            vertices[subdivision_[i]].push_back( graph_.vertices[i] );
+        }
+        coefficients_.resize( subareas_num_ );
+        for ( size_t s = 0; s != subareas_num_; ++s ) 
+        {
+            coefficients_[s] = analysers_[s]->get_coefficients( vertices[s] ); 
+        }
+    }
+
+    template< class Point >
+    template< class Stream >
+    void embedding_impl< Point >::dump( Stream & out ) const
+    {
+        out << subareas_num_ << std::endl;
+        foreach (analyser_ptr const & analyser, analysers_ )
+        {
+            analyser->dump(out);
+        }
+        dump_graph(graph_, out);
+        foreach (size_t s, subdivision_ )
+            out << s << " ";
     }
 
     template< class Point >
@@ -107,7 +162,7 @@ namespace watermarking
             step_ = FACTORIZE;
             return true;
         case FACTORIZE:
-            factorize( subareas_num_ );
+            factorize( subareas_num_, fill_matrix_ );
             step_ = MODIFY_VERTICES;
             return true;
         default:
@@ -213,7 +268,7 @@ namespace watermarking
     }
     
     template< class Point >
-    void embedding_impl< Point >::factorize( size_t subareas_num )
+    void embedding_impl< Point >::factorize( size_t subareas_num, FILL_MATRIX_TYPE fm )
     {
         util::stopwatch _("coordinate vectors factorization");
 
@@ -246,8 +301,9 @@ namespace watermarking
             }
             
             incidence_graph graph( trg, trg_vertex_to_index, weighted_ );
-            boost::function< void (incidence_graph const &, spectral_analyser::matrix_t &) > fill_matrix =
-                boost::bind( &watermarking::details::fill_matrix_by_chen< incidence_graph, spectral_analyser::matrix_t >, _1, _2 ); 
+            boost::function< void (incidence_graph const &, spectral_analyser::matrix_t &) > fill_matrix = fm == CHEN ?
+                boost::bind( &watermarking::details::fill_matrix_by_chen< incidence_graph,      spectral_analyser::matrix_t >, _1, _2 ) :
+                boost::bind( &watermarking::details::fill_matrix_by_obuchi< incidence_graph,    spectral_analyser::matrix_t >, _1, _2 ); 
             analyser.reset( new spectral_analyser( graph, fill_matrix ) );
         
             coefficients_[s] = analyser->get_coefficients( vertices );
@@ -256,12 +312,12 @@ namespace watermarking
 
     template< class Point >
     std::auto_ptr< embedding_impl< Point > > embed( planar_graph< Point > const & graph, size_t max_patch_size, bool weighted, bool use_edges, 
-													bool step_by_step = false )
+													bool step_by_step, FILL_MATRIX_TYPE fill_matrix )
     {
         util::stopwatch _("watermarking generator creation");
 
         typedef embedding_impl< Point > result_t; 
-        return std::auto_ptr< result_t >( new result_t( graph, max_patch_size, weighted, use_edges, step_by_step ) );
+        return std::auto_ptr< result_t >( new result_t( graph, max_patch_size, weighted, use_edges, step_by_step, fill_matrix ) );
     }
 }
 

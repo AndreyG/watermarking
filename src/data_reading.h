@@ -39,22 +39,21 @@ void read_graph( Graph & graph, Stream & in )
 
     read_points( in, n, &graph.vertices[0] );
 
-    typedef typename Graph::vertex_t vertex_t; 
-    
-    double middle_x = 0, middle_y = 0;
-    foreach ( vertex_t const & v, graph.vertices )
-    {
-        middle_x += v.x();
-        middle_y += v.y();
-    }
-    middle_x /= graph.vertices.size();
-    middle_y /= graph.vertices.size();
-    foreach ( vertex_t & v, graph.vertices )
-    {
-        v = vertex_t( v.x() - middle_x, v.y() - middle_y );
-    }
-
     read_edges( in, m, &graph.edges[0] );
+}
+
+template< class Graph, class Stream >
+void dump_graph( Graph const & graph, Stream & out )
+{
+    out << graph.vertices.size() << "\t" << graph.edges.size() << "\n";
+    foreach (typename Graph::vertex_t const & v, graph.vertices)
+    {
+        out << "(" << v.x() << ", " << v.y() << ")\n";
+    }
+    foreach (typename Graph::edge_t const & e, graph.edges)
+    {
+        out << e.first << " " << e.second << "\n";
+    }
 }
 
 struct message_params_t
@@ -65,9 +64,9 @@ struct message_params_t
     double      alpha;
 };
 
-message_params_t read_message_params()
+message_params_t read_message_params(const char * filepath)
 {
-    std::ifstream conf("conf/embedding.conf");
+    std::ifstream conf(filepath);
                 
     namespace po = boost::program_options;
 
@@ -97,6 +96,21 @@ void fix_graph( Graph & g )
     typedef typename Graph::vertex_t vertex_t;
     typedef typename Graph::edge_t edge_t;
     typedef std::map< vertex_t, size_t > v2i_t;  
+
+    typedef typename Graph::vertex_t vertex_t; 
+    
+    double middle_x = 0, middle_y = 0;
+    foreach ( vertex_t const & v, g.vertices )
+    {
+        middle_x += v.x();
+        middle_y += v.y();
+    }
+    middle_x /= g.vertices.size();
+    middle_y /= g.vertices.size();
+    foreach ( vertex_t & v, g.vertices )
+    {
+        v = vertex_t( v.x() - middle_x, v.y() - middle_y );
+    }
 
     v2i_t v2i;
     size_t idx = 0;
