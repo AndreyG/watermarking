@@ -1,3 +1,3 @@
 scalac -d tester -sourcepath tester tester/TestGenerator.scala &&
-scala -classpath tester TestGenerator 1 rivers 0.0 0.1 0.1 &&
+scala -classpath tester TestGenerator 30 rivers 0.5 1.5 0.1 &&
 chmod +x test-run.sh 

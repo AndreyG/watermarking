@@ -1,6 +1,6 @@
 import java.io.{File, PrintStream, FileOutputStream}
 import scala.io.Source
-
+import java.lang.Double.parseDouble
 import Common._
 
 object TestChecker {
@@ -11,16 +11,23 @@ object TestChecker {
 	for (embeddingDir <- dirs(factorizationDir, nameStarts("alpha"))) {
 	  for (timeDir <- dirs(embeddingDir)) {
 	    for (noiseDir <- dirs(timeDir, nameStarts("noise"))) {
+	      val noise = {
+		val x = parseDouble(noiseDir.getName.substring(6))
+		format("%f", x)
+	      }			    
+	      val name = factorizationDir.getName + "/" + graphDir.getName + "/" + embeddingDir.getName + "/noise-" + noise
+	      var attemptsNum = 0
+	      var successesNum = 0
 	      for (attemptDir <- dirs(noiseDir, nameStarts("attempt"))) {
-		for (f <- attemptDir.listFiles; if f.getName == "message.txt") {
-		  val name = f.getAbsolutePath.substring(inputDir.getAbsolutePath.length)
+		val f = new File(attemptDir, "message.txt")
+		if (f.exists) {
+		  attemptsNum += 1
 		  val lines = Source.fromFile(f).getLines.toArray
 		  if ((lines.length == 4) && (lines(1) == lines(3)))
-		    println(name + " -- Accepted")
-		  else
-		    println(name + " -- Fail")
+		    successesNum += 1
 		}
 	      }
+	      println(format("%s: (%d/%d)", name, successesNum, attemptsNum))
 	    }
 	  }
 	}
