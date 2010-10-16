@@ -51,35 +51,37 @@ object TestGenerator {
     for (graphDir <- dirs(inputDir, matchPattern(params(1)))) {
       args(1) = graphDir.getAbsolutePath + "/input-graph.txt" 
       for (factorizationDir <- dirs(graphDir)) {
-	args(2) = {
-	  val factorizationParams = new File(factorizationDir, "factorization.params")
-	  if (factorizationParams.exists()) {
-	    "dump" 
-	  } else {
-	    factorizationDir.getAbsolutePath + "/factorization.conf"
-	  }
-	}
-	args(3) = factorizationDir.getAbsolutePath
-	for (embeddingDir <- dirs(factorizationDir, nameStarts("alpha"))) {
-	  args(4) = embeddingDir.getAbsolutePath + "/embedding.conf"
- 	  val outDir = mkdirIfNotExists(embeddingDir, outDirName)
-	  for (noise <- range) {
-	    val noiseDir = mkdirIfNotExists(outDir, "noise-" + noise)
-	    for (attempt <- 0 until attemptsNum) {
-	      mkdirIfNotExists(noiseDir, "attempt-" + attempt)
-	    }
-	  }
-	  args(5) = outDir.getAbsolutePath
-	  val logDir = mkdirIfNotExists(outDir, "log")
-	  val errStream = logDir.getAbsolutePath + "/err.txt"
-	  val outStream = logDir.getAbsolutePath + "/out.txt" 
-	  for (arg <- args) {
-	    out.print(arg + " ")
-	  }
-	  out.print(" 1> " + outStream)
-	  out.print(" 2> " + errStream)
-	  out.println()
-	}
+		var first = true
+		args(3) = factorizationDir.getAbsolutePath
+		for (embeddingDir <- dirs(factorizationDir, nameStarts("alpha"))) {
+		  args(2) = {
+			val factorizationParams = new File(factorizationDir, "factorization.params")
+			if (factorizationParams.exists() || !first) {
+			  "dump" 
+			} else {
+			  factorizationDir.getAbsolutePath + "/factorization.conf"
+			}
+		  }
+		  first = false
+		  args(4) = embeddingDir.getAbsolutePath + "/embedding.conf"
+ 		  val outDir = mkdirIfNotExists(embeddingDir, outDirName)
+		  for (noise <- range) {
+			val noiseDir = mkdirIfNotExists(outDir, "noise-" + noise)
+			for (attempt <- 0 until attemptsNum) {
+			  mkdirIfNotExists(noiseDir, "attempt-" + attempt)
+			}
+		  }
+		  args(5) = outDir.getAbsolutePath
+		  val logDir = mkdirIfNotExists(outDir, "log")
+		  val errStream = logDir.getAbsolutePath + "/err.txt"
+		  val outStream = logDir.getAbsolutePath + "/out.txt" 
+		  for (arg <- args) {
+			out.print(arg + " ")
+		  }
+		  out.print(" 1> " + outStream)
+		  out.print(" 2> " + errStream)
+		  out.println()
+		}
       }
     }
   }
