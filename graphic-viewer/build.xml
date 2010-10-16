@@ -1,6 +1,7 @@
 <project name="Graphic" default="build">
 
-    <property name="scala.home" value="/Users/andrey/programming/lang/scala/scala-2.8.0.final"/>
+    <property environment="env"/>
+    <property name="scala.home" value="${env.SCALA_HOME}"/>
     <property name="lib" value="lib"/>
     <property name="build" value="classes"/>
 
