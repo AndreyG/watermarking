@@ -53,7 +53,6 @@ object Main {
   import java.lang.{Double => JDouble}
 
   def main(args: Array[String]) {
-	println(args.mkString)
 	assert(args.size == 1)
 	val data = readData(args(0))
 	val arguments: ArrayList[ArrayList[JDouble]] = new ArrayList()
@@ -64,7 +63,6 @@ object Main {
 	  val noise: ArrayList[JDouble] = new ArrayList
 	  val percent: ArrayList[JDouble] = new ArrayList
 	  for ((arg, value) <- func) {
-		println("f(%f) = %f".format(arg, value))
 		noise.add(arg)
 		percent.add(value)
 	  }
