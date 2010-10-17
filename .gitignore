@@ -10,3 +10,4 @@ err.txt
 test-run.sh
 bin
 *.swp
+\#*\#
