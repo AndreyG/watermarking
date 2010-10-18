@@ -19,6 +19,6 @@ object Common {
 
   def nameStarts(str: String): (File => Boolean) = _.getName.startsWith(str)
 
-  def matchPattern(s: String): (File => Boolean) = dir => s.r.findPrefixOf(dir.getName).isDefined
+  def matchPattern(s: String): (File => Boolean) = dir => (if (s == "_") ".*" else s).r.findPrefixOf(dir.getName).isDefined
 
 }

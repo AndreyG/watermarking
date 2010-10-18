@@ -38,22 +38,24 @@ object TestGenerator {
     res
   }
   
+  def and[T](preds: (T => Boolean)*): (T => Boolean) = t => preds.forall(_(t))
+  
   def main(params: Array[String]) {
-    assert(params.size == 5)
-    val range = genRange(parseDouble(params(2)), parseDouble(params(3)), parseDouble(params(4)))
-    val args = new Array[String](7 + 1 + range.size)
+    assert(params.size == 7)
+    val range = genRange(parseDouble(params(4)), parseDouble(params(5)), parseDouble(params(6)))
+    val args = new Array[String](9 + range.size)
     Array.copy(range, 0, args, args.size - range.size, range.size)
     args(0) = "bin/watermarking"
     val attemptsNum = java.lang.Integer.parseInt(params(0))
-    args(6) = params(0)
-    args(7) = range.size.toString
+    args(7) = params(0)
+    args(8) = range.size.toString
     val outDirName = genNameByTime()
     for (graphDir <- dirs(inputDir, matchPattern(params(1)))) {
       args(1) = graphDir.getAbsolutePath + "/input-graph.txt" 
-      for (factorizationDir <- dirs(graphDir)) {
+      for (factorizationDir <- dirs(graphDir, matchPattern(params(2)))) {
 		var first = true
 		args(3) = factorizationDir.getAbsolutePath
-		for (embeddingDir <- dirs(factorizationDir, nameStarts("alpha"))) {
+		for (embeddingDir <- dirs(factorizationDir, and(nameStarts("alpha"), matchPattern(params(3))))) {
 		  args(2) = {
 			val factorizationParams = new File(factorizationDir, "factorization.params")
 			if (factorizationParams.exists() || !first) {
@@ -72,6 +74,8 @@ object TestGenerator {
 			}
 		  }
 		  args(5) = outDir.getAbsolutePath
+		  val modifiedGraphFile = new File(embeddingDir, "modified_graph.txt")
+		  args(6) = if (modifiedGraphFile.exists) "skip" else modifiedGraphFile.getAbsolutePath
 		  val logDir = mkdirIfNotExists(outDir, "log")
 		  val errStream = logDir.getAbsolutePath + "/err.txt"
 		  val outStream = logDir.getAbsolutePath + "/out.txt" 
@@ -83,6 +87,6 @@ object TestGenerator {
 		  out.println()
 		}
       }
-    }
+	}
   }
 }

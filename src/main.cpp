@@ -135,15 +135,16 @@ int main( int argc, char** argv )
     std::vector< watermarking::analyser_ptr > analyser_vec = ew->get_analysers();
     std::vector< size_t > const & subdivision = ew->get_subdivision();
 
-    size_t attempts_num = boost::lexical_cast< size_t >( argv[6] );
-    size_t noises_num   = boost::lexical_cast< size_t >( argv[7] );
-    assert((size_t) argc == 8 + noises_num);
+    size_t attempts_num = boost::lexical_cast< size_t >( argv[7] );
+    size_t noises_num   = boost::lexical_cast< size_t >( argv[8] );
+    assert((size_t) argc == 9 + noises_num);
     
-    dump_graph(modified_graph, (std::string(argv[5]) + "/modified_graph.txt").c_str());
+    if (std::string(argv[6]) != "skip")
+        dump_graph(modified_graph, (const char *) argv[6]);
 
     for (size_t i = 0; i != noises_num; ++i)
     {
-        double noise = boost::lexical_cast< double >( argv[8 + i] );
+        double noise = boost::lexical_cast< double >( argv[9 + i] );
         for (size_t j = 0; j != attempts_num; ++j)
         {
             std::stringstream outdirstream;
