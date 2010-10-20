@@ -1,4 +1,4 @@
 #!/bin/sh
 
 export name=$1
-pdflatex $name.tex && xpdf $name.pdf
+pdflatex $name.tex && open $name.pdf
