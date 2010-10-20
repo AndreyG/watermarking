@@ -93,7 +93,7 @@
         \left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] = 
         \frac{1}{\Delta^2} 
         [
-            (f_1 - f_3)^2 [(y_2 - y_3)^2 + (x_2 - x_3)^2] + (f_1 - f_3)^2 [(y_1 - y_3)^2 + (x_1 - x_3)^2] - \\
+            (f_1 - f_3)^2 [(y_2 - y_3)^2 + (x_2 - x_3)^2] + (f_2 - f_3)^2 [(y_1 - y_3)^2 + (x_1 - x_3)^2] - \\
             - 2 (f_1 - f_3)(f_2 - f_3)((y_2 - y_3)(y_1 - y_3) + (x_2 - x_3)(x_1 - x_3))
         ]
     \end{multline*}
@@ -102,24 +102,24 @@
         \left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] = 
         \frac{1}{\Delta^2} 
         \left[
-            (f_1 - f_3)^2 a^2 + (f_1 - f_3)^2 b^2 - 2 (f_1 - f_3)(f_2 - f_3)(\vec{a}, \vec{b}) 
+            (f_1 - f_3)^2 a^2 + (f_2 - f_3)^2 b^2 - 2 (f_1 - f_3)(f_2 - f_3)(\vec{a}, \vec{b}) 
         \right] = \\
         = \frac{1}{\Delta^2} 
         \left[
-            (f_1 - f_3)^2 a^2 + (f_1 - f_3)^2 b^2 - (f_1 - f_3)(f_2 - f_3)(a^2 + b^2 - c^2) 
+            (f_1 - f_3)^2 a^2 + (f_2 - f_3)^2 b^2 - (f_1 - f_3)(f_2 - f_3)(a^2 + b^2 - c^2) 
         \right] = \\
         = \frac{1}{\Delta^2} 
         \left[
-            a^2 (f_1 - f_3)^2 + b^2 (f_1 - f_3)^2 - (a^2 + b^2 - c^2)(f_1 f_2 - f_3(f_1 + f_2) + f_3^2)
+            a^2 (f_1 - f_3)^2 + b^2 (f_2 - f_3)^2 - (a^2 + b^2 - c^2)(f_1 f_2 - f_3(f_1 + f_2) + f_3^2)
         \right] = \\
         = \frac{1}{2 \Delta^2} 
         \left[
-            2 a^2 (f_1 - f_3)^2 + 2 b^2 (f_1 - f_3)^2 - (a^2 + b^2 - c^2)([2 f_1 f_2 - f_1^2 - f_2 ^ 2] + 
+            2 a^2 (f_1 - f_3)^2 + 2 b^2 (f_2 - f_3)^2 - (a^2 + b^2 - c^2)([2 f_1 f_2 - f_1^2 - f_2 ^ 2] + 
             [f_1 ^2 - 2 f_3 f_1 + f_3 ^ 2] + [f_2^2 - 2 f_3 f_2 + f_3^2])
         \right] = \\
         = \frac{1}{2 \Delta^2} 
         \left[
-            2 a^2 (f_1 - f_3)^2 + 2 b^2 (f_1 - f_3)^2 - 
+            2 a^2 (f_1 - f_3)^2 + 2 b^2 (f_2 - f_3)^2 - 
             \left( a^2 + b^2 - c^2 \right) \left(-(f_1 - f_2)^2 + (f_1 - f_3)^2 + (f_2 - f_3)^2 \right)
         \right] = \\
         = \frac{1}{2 \Delta^2} 
@@ -190,7 +190,7 @@
         \sum_{\left( u, v \right) \in E \left( G \right)}{w_{uv} \sum_{i=1}^k{\left((m_i e^i)_v - (m_i e^i)_u \right)^2}} =
         \sum_{\left( u, v \right) \in E \left( G \right)}{w_{uv} ||f_d(u) - f_d(v)||^2} = E_D(f)
     $$
-    То есть, для минимизации энергии энергии Дирихле, надо взять $f_d = \sum_{i=1}^k{m_i e^i}$, где $e^i$ -- собсвтенные вектора матрицы $L$ определенной 
+    То есть, для минимизации энергии энергии Дирихле, надо взять $f_d = \sum_{i=1}^k{m_i e^i}$, где $e^i$ -- собственные вектора матрицы $L$ определенной 
     в пункте~\ref{RossTheorem}.
 \end{enumerate}
 
