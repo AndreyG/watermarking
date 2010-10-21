@@ -1,0 +1,3 @@
+pdflatex doc.tex
+bibtex doc
+open doc.pdf
