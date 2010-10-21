@@ -1,0 +1,34 @@
+<project name="Graphic" default="build">
+
+    <property environment="env"/>
+    <property name="scala.home" value="${env.SCALA_HOME}"/>
+    <property name="lib" value="lib"/>
+    <property name="build" value="classes"/>
+
+    <path id="scala.lib.path">
+        <fileset dir="${scala.home}/lib" includes="*.jar"/>
+    </path>
+
+    <taskdef name="scalac" classname="scala.tools.ant.Scalac"
+             classpathref="scala.lib.path"/>
+
+    <target name="build" depends="compile">
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${build}"/>
+        <scalac
+                srcdir="src"
+                destdir="${build}"
+                >
+            <classpath>
+                <path refid="scala.lib.path"/>
+            </classpath>
+        </scalac>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build}"/>
+    </target>
+
+</project>

@@ -43,12 +43,12 @@ object TestGenerator {
   def main(params: Array[String]) {
     assert(params.size == 7)
     val range = genRange(parseDouble(params(4)), parseDouble(params(5)), parseDouble(params(6)))
-    val args = new Array[String](9 + range.size)
+    val args = new Array[String](10 + range.size)
     Array.copy(range, 0, args, args.size - range.size, range.size)
     args(0) = "bin/watermarking"
     val attemptsNum = java.lang.Integer.parseInt(params(0))
-    args(7) = params(0)
-    args(8) = range.size.toString
+    args(8) = params(0)
+    args(9) = range.size.toString
     val outDirName = genNameByTime()
     for (graphDir <- dirs(inputDir, matchPattern(params(1)))) {
       args(1) = graphDir.getAbsolutePath + "/input-graph.txt" 
@@ -76,6 +76,8 @@ object TestGenerator {
 		  args(5) = outDir.getAbsolutePath
 		  val modifiedGraphFile = new File(embeddingDir, "modified_graph.txt")
 		  args(6) = if (modifiedGraphFile.exists) "skip" else modifiedGraphFile.getAbsolutePath
+		  val angleDifferenceFile = new File(embeddingDir, "angle_difference.txt")
+		  args(7) = if (angleDifferenceFile.exists) "skip" else angleDifferenceFile.getAbsolutePath
 		  val logDir = mkdirIfNotExists(outDir, "log")
 		  val errStream = logDir.getAbsolutePath + "/err.txt"
 		  val outStream = logDir.getAbsolutePath + "/out.txt" 

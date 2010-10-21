@@ -12,13 +12,14 @@ typedef CGAL::Exact_predicates_inexact_constructions_kernel::Point_2    point_t;
 typedef watermarking::planar_graph< point_t >                           graph_t;
 typedef std::auto_ptr< watermarking::embedding_impl< point_t > >        embedding_impl_ptr;
 
-graph_t create_graph( const char * filepath )
+graph_t create_graph( const char * filepath, bool fix = true )
 {
     std::ifstream in(filepath);
     
     graph_t graph;
     read_graph( graph, in );
-    fix_graph( graph );
+    if (fix)
+        fix_graph( graph );
 
     return graph;
 }
@@ -105,9 +106,86 @@ void dump_graph(graph_t const & graph, const char * filepath)
     dump_graph(graph, out);
 }
 
+double angle(point_t const & u, point_t const & v, point_t const & w)
+{
+    double x1 = u.x() - v.x();
+    double x2 = w.x() - v.x();
+    double y1 = u.y() - v.y();
+    double y2 = w.y() - v.y();
+
+    double c = (x1 * x2 + y1 * y2) / (sqrt(x1 * x1 + y1 * y1) * sqrt(x2 * x2 + y2 * y2));
+    using algorithm::make_min;
+    using algorithm::make_max;
+    if (isnan(c))
+    {
+        std::cout << std::setprecision(32) << "(" << x1 << ", " << y1 << "); (" << x2 << ", " << y2 << ")" << std::endl;
+        assert(false);
+    }
+    make_min(c, 1.0);
+    make_max(c, -1.0);
+    return acos(c);
+}
+
+bool loops_exist(graph_t const & graph)
+{
+    foreach (typename graph_t::edge_t const & edge, graph.edges)
+    {
+        if (edge.first == edge.second)
+            return true;
+    }
+    return false;
+}
+
+bool has_duplicate_vertices(graph_t const & graph)
+{
+    std::set< point_t > vertices( graph.vertices.begin(), graph.vertices.end() );
+    return vertices.size() < vertices_num( graph );
+}
+
+double angle_difference(graph_t const& g1, graph_t const& g2)
+{
+    assert(!loops_exist(g1));
+    assert(!loops_exist(g2));
+    assert(!has_duplicate_vertices(g1));
+    assert(!has_duplicate_vertices(g2));
+
+    const size_t N = vertices_num( g1 );
+    std::vector< std::vector< size_t > > edges( N );
+    foreach (typename graph_t::edge_t const & e, g1.edges)
+    {
+        edges[e.first].push_back(e.second);
+        edges[e.second].push_back(e.first);
+    }
+    double res = 0.0;
+    for (size_t v = 0; v != N; ++v)
+    {
+        if (edges[v].size() >= 2)
+        {
+            point_t const & p1 = g1.vertices[v];
+            point_t const & p2 = g2.vertices[v];
+            for (size_t e1 = 0; e1 + 1 != edges[v].size(); ++e1)
+            {
+                for (size_t e2 = e1 + 1; e2 != edges[v].size(); ++e2)
+                {
+                    auto a1 = angle(g1.vertices[e1], p1, g1.vertices[e2]);
+                    auto a2 = angle(g2.vertices[e1], p2, g2.vertices[e2]);
+                    assert(a1 >= -1e-10);
+                    assert(a1 < 3.15);
+                    assert(a2 >= -1e-10);
+                    assert(a2 < 3.15);
+                    res += abs(a1 - a2);
+                }
+            }
+        }
+    }
+    return res;
+}
+
 int main( int argc, char** argv )
 {
-    auto graph  = create_graph( argv[1] );
+    auto graph = create_graph(argv[1]);
+    assert(!loops_exist(graph));
+    assert(!has_duplicate_vertices(graph));
     embedding_impl_ptr ew;
     {
         auto dumppath = (std::string(argv[3]) + "/factorization.params"); 
@@ -135,23 +213,30 @@ int main( int argc, char** argv )
     std::vector< watermarking::analyser_ptr > analyser_vec = ew->get_analysers();
     std::vector< size_t > const & subdivision = ew->get_subdivision();
 
-    size_t attempts_num = boost::lexical_cast< size_t >( argv[7] );
-    size_t noises_num   = boost::lexical_cast< size_t >( argv[8] );
-    assert((size_t) argc == 9 + noises_num);
+    size_t attempts_num = boost::lexical_cast< size_t >( argv[8] );
+    size_t noises_num   = boost::lexical_cast< size_t >( argv[9] );
+    assert((size_t) argc == 10 + noises_num);
     
     if (std::string(argv[6]) != "skip")
+    {
         dump_graph(modified_graph, (const char *) argv[6]);
+    }
+    if (std::string(argv[7]) != "skip")
+    {
+        std::ofstream out(argv[7]);
+        out << angle_difference(rearranged_graph, modified_graph);
+    }
 
     for (size_t i = 0; i != noises_num; ++i)
     {
-        double noise = boost::lexical_cast< double >( argv[9 + i] );
+        double noise = boost::lexical_cast< double >( argv[10 + i] );
         for (size_t j = 0; j != attempts_num; ++j)
         {
             std::stringstream outdirstream;
             outdirstream << argv[5] << std::string("/noise-") << std::string(argv[8 + i]) << std::string("/attempt-") << j << std::string("/");
             std::string out_dir = outdirstream.str();
             graph_t noised_graph = watermarking::add_noise( modified_graph, noise );
-	        dump_graph(noised_graph, (out_dir + "noised_graph.txt").c_str());
+	        //dump_graph(noised_graph, (out_dir + "noised_graph.txt").c_str());
 	        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 
 			                                    					    analyser_vec, message_params.key,
                                                                         message_params.chip_rate, message.size() ); 

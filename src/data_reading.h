@@ -105,8 +105,8 @@ void fix_graph( Graph & g )
         middle_x += v.x();
         middle_y += v.y();
     }
-    middle_x /= g.vertices.size();
-    middle_y /= g.vertices.size();
+    middle_x /= vertices_num( g );
+    middle_y /= vertices_num( g );
     foreach ( vertex_t & v, g.vertices )
     {
         v = vertex_t( v.x() - middle_x, v.y() - middle_y );
@@ -137,7 +137,10 @@ void fix_graph( Graph & g )
     typename Graph::edges_t new_edges;
     foreach ( edge_t const & e, g.edges )
     {
-        new_edges.push_back( edge_t( v2i[g.vertices[e.first]], v2i[g.vertices[e.second]] ) );
+        size_t v = v2i[g.vertices[e.first]];
+        size_t u = v2i[g.vertices[e.second]]; 
+        if (v != u)
+            new_edges.push_back( edge_t( v, u ) );
     }
 
     g.vertices.swap( new_vertices );
