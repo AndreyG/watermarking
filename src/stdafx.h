@@ -15,6 +15,10 @@
 #include <boost/program_options.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <boost/tuple/tuple.hpp>
+
+using boost::tuple;
+using boost::make_tuple;
 
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH

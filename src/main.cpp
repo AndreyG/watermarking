@@ -108,9 +108,13 @@ void dump_graph(graph_t const & graph, const char * filepath)
 
 double angle(point_t const & u, point_t const & v, point_t const & w)
 {
+    assert(u != v);
+    assert(w != v);
+    assert(u != w);
+
     double x1 = u.x() - v.x();
-    double x2 = w.x() - v.x();
     double y1 = u.y() - v.y();
+    double x2 = w.x() - v.x();
     double y2 = w.y() - v.y();
 
     double c = (x1 * x2 + y1 * y2) / (sqrt(x1 * x1 + y1 * y1) * sqrt(x2 * x2 + y2 * y2));
@@ -119,6 +123,10 @@ double angle(point_t const & u, point_t const & v, point_t const & w)
     if (isnan(c))
     {
         std::cout << std::setprecision(32) << "(" << x1 << ", " << y1 << "); (" << x2 << ", " << y2 << ")" << std::endl;
+        std::cout << "u = ";
+        dump(std::cout, u) << "; v = ";
+        dump(std::cout, v) << "; w = ";
+        dump(std::cout, w) << std::endl;
         assert(false);
     }
     make_min(c, 1.0);
@@ -142,7 +150,15 @@ bool has_duplicate_vertices(graph_t const & graph)
     return vertices.size() < vertices_num( graph );
 }
 
-double angle_difference(graph_t const& g1, graph_t const& g2)
+double abs(double x)
+{
+    if (x < 0)
+        return -x;
+    else
+        return x;
+}
+
+tuple<double, size_t> angle_difference(graph_t const& g1, graph_t const& g2)
 {
     assert(!loops_exist(g1));
     assert(!loops_exist(g2));
@@ -150,35 +166,41 @@ double angle_difference(graph_t const& g1, graph_t const& g2)
     assert(!has_duplicate_vertices(g2));
 
     const size_t N = vertices_num( g1 );
-    std::vector< std::vector< size_t > > edges( N );
+    std::vector< std::set< size_t > > edges( N );
     foreach (typename graph_t::edge_t const & e, g1.edges)
     {
-        edges[e.first].push_back(e.second);
-        edges[e.second].push_back(e.first);
+        edges[e.first].insert(e.second);
+        edges[e.second].insert(e.first);
     }
     double res = 0.0;
+    size_t angles_num = 0;
     for (size_t v = 0; v != N; ++v)
     {
         if (edges[v].size() >= 2)
         {
             point_t const & p1 = g1.vertices[v];
             point_t const & p2 = g2.vertices[v];
-            for (size_t e1 = 0; e1 + 1 != edges[v].size(); ++e1)
+            std::vector< size_t > e( edges[v].begin(), edges[v].end() );
+            for (size_t i = 0; i + 1 != e.size(); ++i)
             {
-                for (size_t e2 = e1 + 1; e2 != edges[v].size(); ++e2)
+                for (size_t j = i + 1; j != e.size(); ++j)
                 {
-                    auto a1 = angle(g1.vertices[e1], p1, g1.vertices[e2]);
-                    auto a2 = angle(g2.vertices[e1], p2, g2.vertices[e2]);
-                    assert(a1 >= -1e-10);
+                    ++angles_num;
+                    assert(e[i] != v);
+                    assert(e[j] != v);
+                    double a1 = angle(g1.vertices[e[i]], p1, g1.vertices[e[j]]);
+                    double a2 = angle(g2.vertices[e[i]], p2, g2.vertices[e[j]]);
+                    assert(a1 >= 0);
                     assert(a1 < 3.15);
-                    assert(a2 >= -1e-10);
+                    assert(a2 >= 0);
                     assert(a2 < 3.15);
                     res += abs(a1 - a2);
+                    std::cout << std::setprecision(32) << a1 << " " << a2 << " " << (a1 - a2) << " " << abs(a1 - a2) << " " << res << "\n";
                 }
             }
         }
     }
-    return res;
+    return make_tuple(res, angles_num);
 }
 
 int main( int argc, char** argv )
@@ -224,7 +246,9 @@ int main( int argc, char** argv )
     if (std::string(argv[7]) != "skip")
     {
         std::ofstream out(argv[7]);
-        out << angle_difference(rearranged_graph, modified_graph);
+        auto ad = angle_difference(rearranged_graph, modified_graph); 
+        out << std::setprecision(32) << boost::get<0>(ad) / boost::get<1>(ad) << "\n" 
+            << boost::get<0>(ad) << "\n" << boost::get<1>(ad);
     }
 
     for (size_t i = 0; i != noises_num; ++i)

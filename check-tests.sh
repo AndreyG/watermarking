@@ -1,2 +1,2 @@
-scalac -d tester -sourcepath tester tester/TestChecker.scala &&
-scala -classpath tester TestChecker $1 
+cd tester && ant && cd .. &&
+scala -classpath tester/classes TestChecker $1 

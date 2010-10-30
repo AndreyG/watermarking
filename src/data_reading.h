@@ -42,13 +42,20 @@ void read_graph( Graph & graph, Stream & in )
     read_edges( in, m, &graph.edges[0] );
 }
 
+template< class Stream, class Point >
+Stream& dump( Stream & out, Point const & pt )
+{
+     out << "(" << pt.x() << ", " << pt.y() << ")";
+     return out;
+}
+
 template< class Graph, class Stream >
 void dump_graph( Graph const & graph, Stream & out )
 {
     out << graph.vertices.size() << "\t" << graph.edges.size() << "\n";
     foreach (typename Graph::vertex_t const & v, graph.vertices)
     {
-        out << "(" << v.x() << ", " << v.y() << ")\n";
+        dump(out, v) << "\n";
     }
     foreach (typename Graph::edge_t const & e, graph.edges)
     {

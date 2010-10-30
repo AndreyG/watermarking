@@ -156,8 +156,6 @@ namespace geometry
         std::vector< edges_t > edges_; 
         std::vector< double > degree_;
     };
-
-    
 }
 
 #endif /* _TRIANGULATION_GRAPH_H_ */
