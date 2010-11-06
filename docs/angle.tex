@@ -1,0 +1,106 @@
+\documentclass{article}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage[top=2cm,bottom=2cm,left=1.5cm,right=1.5cm]{geometry}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{euscript}
+
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\begin{document}
+
+\section*{Оценка искажения углов}
+Пусть дано множество точек плоскости $V = \{v_i\}_{i=1}^n, v_i = (x_i, y_i)$, $\mathfrak{T}$ -- триангуляция $V$, $f: V \to \mathbf{R}^2, V' = f(V)$. Оценим изменение углов между 
+ребрами триангуляции $\mathfrak{T}$. Пусть $(\triangle T = ABC) \in \mathfrak{T}$. 
+
+Введем обозначения $f(A) = {AA'} = \vec{f_1}, f(B) = {BB'} = \vec{f_2}, f(C) = {CC'} = \vec{f_3}$. 
+$\vec{f_2} - \vec{f_1} = \vec{g_3}, \vec{f_3} - \vec{f_2} = \vec{g_1}, \vec{f_1} - \vec{f_3} = \vec{g_2}$. $\vec{AB} = \vec{c}, \vec{BC} = \vec{a}, \vec{CA} = \vec{b}.$
+$\angle{CAB} = \alpha, \angle{ABC} = \beta, \angle{BCA} = \gamma; \angle{C'A'B'} = \alpha', \angle{A'B'C'} = \beta', \angle{B'C'A'} = \gamma'$   
+
+\begin{tikzpicture}
+
+%----------------------------------------------------
+% Coordinates of A, B and C, the triangle vertices 
+%----------------------------------------------------
+\coordinate[label=above:$A$] (A) at (5,4);
+\coordinate[label=left:$B$] (B) at (0,0);
+\coordinate[label=right:$C$] (C) at (7,0);
+
+\coordinate[label=above:$A'$] (A') at (4.7,4.0);
+\coordinate[label=below:$B'$] (B') at (0.2,-0.2);
+\coordinate[label=left:$C'$] (C') at (6.7,0.15);
+
+\draw (A)--(B)--(C)--cycle;
+\draw [dashed] (A')--(B')--(C')--cycle;
+\draw [->] (A)--(A');
+\draw [->] (B)--(B');
+\draw [->] (C)--(C');
+
+\end{tikzpicture}
+
+\begin{equation*} 
+  \angle \alpha' = \angle (C + \vec{f_3})(A + \vec{f_1})(B + \vec{f_2}) = \angle(C + \vec{f_3} - \vec{f_1})A(B + \vec{f_2} - \vec{f_1})  
+  = \angle (C - \vec{g_2})A(B + \vec{g_3}) = \alpha + \angle(-\vec{b} - \vec{g_2}, -\vec{b}) + \angle(\vec{c} + \vec{g_3}, \vec{c})
+\end{equation*}
+\begin{multline}
+\label{SinDif}
+  \sin(\alpha - \alpha') = \sin(\angle(\vec{b}, \vec{b} + \vec{g_2}) + \angle(\vec{c}, \vec{c} + \vec{g_3})) = 
+  \sin(\angle(\vec{b}, \vec{b} + \vec{g_2})) \cos(\angle(\vec{c}, \vec{c} + \vec{g_3})) + \sin(\angle(\vec{c}, \vec{c} + \vec{g_3})) \cos(\angle(\vec{b}, \vec{b} + \vec{g_2})) = \\
+  = \frac{1}{bc|\vec{b} + \vec{g_2}||\vec{c} + \vec{g_3}|}\left[    (\vec{b}, \vec{b} + \vec{g_2})|[\vec{c}, \vec{c} + \vec{g_3}]| + (\vec{c}, \vec{c} + \vec{g_3})|[\vec{b}, \vec{b} + \vec{g_3}]| \right]
+  \approx \frac{1}{b^2 c^2} \left[ (b^2 + (\vec{b}, \vec{g_2})) |[\vec{c}, \vec{g_3}]| + (c^2 + (\vec{c}, \vec{g_3})) |[\vec{b}, \vec{g_2}]| \right] = \\
+  = \frac{|[\vec{c}, \vec{g_3}]|}{c^2} + \frac{|[\vec{b}, \vec{g_2}]|}{b^2} + \frac{1}{b^2 c^2} \left[ (\vec{b}, \vec{g_2})|[\vec{c}, \vec{g_3}]| + (\vec{c}, \vec{g_3}) |[\vec{b}, \vec{g_2}]| \right] = \\
+  = \frac{|[\vec{b}, \vec{g_2}]|}{b^2} + \frac{|[\vec{c}, \vec{g_3}]|}{c^2} 
+    + \frac{bc g_2 g_3}{b^2 c^2} \left[ \sin(\angle(\vec{c}, \vec{g_3})) \cos(\angle(\vec{b}, \vec{g_2})) + \sin(\angle(\vec{b}, \vec{g_2})) \cos(\angle(\vec{c}, \vec{g_3})) \right] = \\
+  = \frac{|[\vec{b}, \vec{g_2}]|}{b^2} + \frac{|[\vec{c}, \vec{g_3}]|}{c^2} + \frac{g_2 g_3}{bc} \sin\left(\angle(\vec{b}, \vec{g_2}) + \angle(\vec{c}, \vec{g_3})\right)
+  \approx \frac{|[\vec{b}, \vec{g_2}]|}{b^2} + \frac{|[\vec{c}, \vec{g_3}]|}{c^2} 
+\end{multline}
+Примерные равенства верны в предположении, что $\max\left(|\vec{f_1}|, |\vec{f_2}|, |\vec{f_3}|\right) \ll \min\left(|\vec{a}|, |\vec{b}|, |\vec{c}|\right)$. 
+Пусть вектора $\vec{f_1}, \vec{f_2}, \vec{f_3}$ выражаются в виде $(f_1, f_1), (f_2, f_2), (f_3, f_3)$, соответсвенно 
+\begin{equation*}
+  \vec{g_1} = \vec{f_3} - \vec{f_2} = (f_3~-~f_2)(1, 1), \vec{g_2} = \vec{f_1} - \vec{f_3} = (f_1 - f_3)(1, 1), \vec{g_3} = \vec{f_2} - \vec{f_1} = (f_2 - f_1)(1, 1),     
+\end{equation*}
+тогда $\frac{|[\vec{a}, \vec{g_1}]|}{a^2} = \frac{\sin{\angle{\left(\vec{a}, (1,1)\right)}}}{a} g_1 = k_1 g_1$. Аналогично введем коеффициенты $k_2, k_3$. С их помощью мы можем записать 
+формулу~(\ref{SinDif}) следующим образом: $\sin(\alpha - \alpha') \approx k_2 g_2 + k_3 g_3$.
+
+Величина $E(T) = \sin^2(\alpha - \alpha') + \sin^2(\beta - \beta') + \sin^2(\gamma - \gamma')$, очевидно характеризует изменение углов $\triangle T$. Нехитрыми преобразованиями получаем
+
+\begin{multline*}
+  \sin^2(\alpha - \alpha') + \sin^2(\beta - \beta') + \sin^2(\gamma - \gamma') \approx (k_2 g_2 + k_3 g_3)^2 + (k_3 g_3 + k_1 g_1)^2 + (k_1 g_1 + k_2 g_2)^2 = \\
+  = (k_2 (f_3 - f_1) + k_3 (f_1 - f_2))^2 + (k_3 (f_1 - f_2) + k_1 (f_2 - f_3))^2 + (k_1 (f_2 - f_3) + k_2 (f_3 - f_1))^2 = \\
+  = ( (k_3 - k_2) f_1 - k_3 f_2 + k_2 f_3 )^2 + \left( (k_1 - k_3) f_2 + k_3 f_1 - k_1 f_3 \right)^2 + \left( (k_2 - k_1) f_3 - k_2 f_ 1 + k_1 f_2 \right)^2 = \\
+  = ( (k_3 - k_2) ^ 2 + k_3^2 + k_2 ^ 2 ) f_1 ^ 2 + ( (k_1 - k_3) ^ 2 + k_1^2 + k_3 ^ 2 ) f_2 ^ 2 + ( (k_2 - k_1) ^ 2 + k_1^2 + k_2 ^ 2 ) f_3 ^ 2 + \\
+  + 2 ((k_2 - k_3) k_3 + (k_1 - k_3) k_3 - k_1 k_2 ) f_1 f_2 + 2((k_3 - k_1) k_1 + (k_2 - k_1) k_1 - k_2 k_3 ) f_2 f_3 + 2((k_1 - k_2) k_2 + (k_3 - k_2) k_2 - k_3 k_1 ) f_3 f_1 = \\    
+  = 2( k_2^2 + k_3^2 - k_2 k_3 ) f_1 ^ 2 + 2( k_1^2 + k_3^2 - k_1 k_3 ) f_2^2 + 2( k_1^2 + k_2^2 - k_1 k_2 ) f_3 ^ 3 - \\ 
+  - 2(2 k_3^2 + k_1 k_2 - k_3(k_1 + k_2))f_1 f_2 - 2(2 k_1^2 + k_2 k_3 - k_1 (k_2 + k_3))f_2 f_3 - 2(2 k_2^2 + k_3 k_1 - k_2(k_3 + k_1))f_3 f_1 = \\
+  = 2 \left[ k_3^2 (f_1 ^ 2 + f_2 ^ 2 - 2 f_1 f_2 ) + k_2 ^ 2 (f_1 ^ 2 + f_3 ^ 2 - 2 f_1 f_ 3) + k_1^2 (f_2 ^ 2 + f_3 ^ 2 - 2 f_2 f_3 ) \right] \\
+  - 2 \left[ k_2 k_3 f_1 ^ 2 + k_3 k_1 f_2^2 + k_1 k_2 f_3^2 - k_3(k_1 + k_2)f_1 f_2 - k_2(k_1 + k_3)f_1 f_3 - k_3(k_1 + k_2)f_2 f_3 \right] = \\
+  = 2 \left[ k_3^2 (f_1 - f_2)^2 + k_2^2 (f_3 - f_1)^2 + k_1^2 (f_2 - f_3)^2 \right] - \\
+  - [ k_2 k_3 (f_1^2 + f_2^2 - 2 f_1 f_2) + k_2 k_3 (f_1^2 + f_3^2 - 2 f_1 f_3) + k_1 k_3 (f_2^2 + f_1^2 - 2 f_2 f_1) + k_1 k_3 (f_2^2 + f_3^2 - 2 f_2 f_3) + \\
+  + k_1 k_2 (f_3^2 + f_1^2 - 2 f_3 f_1) + k_1 k_2 (f_3^2 + f_2^2 - 2 f_3 f_2) ]  
+  + \left[ k_1 (k_2 + k_3) f_1 ^ 2 + k_2 (k_1 + k_3) f_2 ^ 2 + k_3 (k_1 + k_2) f_3 ^ 2 \right] = \\
+  = \left[ (2 k_3^2 - k_3 (k_2 + k_1)) (f_1 - f_2)^2 + (2 k_2 ^ 2 - k_2 (k_1 + k_3)) (f_3 - f_1)^2 + (2 k_1 ^ 2 - k_1 (k_2 + k_3)) (f_2 - f_3)^2 \right] + \\
+  + \left[ k_1 (k_2 + k_3) f_1 ^ 2 + k_2 (k_1 + k_3) f_2 ^ 2 + k_3 (k_1 + k_2) f_3 ^ 2 \right].
+\end{multline*}
+Введем обозначения $l_{xy}(T = \triangle (x,y,z)) = 2 * k_z^2 - k_z(k_x + k_y), l_{x}(T = \triangle(x, y, z)) = k_x(k_y + k_z)$. 
+
+Просуммируем $E(T)$ по всем треугольникам $T \in \mathfrak{T}$.
+\begin{equation*}
+  E(\mathfrak{T}, f) = \sum_{T \in \mathfrak{T}} \sin^2(\alpha - \alpha') + \sin^2(\beta - \beta') + \sin^2(\gamma - \gamma') = \sum_{(u, v) \in E(\mathfrak{T})} w_{uv} (f_u - f_v)^2 + 
+  \sum_{v \in V(\mathfrak{T})} w_v f_v^2,
+\end{equation*}
+где $w_{xy} = l_{xy}(\triangle (x, y, z_1)) + l_{xy}(\triangle (x,y,z_2))$; $w_x = \sum_{\left(T = \triangle (x, y, z)\right) \in \mathfrak{T}} l_x(T)$.
+\begin{equation*}
+  E(\mathfrak{T}, f) = f^T Z f \mbox{ где, } Z_uv = \begin{cases}
+  w_v + \sum_{(v, x) \in E(G)}{w_{vx}}&\text{if $u = v;$} \\
+  -w_{uv}&\text{if $u \sim v;$} \\
+  0 &\text{otherwize;}
+    \end{cases} f = (f_1, f_2, \dots f_n)^T.
+\end{equation*}
+Видно что, для $f = \alpha \sum_{i=1}^k p_i e_i$, где $\alpha$ -- некоторое число, $p_i \in \{-1, 1 \}$, 
+$\left\{e_i\right\}_{i=1}^k$ -- набор ортонормированных векторов в $\mathbb{R}^n$, минимум $E(\mathfrak{T}, f)$ достигается при $e_i$ равных собственным векторам 
+$Z$, соответствующим $k$ наименьшим собственным числам.
+\end{document}
