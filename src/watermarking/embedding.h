@@ -26,7 +26,8 @@ namespace watermarking
         };
         
         embedding_impl( graph_t const & graph, size_t max_patch_size, 
-                        bool weighted, bool use_edges, bool step_by_step, FILL_MATRIX_TYPE );
+                        geometry::WeightType::Type, bool use_edges, 
+                        bool step_by_step, FILL_MATRIX_TYPE );
 
         template< class Stream >
         explicit embedding_impl( Stream & in );
@@ -80,7 +81,7 @@ namespace watermarking
         step_t                              step_;
 
         size_t                              max_patch_size_;
-        bool                                weighted_;
+        geometry::WeightType::Type          weight_type_;
         bool                                use_edges_;
         FILL_MATRIX_TYPE                    fill_matrix_;
     };
@@ -90,11 +91,11 @@ namespace watermarking
 
     template< class Point >
     embedding_impl< Point >::embedding_impl(    graph_t const & graph, size_t max_patch_size, 
-                                                bool weighted, bool use_edges, bool step_by_step,
-                                                FILL_MATRIX_TYPE fill_matrix )
+                                                geometry::WeightType::Type weight_type, bool use_edges,
+                                                bool step_by_step, FILL_MATRIX_TYPE fill_matrix )
             : graph_( graph )
             , max_patch_size_( max_patch_size )
-            , weighted_( weighted )
+            , weight_type_( weight_type )
             , use_edges_( use_edges )
             , fill_matrix_( fill_matrix )
     {
@@ -300,7 +301,7 @@ namespace watermarking
                 ++i;
             }
             
-            incidence_graph graph( trg, trg_vertex_to_index, weighted_ );
+            incidence_graph graph( trg, trg_vertex_to_index, weight_type_ );
             boost::function< void (incidence_graph const &, spectral_analyser::matrix_t &) > fill_matrix = fm == CHEN ?
                 boost::bind( &watermarking::details::fill_matrix_by_chen< incidence_graph,      spectral_analyser::matrix_t >, _1, _2 ) :
                 boost::bind( &watermarking::details::fill_matrix_by_obuchi< incidence_graph,    spectral_analyser::matrix_t >, _1, _2 ); 
@@ -311,13 +312,14 @@ namespace watermarking
     }
 
     template< class Point >
-    std::auto_ptr< embedding_impl< Point > > embed( planar_graph< Point > const & graph, size_t max_patch_size, bool weighted, bool use_edges, 
+    std::auto_ptr< embedding_impl< Point > > embed( planar_graph< Point > const & graph, size_t max_patch_size, 
+                                                    geometry::WeightType::Type weight_type, bool use_edges, 
 													bool step_by_step, FILL_MATRIX_TYPE fill_matrix )
     {
         util::stopwatch _("watermarking generator creation");
 
         typedef embedding_impl< Point > result_t; 
-        return std::auto_ptr< result_t >( new result_t( graph, max_patch_size, weighted, use_edges, step_by_step, fill_matrix ) );
+        return std::auto_ptr< result_t >( new result_t( graph, max_patch_size, weight_type, use_edges, step_by_step, fill_matrix ) );
     }
 }
 

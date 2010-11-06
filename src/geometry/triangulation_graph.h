@@ -39,6 +39,23 @@ namespace geometry
             return c / sqrt(len_sqr - c * c);
         }
     }
+
+    namespace WeightType
+    {
+        enum Type
+        {
+            Unweighted, Ctg
+        };
+
+        Type from_str(std::string const & str)
+        {
+            if (str == "unweighted")
+                return Unweighted;
+            if (str == "ctg")
+                return Ctg;
+            throw std::logic_error("There is no weight type with name = " + str);
+        }
+    }
     
     template< class Triangulation >
     struct triangulation_graph
@@ -50,12 +67,13 @@ namespace geometry
     public:
         typedef edges_t::const_iterator edges_iterator;
 
-        triangulation_graph( Triangulation const & trg, std::map< vertex_t, size_t > & index, bool weighted)
+        triangulation_graph( Triangulation const & trg, std::map< vertex_t, size_t > & index, WeightType::Type type )
                     : edges_( index.size() )
                     , degree_( index.size(), 0 )
         {
-            if ( !weighted )
+            switch ( type )
             {
+            case WeightType::Unweighted:
                 typedef typename Triangulation::Finite_vertices_iterator    vertices_iterator;
                 typedef typename Triangulation::Vertex_circulator           vertex_circulator;
                 for ( vertices_iterator v = trg.finite_vertices_begin(); v != trg.finite_vertices_end(); ++v )
@@ -68,9 +86,12 @@ namespace geometry
                             edges.push_back( graph::edge_t( index[vc], 1 ) );
                     } while ( ++vc != vc_begin );
                 }
-            }
-            else
-            {
+                for ( size_t v = 0; v != degree_.size(); ++v )
+                {
+                    degree_[v] = edges_[v].size();
+                }
+                break;
+            case WeightType::Ctg:
                 typedef typename Triangulation::Finite_edges_iterator edges_iterator;
                 typedef typename Triangulation::Face_handle face_t;
                 for ( edges_iterator e = trg.finite_edges_begin(); e != trg.finite_edges_end(); ++e )
@@ -123,13 +144,13 @@ namespace geometry
                         edges_[index[c]].push_back( graph::edge_t( index[b], w ) );
                     }
                 }
+                for ( size_t v = 0; v != degree_.size(); ++v )
+                {
+                    foreach ( graph::edge_t const & e, edges_[v] )
+                        degree_[v] += e.weight;
+                    assert( degree_[v] > 0 );
+                }    
             }
-            for ( size_t v = 0; v != degree_.size(); ++v )
-            {
-                foreach ( graph::edge_t const & e, edges_[v] )
-                    degree_[v] += e.weight;
-                assert( degree_[v] > 0 );
-            }    
         }
 
         size_t vertices_num() const

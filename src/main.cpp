@@ -32,7 +32,7 @@ embedding_impl_ptr create_embedding( graph_t const & graph, const char * filepat
     po::options_description desc;
     desc.add_options()
         ( "step-by-step", po::value<bool>() )
-        ( "weighted",     po::value<bool>() )
+        ( "weight-type",  po::value<std::string>() )
         ( "use-edges",    po::value<bool>() )
         ( "max-subarea-size", po::value< size_t >() )
         ( "fill-matrix",  po::value<std::string>() )
@@ -41,14 +41,14 @@ embedding_impl_ptr create_embedding( graph_t const & graph, const char * filepat
     po::variables_map params;       
     po::store(po::parse_config_file(conf, desc), params);
 
-    const bool weighted           = params["weighted"].as< bool >();
+    const auto weight_type        = geometry::WeightType::from_str( params["weight-type"].as< std::string >() );
     const bool use_edges          = params["use-edges"].as< bool >();
     const size_t max_subarea_size = params["max-subarea-size"].as< size_t >();
     const bool step_by_step       = params["step-by-step"].as< bool >();
     const watermarking::FILL_MATRIX_TYPE fill_matrix = 
         params["fill-matrix"].as< std::string >() == "fill_matrix_by_chen" ? 
             watermarking::CHEN : watermarking::OBUCHI;
-    return watermarking::embed( graph, max_subarea_size, weighted, use_edges, step_by_step, fill_matrix );
+    return watermarking::embed( graph, max_subarea_size, weight_type, use_edges, step_by_step, fill_matrix );
 }
 
 namespace
@@ -243,8 +243,9 @@ int main( int argc, char** argv )
     {
         std::ofstream out(argv[7]);
         auto ad = angle_difference(rearranged_graph, modified_graph); 
-        out << std::setprecision(32) << boost::get<0>(ad) / boost::get<1>(ad) << "\n" 
-            << boost::get<0>(ad) << "\n" << boost::get<1>(ad);
+        out << std::setprecision(32) << boost::get<0>(ad) / boost::get<1>(ad) 
+            << "\n" << boost::get<0>(ad) 
+            << "\n" << boost::get<1>(ad);
     }
 
     for (size_t i = 0; i != noises_num; ++i)
