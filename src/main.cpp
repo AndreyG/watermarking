@@ -239,11 +239,7 @@ int main( int argc, char** argv )
     size_t noises_num   = boost::lexical_cast< size_t >( argv[9] );
     assert((size_t) argc == 10 + noises_num);
     
-    if (std::string(argv[6]) != "skip")
-    {
-        dump_graph(modified_graph, (const char *) argv[6]);
-    }
-    if (std::string(argv[7]) != "skip")
+    dump_graph(modified_graph, (const char *) argv[6]);
     {
         std::ofstream out(argv[7]);
         auto ad = angle_difference(rearranged_graph, modified_graph); 

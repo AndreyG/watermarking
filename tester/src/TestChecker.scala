@@ -50,7 +50,7 @@ object TestChecker {
 			}
 		  }
 		  for ((noise, (attemptsNum, successesNum)) <- attempts; if attemptsNum != 0) { 
-			val name = factorizationDir.getName + "/" + graphDir.getName + "/" + embeddingDir.getName + "/noise-" + "%f".format(noise)
+			val name = format("%s/%s/%s/noise-%f", factorizationDir.getName, graphDir.getName, embeddingDir.getName, noise)
 			println(format("%s: (%d/%d)", name, successesNum, attemptsNum))
 		  }
 		}

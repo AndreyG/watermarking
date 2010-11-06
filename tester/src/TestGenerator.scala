@@ -37,6 +37,16 @@ object TestGenerator {
       res.mkdir()
     res
   }
+
+  def deleteReqursively(dir: File) {
+	assert(dir.exists && dir.isDirectory)
+	for (file <- dir.listFiles) {
+	  if (file.isDirectory) {
+		deleteReqursively(file)
+	  }
+	  file.delete()
+	}
+  }
   
   def and[T](preds: (T => Boolean)*): (T => Boolean) = t => preds.forall(_(t))
   
@@ -49,7 +59,7 @@ object TestGenerator {
     val attemptsNum = java.lang.Integer.parseInt(params(0))
     args(8) = params(0)
     args(9) = range.size.toString
-    val outDirName = genNameByTime()
+    val outDirName = "result"
     for (graphDir <- dirs(inputDir, matchPattern(params(1)))) {
       args(1) = graphDir.getAbsolutePath + "/input-graph.txt" 
       for (factorizationDir <- dirs(graphDir, matchPattern(params(2)))) {
@@ -66,7 +76,11 @@ object TestGenerator {
 		  }
 		  first = false
 		  args(4) = embeddingDir.getAbsolutePath + "/embedding.conf"
- 		  val outDir = mkdirIfNotExists(embeddingDir, outDirName)
+ 		  val outDir = new File(embeddingDir, outDirName)
+		  if (outDir.exists)
+			deleteReqursively(outDir)
+		  else
+			outDir.mkdir()
 		  for (noise <- range) {
 			val noiseDir = mkdirIfNotExists(outDir, "noise-" + noise)
 			for (attempt <- 0 until attemptsNum) {
@@ -74,10 +88,8 @@ object TestGenerator {
 			}
 		  }
 		  args(5) = outDir.getAbsolutePath
-		  val modifiedGraphFile = new File(embeddingDir, "modified_graph.txt")
-		  args(6) = if (modifiedGraphFile.exists) "skip" else modifiedGraphFile.getAbsolutePath
-		  val angleDifferenceFile = new File(embeddingDir, "angle_difference.txt")
-		  args(7) = if (angleDifferenceFile.exists) "skip" else angleDifferenceFile.getAbsolutePath
+		  args(6) = new File(embeddingDir, "modified_graph.txt").getAbsolutePath
+		  args(7) = new File(embeddingDir, "difference.txt").getAbsolutePath
 		  val logDir = mkdirIfNotExists(outDir, "log")
 		  val errStream = logDir.getAbsolutePath + "/err.txt"
 		  val outStream = logDir.getAbsolutePath + "/out.txt" 
