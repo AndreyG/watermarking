@@ -195,7 +195,6 @@ tuple<double, size_t> angle_difference(graph_t const& g1, graph_t const& g2)
                     assert(a2 >= 0);
                     assert(a2 < 3.15);
                     res += abs(a1 - a2);
-                    std::cout << std::setprecision(32) << a1 << " " << a2 << " " << (a1 - a2) << " " << abs(a1 - a2) << " " << res << "\n";
                 }
             }
         }
