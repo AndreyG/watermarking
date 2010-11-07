@@ -301,7 +301,7 @@ namespace watermarking
                 ++i;
             }
             
-            incidence_graph graph( trg, trg_vertex_to_index, weight_type_ );
+            incidence_graph graph( trg, trg_vertex_to_index, use_edges_, weight_type_ );
             boost::function< void (incidence_graph const &, spectral_analyser::matrix_t &) > fill_matrix = fm == CHEN ?
                 boost::bind( &watermarking::details::fill_matrix_by_chen< incidence_graph,      spectral_analyser::matrix_t >, _1, _2 ) :
                 boost::bind( &watermarking::details::fill_matrix_by_obuchi< incidence_graph,    spectral_analyser::matrix_t >, _1, _2 ); 
