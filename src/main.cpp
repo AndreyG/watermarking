@@ -204,9 +204,6 @@ tuple<double, size_t> angle_difference(graph_t const& g1, graph_t const& g2)
 
 int main( int argc, char** argv )
 {
-    auto graph = create_graph(argv[1]);
-    assert(!loops_exist(graph));
-    assert(!has_duplicate_vertices(graph));
     embedding_impl_ptr ew;
     {
         auto dumppath = (std::string(argv[3]) + "/factorization.params"); 
@@ -217,6 +214,10 @@ int main( int argc, char** argv )
         }
         else
         {
+            auto graph = create_graph(argv[1]);
+            assert(!loops_exist(graph));
+            assert(!has_duplicate_vertices(graph));
+            
             auto inputpath = std::string(argv[2]); 
             ew = create_embedding( graph, inputpath.c_str() );
             std::ofstream out( dumppath.c_str() ); 

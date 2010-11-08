@@ -262,7 +262,10 @@ namespace watermarking
                 size_t begin = edge.first, end = edge.second;
                 if ( subdivision_[begin] == subdivision_[end] )
                 {
-                    trgs_[subdivision_[begin]].insert_constraint( graph_.vertices[begin], graph_.vertices[end] );
+                    trg_t & trg = trgs_[subdivision_[begin]]; 
+                    const trg_t::size_type old_vertices_num = trg.number_of_vertices();
+                    trg.insert_constraint( graph_.vertices[begin], graph_.vertices[end] );
+                    assert( trg.number_of_vertices() == old_vertices_num );
                 }
             }
         }            

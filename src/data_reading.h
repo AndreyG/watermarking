@@ -1,3 +1,6 @@
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Constrained_Delaunay_triangulation_2.h>
+
 #include "utility/dump.h"
 
 template< class Stream, class Point >
@@ -98,14 +101,55 @@ message_params_t read_message_params(const char * filepath)
 }
 
 template< class Graph >
+void add_intersection_points( Graph & graph )
+{
+    util::stopwatch _("fixing intersections in input graph");
+
+    typedef CGAL::Exact_predicates_inexact_constructions_kernel         GT;
+    typedef CGAL::Exact_predicates_tag                                  Itag;
+    typedef CGAL::Triangulation_vertex_base_2<GT>                       Vb;
+    typedef CGAL::Constrained_triangulation_face_base_2<GT>             Fb;
+    typedef CGAL::Triangulation_data_structure_2<Vb, Fb>                TDS;
+    typedef CGAL::Constrained_Delaunay_triangulation_2<GT, TDS, Itag>   CDT;
+
+    CDT trg;
+    
+    typedef typename Graph::vertex_t vertex_t;
+    typedef typename Graph::edge_t edge_t;
+    
+    foreach ( edge_t const & e, graph.edges )
+    {
+        trg.insert_constraint(graph.vertices[e.first], graph.vertices[e.second]);
+    }
+
+    graph.vertices.clear();
+    graph.edges.clear();
+
+    std::map< CDT::Vertex_handle, size_t > handle_to_index;
+    for ( auto v = trg.finite_vertices_begin(); v != trg.finite_vertices_end(); ++v )
+    {
+        handle_to_index[v] = graph.vertices.size();
+        graph.vertices.push_back(v->point());
+    }
+
+    for ( auto e = trg.finite_edges_begin(); e != trg.finite_edges_end(); ++e )
+    {
+        auto face = e->first;
+        int v = e->second;
+        size_t a = handle_to_index[face->vertex(trg.cw(v))];
+        size_t b = handle_to_index[face->vertex(trg.ccw(v))];
+        graph.edges.push_back( edge_t( a, b ) );
+    }
+}
+
+template< class Graph >
 void fix_graph( Graph & g )
 {
+    add_intersection_points( g );
     typedef typename Graph::vertex_t vertex_t;
     typedef typename Graph::edge_t edge_t;
     typedef std::map< vertex_t, size_t > v2i_t;  
 
-    typedef typename Graph::vertex_t vertex_t; 
-    
     double middle_x = 0, middle_y = 0;
     foreach ( vertex_t const & v, g.vertices )
     {
