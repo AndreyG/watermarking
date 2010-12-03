@@ -1,0 +1,95 @@
+\documentclass{article}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english, russian]{babel}
+\usepackage[top=2cm,bottom=2cm,left=1.5cm,right=1.5cm]{geometry}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{euscript}
+
+\begin{document}
+Let $V = \left\{v_1, v_2, ... , v_n\right\}, V' = \left\{v_1', v_2', ... , v_n'\right\}, v_i, v_i' \in \mathbb{R}^2$ denote input (before) and output (after embedding watermark) set of points. 
+Let's consider function of displacement of input map $f: V \to \mathbb{R}^2, f(v_i) = v_i' - v_i$. Let $\mathfrak{T}$ denote some triangulation of the set $V$, $\Omega$ denote the convex hull of the set $V$. 
+We can construct Piecewise Linear Interpolation Surface (PLIS) of function values $\left\{f(v_i)\right\}_{i=1}^n$, consequently $f$ can be viewed as function on $\Omega$. 
+If point $v$ is in triangle $\triangle T = (v_i v_j v_k)$, $\triangle T \in \mathfrak{T}$; $v = \alpha v_i + \beta v_j + \gamma v_k$, $0 \le \alpha, \beta, \gamma \le 1$, $\alpha + \beta + \gamma = 1$, then
+$f(v) = \alpha f(v_i) + \beta f(v_j) + \gamma f(v_k)$. According to the Rippa's theorem Delaunay triangulation minimizes the roughness measure of a PLIS, thereby it's profitable to select $\mathfrak{T}$ as 
+Delaunay triangulation.
+
+I propose to use \textit{Dirichlet energy} $$E_D(f) = \frac{1}{2} \int_{\Omega}{||\nabla f||^2}d\Omega$$ as measure of distortion, where $f(v) = f(x, y) = \begin{pmatrix} f_x(x, y) \\ f_y(x, y) \end{pmatrix}$, 
+$\nabla f = \begin{pmatrix} \frac{\partial f_x}{\partial x} & \frac{\partial f_x}{\partial y} \\ \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} \end{pmatrix}$, 
+$||\nabla f||^2 = |\nabla f_x|^2 + |\nabla f_y|^2$. 
+
+$||\nabla f(v)||$ is magnitude of maximal difference between the value 
+of displacement function $f(v)$ in the point $v$ and the value of displacement function $f(v + dv)$ in the near point $v + dv$. And so $E_D(f)$ shows how greatly input map spread in each point. 
+
+Let's condider $g(v) = f(v) + v = v'$. 
+\begin{multline*}
+  E_D(g) = E_D(f + v) = \frac{1}{2} \int_{\Omega}{||\nabla (f + v)||^2}d\Omega = \frac{1}{2} \int_{\Omega}{\left(\nabla (f + v), \nabla (f + v)\right)}d\Omega = \\
+  = \frac{1}{2} \int_{\Omega}{||\nabla f||^2}d\Omega + \frac{1}{2} \int_{\Omega}{||\nabla v||^2}d\Omega + \int_{\Omega}{\left(\nabla f, \nabla v \right)} d\Omega 
+  = E_D(f) + \frac{1}{2} \int_{\Omega}{2}\text{ }d\Omega + \int_{\Omega}{\left[\frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y}\right]} d\Omega = \\
+  = E_D(f) + Area(\Omega) + \int_{\Omega}{\left[\frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y}\right]} d\Omega. 
+\end{multline*}   
+\begin{equation}
+\label{DEEstimation}
+  E_D(f) = E_D(g) - Area(\Omega) - \int_{\Omega}{\left[\frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y}\right]} d\Omega. 
+\end{equation}
+Let's estimate $\int_{\Omega}{\left[\frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y}\right]} d\Omega$. 
+\begin{multline}
+\label{IntegralEstimation}
+  \det \left(\nabla g \right) = \det \left( \nabla(f + v) \right) = 
+  \det \begin{pmatrix} \frac{\partial f_x}{\partial x} + 1 & \frac{\partial f_x}{\partial y} \\ \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} + 1 \end{pmatrix} = 
+  \det \begin{pmatrix} \frac{\partial f_x}{\partial x} & \frac{\partial f_x}{\partial y} \\ \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} \end{pmatrix} + 
+    {\left(\frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y}\right)} + 1  
+    = \det \left(\nabla f \right) + {\left(\frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y}\right)} + 1 \\
+    \frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y} = \det \left(\nabla g \right) - \det \left(\nabla f \right) - 1 \\
+    \int_{\Omega} {\left[\frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y}\right]} d\Omega = \int_{\Omega} \det \left(\nabla g \right) d\Omega - \int_{\Omega} \det \left(\nabla f \right) d\Omega - 
+    \int_{\Omega} d\Omega = \int_{\Omega} \det \left(\nabla g \right) d\Omega - Area(f(\Omega)) - Area(\Omega)
+\end{multline}
+By substituting for (\ref{IntegralEstimation}) to (\ref{DEEstimation}) we have the following expression:
+\begin{multline}
+  E_D(f) = E_D(g) - Area(\Omega) - \int_{\Omega}{\left[\frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y}\right]} d\Omega = E_D(g) - \int_{\Omega} \det \left(\nabla g \right) d\Omega + Area(f(\Omega)) 
+  = E_C(g) + Area(f(\Omega)),
+\end{multline}
+where $ E_C(g) = E_D(f) - \int_{\Omega} \det \left(\nabla g \right) d\Omega$ is \textit{conformal energy} of map $g: V \to V'$. 
+\begin{multline*}
+ E_C(g) = \frac{1}{2} \int_{\Omega} \left[\left(\frac{\partial f_x}{\partial x}\right)^2 + \left(\frac{\partial f_x}{\partial y}\right)^2 + 
+ \left(\frac{\partial f_y}{\partial x}\right)^2  + \left(\frac{\partial f_y}{\partial y}\right)^2 \right] d\Omega - \int_{\Omega}{\left[\frac{\partial f_x}{\partial x} \frac{\partial f_y}{\partial y} -
+ \frac{\partial f_x}{\partial y} \frac{\partial f_y}{\partial x} \right]} d \Omega = \\
+ = \frac{1}{2} \int_{\Omega}\left[ \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y} \right)^2 + \left( \frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x} \right)^2 \right] d\Omega.
+\end{multline*}
+It is easy to see that $E_C(g) \ge 0$ and $E_C(g) = 0$ iff $g$ is conformal map. If we assume that magnitude of displacement of each point of the input map is less than some $\epsilon$ 
+then $Area(f(A)) \le \pi \epsilon^2$. And so we can say that $E_D(f) \approx E_C(g)$, consequently $E_D(f)$ is measure of the variation of map $g$ from a conformal map, consequently $E_D(f)$ is a measure of distortion of the angles on then input map.
+
+It is well-known that if $f$ is PLIS of function values $\left\{f_i = f(v_i)\right\}_{i=1}^n$ over triangulation $\mathfrak{T}$ of set of points $V = \left\{v_i\right\}_{i=1}^n$, then  
+\begin{equation}
+\label{PinkallEquation}
+  E_D(f) = \frac{1}{4} \sum_{\triangle (i, j, k) \in \mathfrak{T}}
+  {\ctg{\alpha_{ij}}||f_i - f_j||^2 + \ctg{\alpha_{jk}}||f_j - f_k||^2 + \ctg{\alpha_{ki}}||f_k - f_i||^2},
+\end{equation}
+where $\alpha_{ij}$ is the angle opposite the edge $(v_i, v_j)$ in the triangle $\triangle T = (v_i, v_j, v_k)$. Formula~(\ref{PinkallEquation}) is equivalent to the following:
+\begin{equation}
+  \label{EDOverEdges}
+  E_D(f) = \frac{1}{2} \sum_{\left( i, j \right) \in E\left(\mathfrak{T}\right)}{w_{ij} ||f_i - f_j||^2}, 
+\end{equation}
+where $E(\mathfrak{T})$ is the set of edges of the triangulation $\mathfrak{T}$, $w_{ij} = \frac{1}{2}\left(\ctg\alpha_{ij} + \ctg\alpha_{ji}\right)$, $\alpha_{\left\{{ij, ji}\right\}}$ are the angles opposite 
+to the edge~$(v_i, v_j)$ in adjacent triangles $\triangle T_1 = v_i v_j v_{k_1}, \triangle T_2 = v_j v_i v_{k_2}$.
+
+Let $G$ denote weighted graph of the triangulation $\mathfrak{T}$, $V(G) = V, E(G) = E(\mathfrak{T})$, $weight(u, v) = w_{uv}$. If we consider Laplacian $L$ of the graph $G$ defined as follows 
+$L_{uv} = \begin{cases}
+  \sum_{(v, x) \in E(G)}{w_{vx}}&\text{if $u = v,$} \\
+  -w_{uv}&\text{if $u \sim v,$} \\
+  0 &\text{otherwise;}
+\end{cases}
+$ then formula~(\ref{EDOverEdges}) is equivalent to the following:
+\begin{equation}
+\label{EDOverLaplacian}
+  E_D(f) = \frac{1}{2} f^T L f,
+\end{equation}
+where $f = (f_1, f_2, \dots f_n)^T$.
+
+If we use your method of embedding watermark then $f = \alpha \sum_{i=1}^k p_i e_i$, where $p_i \in {-1, 1}$, $\left\{e_i\right\}_{i=1}^k$ is set of orthonormal vectors.
+We can easily deduce from~(\ref{EDOverLaplacian}) that $E_D(f)$ will be minimized when $\left\{e_i\right\}_{i=1}^k$ are eigenvectors of Laplacian corresponding to the $k$ smallest eigenvalues.
+
+Thereby I have proposed measure of distortion of an input map and proved that it will be minimized when we use frequency domain constructed by eigenvectors of Laplacian of Delaunay triangulation's weighted graph. 
+\end{document}
