@@ -160,7 +160,30 @@
         E_D(f) = \frac{1}{4} \sum_{T \in \mathfrak{T}} \left[ \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 \right].
     $$     
 
-    \item Обозначенному нами в пункте~\ref{Criterion} критерию качества прекрасно удолетворяет $f_d~=~const$. 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    Рассмотрим функцию $\frac{\partial f_x}{\partial x} \frac{\partial f_y}{\partial y} - \frac{\partial f_x}{\partial y} \frac{\partial f_y}{\partial x}$.
+    \begin{multline*}
+      \frac{\partial f_x}{\partial x} \frac{\partial f_y}{\partial y} - \frac{\partial f_x}{\partial y} \frac{\partial f_y}{\partial x} = \\
+      = \frac{1}{\Delta^2} ( \left[ (y_2 - y_3)(f_{x1} - f_{x3}) - (y_1 - y_3)(f_{x2} - f_{x3}) \right] 
+      \left[ (x_1 - x_3)(f_{y2} - f_{y3}) - (x_2 - x_3)(f_{y1} - f_{y3}) \right] - \\ 
+      - \left[ (x_1 - x_3)(f_{x2} - f_{x3}) - (x_2 - x_3)(f_{x1} - x_{x3}) \right]
+      \left[ (y_2 - y_3)(f_{y1} - f_{y3}) - (y_1 - y_3)(f_{y2} - f_{y3}) \right] )
+    \end{multline*}
+    Обозначим $f_{x1} - f_{x3} = g_{x1}$, $f_{x2} - f_{x3} = g_{x2}$, $f_{y1} - f_{y3} = g_{y1}$, $f_{y2} - f_{y3} = g_{y2}$.  
+    \begin{multline*}
+      \frac{\partial f_x}{\partial x} \frac{\partial f_y}{\partial y} - \frac{\partial f_x}{\partial y} \frac{\partial f_y}{\partial x} 
+      = \frac{1}{\Delta^2} \\ ( \left[ (x_1 - x_3)(y_2 - y_3) g_{x1} g_{y2} + (x_2 - x_3)(y_1 - y_3) g_{x2} g_{y1} -
+      (x_1 - x_3)(y_1 - y_3) g_{x1} g_{y1} - (x_2 - x_3) (y_2 - y_3) g_{x2} g_{y2} \right] - \\
+      - \left[ (x_1 - x_3)(y_2 - y_3) g_{x2} g_{y1} + (x_2 - x_3)(y_2 - y_3) g_{x1} g_{y2} - 
+      (x_1 - x_3)(y_1 - y_3) g_{x2} g_{y2} - (x_2 - x_3) (y_2 - y_3) g_{x1} g_{y1} \right] ) = \\
+      = \frac{1}{\Delta^2} (\Delta g_{x1} g_{y2} - \Delta g_{x2} g_{y1} - \left[(x_1 - x_3) (y_1 - y_3) - (x_2 - x_3)(y_2 - y_3)\right] (g_{x1} g_{y1} - g_{x2} g_{y2}) ) = \\
+      = \frac{1}{\Delta} (
+    \end{multline*}
+    
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item Обозначенному нами в пункте~\ref{Criterion} критерию качества прекрасно удолетворяет $f_d~=~con
+      st$. 
     Действительно, $\nabla{f}~=~0 \Rightarrow E_D(f) = 0$, жаль только информации таким образом не закодируешь. А хотелось бы нам закодировать $k$ бит.
     Obuchi предлагает следующее: выберем какие-нибудь линейно независимые $k$ векторов $\left\{ e^i \right\}_{i=1}^k$ и пусть $f_d = \sum_{i=1}^{k}{m_i e^i}$,
     где $m_i \in \left\{ -1, 1 \right\}$. Если $e^i$ ортогональны, то из $f_d$ однозначно восстанавливается watermark: $m_i = (f_d, e_i)$.
