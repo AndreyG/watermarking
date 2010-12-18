@@ -39,7 +39,7 @@ namespace watermarking
 			vector_t tmp(N);
 			vector_t ans(N * N);
 
-			MKL_INT info = LAPACKE_dgeev(LAPACK_COL_MAJOR, 'N', 'V', N, &e_[0], N, &tmp[0], &tmp[0], NULL, 0, &ans[0], N * N);
+			MKL_INT info = LAPACKE_dgeev(LAPACK_COL_MAJOR, 'N', 'V', N, &e_[0], N, &tmp[0], &tmp[0], &ans[0], 0, &ans[0], N * N);
 			assert(info == 0);
 			e_.swap(ans);
 		}

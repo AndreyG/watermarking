@@ -2,11 +2,12 @@
 
 #include "../geometry/planar_graph.h"
 #include "stopwatch.h"
+#include "debug_stream.h"
 
 void add_intersection_points( geometry::planar_graph_t & graph )
 {
     util::stopwatch _("fixing intersections in input graph");
-
+	
 	typedef geometry::planar_graph_t 									graph_t;
     typedef CGAL::Exact_predicates_inexact_constructions_kernel         GT;
     typedef CGAL::Exact_predicates_tag                                  Itag;
@@ -17,12 +18,19 @@ void add_intersection_points( geometry::planar_graph_t & graph )
 
     CDT trg;
     
-    for ( auto e = graph.edges_begin(); e != graph.edges_end(); ++e )
-    {
-		graph_t::vertex_t const & v = graph.vertex(e->b);
-		graph_t::vertex_t const & u = graph.vertex(e->e);
-        trg.insert_constraint(GT::Point_2(v.x(), v.y()), GT::Point_2(u.x(), u.y()));
-    }
+	{
+		util::stopwatch _("constrained triangulation construction");
+	    for ( auto e = graph.edges_begin(); e != graph.edges_end(); ++e )
+    	{
+			graph_t::vertex_t const & v = graph.vertex(e->b);
+			graph_t::vertex_t const & u = graph.vertex(e->e);
+        	trg.insert_constraint(GT::Point_2(v.x(), v.y()), GT::Point_2(u.x(), u.y()));
+    	}
+	}
+	if ( trg.number_of_vertices() == graph.vertices_num() )
+	{
+		return;
+	}
 
 	graph_t tmp;
 
@@ -34,6 +42,9 @@ void add_intersection_points( geometry::planar_graph_t & graph )
 
     for ( auto e = trg.finite_edges_begin(); e != trg.finite_edges_end(); ++e )
     {
+		if ( !trg.is_constrained( *e ) )
+			continue;
+
         auto face = e->first;
         int v = e->second;
 		graph_t::edge_t edge;
@@ -42,6 +53,10 @@ void add_intersection_points( geometry::planar_graph_t & graph )
         tmp.add_edge( edge );
     }
 
+	util::debug_stream() 	<< "input vertices num " << graph.vertices_num() 
+							<< ", output verices num " << tmp.vertices_num();
+	util::debug_stream() 	<< "input edges num " << graph.edges_num()
+							<< ", output edges num " << tmp.edges_num();
 	graph = tmp;
 }
 

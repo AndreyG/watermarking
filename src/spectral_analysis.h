@@ -48,9 +48,9 @@ namespace watermarking
 
         void dump( std::ostream & out ) const
         {
-            for (int i = 0; i != N; ++i) 
+            for (size_t i = 0; i != N; ++i) 
             {
-                for (int j = 0; j != N; ++j) 
+                for (size_t j = 0; j != N; ++j) 
                 {
                     out << e_[i * N + j] << " ";
                 }

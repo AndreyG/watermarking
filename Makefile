@@ -1,8 +1,8 @@
 MKLROOT=/opt/intel/mkl
 MKLLIB=$(MKLROOT)/lib/ia32
 
-compile: bin/main.o bin/embedding.o bin/stopwatch.o bin/data_reading.o bin/data_writing.o bin/graph_fixing.o
-	g++ -m32 -w bin/main.o bin/embedding.o bin/stopwatch.o bin/data_reading.o bin/data_writing.o bin/graph_fixing.o \
+compile: bin/main.o bin/embedding.o bin/stopwatch.o bin/data_reading.o bin/data_writing.o bin/graph_fixing.o bin/debug_stream.o
+	g++ -m32 -w bin/main.o bin/embedding.o bin/stopwatch.o bin/data_reading.o bin/data_writing.o bin/graph_fixing.o bin/debug_stream.o \
 	-Wl,--start-group \
     "$(MKLLIB)/libmkl_intel.a" \
     "$(MKLLIB)/libmkl_gnu_thread.a" \
@@ -22,6 +22,9 @@ bin/embedding.o: src/watermarking/embedding.cpp src/stdafx.h.gch
 
 bin/stopwatch.o: src/utility/stopwatch.cpp src/stdafx.h.gch 
 	g++ -std=c++0x -c -Wall src/utility/stopwatch.cpp -o bin/stopwatch.o
+
+bin/debug_stream.o: src/utility/debug_stream.cpp src/stdafx.h.gch 
+	g++ -std=c++0x -c -Wall src/utility/debug_stream.cpp -o bin/debug_stream.o
 
 bin/data_reading.o: src/inout/data_reading.cpp src/stdafx.h.gch 
 	g++ -std=c++0x -c -Wall src/inout/data_reading.cpp -o bin/data_reading.o

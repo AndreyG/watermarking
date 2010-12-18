@@ -327,6 +327,7 @@ namespace geometry
 				if ((u != v[0]) && (u != v[1]))
 					return u;
 			}
+			throw std::exception("every vertex in the face is included in its neighbor");
 		}
 
 	public:

@@ -13,7 +13,6 @@ namespace util
 
     private:
         clock_t start;
-        static size_t tabs_num;
     };
 }
 #endif /* _STOPWATCH_H_ */

@@ -35,7 +35,6 @@ embedding_impl_ptr create_embedding( graph_t const & graph, const char * filepat
         ( "weight-type",  po::value<std::string>() )
         ( "use-edges",    po::value<bool>() )
         ( "max-subarea-size", po::value< size_t >() )
-        ( "fill-matrix",  po::value<std::string>() )
     ;
     
     po::variables_map params;       
