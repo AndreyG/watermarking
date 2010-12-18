@@ -1,3 +1,6 @@
+#ifndef _STDAFX_
+#define _STDAFX_
+
 #include <vector>
 #include <fstream>
 #include <iomanip>
@@ -15,6 +18,7 @@
 #include <boost/program_options.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/tuple/tuple.hpp>
 
 using boost::tuple;
@@ -22,3 +26,13 @@ using boost::make_tuple;
 
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
+
+#include <complex>
+#define MKL_Complex16 std::complex<double>
+#include <mkl_lapacke.h>
+
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Delaunay_triangulation_2.h>
+#include <CGAL/Constrained_Delaunay_triangulation_2.h>
+
+#endif /*_STDAFX_*/

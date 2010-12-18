@@ -16,18 +16,6 @@ namespace util
     {
         dump_sequence( p, q, std::cout );
     }
-
-    template< class Stream >
-    void skip_char( Stream & in, char barrier )
-    {
-        while ( in )
-        {
-            char c;
-            in >> c;
-            if ( c == barrier )
-                break;
-        }
-    }
 }
 
 #endif /* _UTILITY_DUMP_H_ */

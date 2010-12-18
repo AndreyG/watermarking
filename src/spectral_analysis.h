@@ -1,43 +1,157 @@
 #ifndef _SPECTRAL_ANALYSIS_H_
 #define _SPECTRAL_ANALYSIS_H_
 
-#include <lapackpp.h>
-
 #include "utility/stopwatch.h"
+#include "geometry/point.h"
 
 namespace watermarking
 {
-    
-    namespace
+    struct spectral_analyser
     {
-        template< class Points, class Matrix >
-        Points spectral_coefficients( Points const & vertices, Matrix const & eigen_vectors )
-        {
-            const size_t N = vertices.size();
-            assert( eigen_vectors.cols() == (int) N );
-            assert( eigen_vectors.rows() == (int) N );
+        typedef geometry::point_t           vertex_t;
+        typedef std::vector< vertex_t >     vertices_t;
+        typedef std::vector< double >       coefficients_t;
+        
+        virtual ~spectral_analyser() {};
+        virtual vertices_t      get_vertices    ( coefficients_t    const & ) const = 0;
+        virtual coefficients_t  get_coefficients( vertices_t        const & ) const = 0;
+		virtual void			dump			( std::ostream &			) const = 0;
+    };
 
-            LaVectorDouble x(N), y(N);
-            for ( size_t i = 0; i != N; ++i )
+    template< class Traits >
+    struct spectral_analyser_impl : spectral_analyser
+    {
+        typedef typename Traits::vector_t vector_t;
+
+	protected:
+
+		template< class Graph >
+        spectral_analyser_impl( Graph const & g )
+                : N ( g.vertices_num() )
+                , e_( N * N )
+        {}
+
+	public:
+
+        explicit spectral_analyser_impl( std::istream & in )
+                : N( read_size( in ) )
+				, e_(N * N)
+        {
+            util::stopwatch _("spectral analyser: reading from file");
+
+            for (size_t i = 0; i != N; ++i)
             {
-                x(i) = vertices[i].x();
-                y(i) = vertices[i].y();
+                for (size_t j = 0; j != N; ++j)
+                    in >> e_[i * N + j];
             }
-            Points coefficients(N);
+        }
+
+        void dump( std::ostream & out ) const
+        {
+            for (int i = 0; i != N; ++i) 
+            {
+                for (int j = 0; j != N; ++j) 
+                {
+                    out << e_[i * N + j] << " ";
+                }
+                out << std::endl;
+            }
+        }
+
+    private:
+
+        size_t read_size( std::istream & in )
+        {
+            size_t s;
+            in >> s;
+            return s;
+        }
+
+    public:
+
+        vertices_t get_vertices( coefficients_t const & r ) const
+        {
+            const size_t K = r.size();
+            assert( K <= N );
+            
+            vertices_t vertices( N );
             for ( size_t i = 0; i != N; ++i )
             {
-                typedef typename Points::value_type point_t;
-                LaVectorDouble e(N);
-                for ( size_t j = 0; j != N; ++j)
-                    e(j) = eigen_vectors(j, i);
-                assert( abs( Blas_Norm2( e ) - 1.0 ) < 1e-5 );
-                coefficients[i] = point_t(  Blas_Dot_Prod( x, e ),
-                                            Blas_Dot_Prod( y, e ) );
+                for ( size_t j = 0; j != K; ++j )
+                {
+                    vertices[i] += Traits::mult( r[j], e_[i * N + j] );
+                }
+            }
+
+            return vertices;
+        }
+
+        coefficients_t get_coefficients( vertices_t const & vertices ) const 
+        {
+            assert( vertices.size() == N );
+
+            auto pts = Traits::points_to_flat( vertices );   
+            coefficients_t coefficients(N);
+            for ( size_t i = 0; i != N; ++i )
+            {
+                coefficients[i] = Traits::get_coeff( &e_[0] + i * N, N, pts );
             }
             return coefficients;
         }
-    }
 
+	protected:
+
+		size_t N;
+        vector_t e_;
+    };
+
+    struct real_traits
+    {
+		typedef std::vector< double > vector_t;
+
+        static geometry::point_t mult( double r, double e )
+        {
+            return geometry::point_t( r * e, r * e );
+        }
+
+        typedef boost::tuple< vector_t, vector_t > points_to_flat_type;
+
+        static points_to_flat_type points_to_flat( std::vector< geometry::point_t > const & pts )
+        {
+            const size_t N = pts.size();
+            vector_t x(N), y(N);
+            for ( size_t i = 0; i != N; ++i )
+            {
+                x[i] = pts[i].x();
+                y[i] = pts[i].y();
+            }
+
+            return points_to_flat_type(x, y);
+        }
+
+        static double get_coeff( double const * e, size_t N, points_to_flat_type const & pts )
+        {
+			vector_t const & a = boost::get< 0 >( pts );
+			vector_t const & b = boost::get< 1 >( pts );
+			assert(a.size() == N);
+			assert(b.size() == N);
+			return dot_prod(&a[0], e, N) + dot_prod(&b[0], e, N);
+        }
+
+	private:
+
+		static double dot_prod( double const * a, double const * b, const size_t N )
+		{
+			double res = 0;
+			for ( size_t i = 0; i != N; ++i, ++a, ++b )
+			{
+				res += (*a * *b);
+			}
+			return res;
+		}
+    };
+
+/*
     namespace details
     {
         template< class Matrix >
@@ -79,118 +193,13 @@ namespace watermarking
                 for ( size_t u = 0; u != N; ++u )
                     a(v, u) = 0;
                 a(v, v) = 1;
-                double d = graph.degree( v );
+                const double d = graph.degree( v );
                 for ( typename Graph::edges_iterator e = graph.edges_begin( v ); e != graph.edges_end( v ); ++e )
                     a(v, e->end) = -e->weight / d;
             }
         }
     }
-         
-    struct spectral_analyser
-    {
-        typedef LaGenMatDouble matrix_t;
-
-        template< class Graph >
-        spectral_analyser(  Graph const & graph, boost::function< void (Graph const &, matrix_t &) > fill_matrix )
-                : lambda_( graph.vertices_num() )
-                , e_( graph.vertices_num(), graph.vertices_num() )
-        {
-            util::stopwatch _("calculating eigenvectors");
-            const size_t N = graph.vertices_num();
-            fill_matrix( graph, e_ );
-
-            LaEigSolveSymmetricVecIP( e_, lambda_ );
-            for ( size_t i = 0; i + 1 != N; ++i )
-            {
-                assert( lambda_(i) <= lambda_(i + 1) );
-            }
-        }
-
-        template< class Stream >
-        void dump( Stream & out ) const
-        {
-            const int N = lambda_.size();
-            out << N << std::endl;
-            for (int i = 0; i != N; ++i) 
-            {
-                for (int j = 0; j != N; ++j) 
-                {
-                    out << e_(i, j) << " ";
-                }
-                out << std::endl;
-            }
-            for (int i = 0; i != N; ++i)
-                out << lambda_(i) << " ";
-        }
-
-    private:
-        template< class Stream >
-        int read_size( Stream & in )
-        {
-            int s;
-            in >> s;
-            return s;
-        }
-    public:
-
-        template< class Stream >
-        explicit spectral_analyser( Stream & in )
-                : lambda_( read_size(in) )
-                , e_(lambda_.size(), lambda_.size())
-        {
-            util::stopwatch _("spectral analyser: reading from file");
-
-            const int N = lambda_.size();
-            for (int i = 0; i != N; ++i)
-            {
-                for (int j = 0; j != N; ++j)
-                    in >> e_(i, j);
-            }
-            for (int i = 0; i != N; ++i)
-                in >> lambda_(i);
-        }
-
-
-        double get_lambda( size_t i ) const
-        {
-            return lambda_( i );
-        }
-
-        template< class Points >
-        Points get_coefficients( Points const & vertices ) const
-        {
-            return spectral_coefficients( vertices, e_ );
-        }
-
-        template< class Points >
-        Points get_vertices( Points const & coefficients ) const
-        {
-            typedef typename Points::value_type point_t;
-            
-            const size_t N = coefficients.size();
-            assert( (int) N == e_.rows() );
-            assert( (int) N == e_.cols() );
-            
-            Points vertices( N );
-            for ( size_t i = 0; i != N; ++i )
-            {
-                double x = 0, y = 0;
-                for ( size_t j = 0; j != N; ++j )
-                {
-                    point_t const & r = coefficients[j];
-                    x += r.x() * e_(i, j);
-                    y += r.y() * e_(i, j);
-                }
-                vertices[i] = point_t( x, y );
-            }
-
-            return vertices;
-        }
-
-    private:
-        LaVectorDouble lambda_;
-        matrix_t e_;
-    };
+  	*/       
 }
 
 #endif /* _SPECTRAL_ANALYSIS_H_ */

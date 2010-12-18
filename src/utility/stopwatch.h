@@ -7,32 +7,13 @@ namespace util
 {
     struct stopwatch
     {
-    private:
-        static size_t tabs_num;
-
     public:
-        explicit stopwatch( const char * message )
-        {
-            for ( size_t i = 0; i != tabs_num; ++i )
-                std::cout << "\t";
-            std::cout << message << "..." << std::endl;
-            ++tabs_num;
-            start = clock();
-        }
-
-        ~stopwatch()
-        {
-            --tabs_num;
-            for ( size_t i = 0; i != tabs_num; ++i )
-                std::cout << "\t";
-            clock_t end = clock();
-            std::cout << double(end - start) / CLOCKS_PER_SEC << " sec" << std::endl;
-        }
+        explicit stopwatch( const char * message );
+        ~stopwatch();
 
     private:
         clock_t start;
+        static size_t tabs_num;
     };
-
-    size_t stopwatch::tabs_num = 0;
 }
 #endif /* _STOPWATCH_H_ */

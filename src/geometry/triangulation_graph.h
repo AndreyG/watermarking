@@ -1,50 +1,31 @@
 #ifndef _TRIANGULATION_GRAPH_H_
 #define _TRIANGULATION_GRAPH_H_
 
-namespace graph
-{
-    struct edge_t
-    {
-        size_t end;
-        double weight;
-
-        edge_t( size_t e, double w )
-            : end( e )
-            , weight( w )
-        {}
-    };
-}
-
 namespace geometry
 {
     namespace 
     {
-        template< class Point >
-        double ctg( Point const & p1, Point const & q, Point const & p2 )
+        double ctg( point_t p1, point_t const & q, point_t p2 )
         {
-            double x1 = q.x() - p1.x();
-            double y1 = q.y() - p1.y();
-            double x2 = q.x() - p2.x();
-            double y2 = q.y() - p2.y();
+            p1 -= q;
+            p2 -= q;
 
-            double c = x1 * x2 + y1 * y2;
-            double len_sqr = (x1 * x1 + y1 * y1) * (x2 * x2 + y2 * y2);
-            if ( ( len_sqr - c * c ) <= 0 )
+            double c = p1 * p2;
+            double s = p1 ^ p2;
+            if ( s == 0 )
             {
                 if ( c > 0 )
                     return std::numeric_limits< double >::max();
                 else
                     return -std::numeric_limits< double >::max();
             }
-            return c / sqrt(len_sqr - c * c);
+            return c / s;
         }
 
-        template< class Point >
-        double magic_k( Point const & p, Point const q, double l )
+        double magic_k( point_t const & p, point_t const & q, double l )
         {
-            double x = q.x() - p.x();
-            double y = q.y() - p.y();
-            return (x - y) * l / (x * x + y * y);
+            point_t v = q - p;
+            return ( v.x() - v.y() ) * l / mod( v );
         }
 
         template< class Point >
@@ -58,27 +39,7 @@ namespace geometry
         }
     }
 
-    namespace WeightType
-    {
-        enum Type
-        {
-            Unweighted, Ctg, SinSum, ConstrainedSinSum
-        };
-
-        Type from_str(std::string const & str)
-        {
-            if (str == "unweighted")
-                return Unweighted;
-            if (str == "ctg")
-                return Ctg;
-            if (str == "sin-sum")
-                return SinSum;
-            if (str == "constrained-sin-sum")
-                return ConstrainedSinSum;
-            throw std::logic_error("There is no weight type with name = " + str);
-        }
-    }
-    
+	/*
     template< class Triangulation >
     struct triangulation_graph
     {
@@ -297,6 +258,103 @@ namespace geometry
         std::vector< edges_t > edges_; 
         std::vector< double > degree_;
     };
+	*/
+
+	template< class Triangulation >
+	struct triangulation_graph
+	{
+		struct edge_t
+		{
+			size_t b, e;
+			size_t left, right;
+		};
+
+	private:
+		typedef typename Triangulation::Vertex_handle				vertex_t;
+		typedef typename Triangulation::Face_handle					face_t;
+
+	public:
+		explicit triangulation_graph( Triangulation const & trg )
+		{
+            typedef typename Triangulation::Finite_vertices_iterator    vertices_iterator;
+            typedef typename Triangulation::Finite_edges_iterator       edges_iterator;
+
+			std::map< vertex_t, size_t > v2i;
+			size_t i = 0;
+			for ( vertices_iterator v = trg.finite_vertices_begin(); v != trg.finite_vertices_end(); ++v, ++i )
+			{
+				v2i[v] = i;
+				vertices_.push_back( point_t(v->point()) );
+			}
+
+			for ( edges_iterator e = trg.finite_edges_begin(); e != trg.finite_edges_end(); ++e )
+			{
+				face_t f = e->first;
+				const int i = e->second;
+
+				edge_t edge;
+				vertex_t v[] = 
+				{
+					f->vertex( trg.ccw( i ) ),					 
+					f->vertex( trg.cw( i ) )
+				};
+
+				edge.b = v2i[v[0]];
+				edge.e = v2i[v[1]];
+
+				if ( trg.is_infinite( f ) )
+					edge.left = vertices_num();
+				else
+					edge.left = v2i[vertex(f, v)];
+				f = f->neighbor( i );
+				if ( trg.is_infinite( f ) )
+					edge.right = vertices_num();
+				else
+					edge.right = v2i[vertex(f, v)];
+				
+				assert(edge.left < vertices_num() || edge.right < vertices_num());
+				edges_.push_back( edge );
+			}
+		}
+	
+	private:
+		
+		vertex_t vertex(face_t const & f, vertex_t const * v) const
+		{
+			for (int i = 0; i != 3; ++i)
+			{
+				vertex_t u = f->vertex(i);
+				if ((u != v[0]) && (u != v[1]))
+					return u;
+			}
+		}
+
+	public:
+
+		point_t const & vertex( size_t v ) const
+		{
+			return vertices_[v];
+		}
+
+		edge_t const & edge( size_t e ) const
+		{
+			return edges_[e];
+		}
+
+		size_t vertices_num() const
+		{
+			return vertices_.size();
+		}
+
+		size_t edges_num() const
+		{
+			return edges_.size();
+		}
+
+	private:
+		std::vector< point_t > 	vertices_;
+		std::vector< edge_t > 	edges_;
+	};
 }
 
 #endif /* _TRIANGULATION_GRAPH_H_ */
