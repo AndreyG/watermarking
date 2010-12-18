@@ -170,15 +170,16 @@
       - \left[ (x_1 - x_3)(f_{x2} - f_{x3}) - (x_2 - x_3)(f_{x1} - x_{x3}) \right]
       \left[ (y_2 - y_3)(f_{y1} - f_{y3}) - (y_1 - y_3)(f_{y2} - f_{y3}) \right] )
     \end{multline*}
-    Обозначим $f_{x1} - f_{x3} = g_{x1}$, $f_{x2} - f_{x3} = g_{x2}$, $f_{y1} - f_{y3} = g_{y1}$, $f_{y2} - f_{y3} = g_{y2}$.  
+    Обозначим $f_{x1} - f_{x3} = g_{x1}$, $f_{x2} - f_{x3} = g_{x2}$, $f_{y1} - f_{y3} = g_{y1}$, $f_{y2} - f_{y3} = g_{y2}$; $x_1 - x_3 = a_x, y_1 - y_3 = a_y, 
+    x_2 - x_3 = b_x, y_2 - y_3 = b_y$. $\Delta = a_x b_y - a_y b_x$.
     \begin{multline*}
-      \frac{\partial f_x}{\partial x} \frac{\partial f_y}{\partial y} - \frac{\partial f_x}{\partial y} \frac{\partial f_y}{\partial x} 
-      = \frac{1}{\Delta^2} \\ ( \left[ (x_1 - x_3)(y_2 - y_3) g_{x1} g_{y2} + (x_2 - x_3)(y_1 - y_3) g_{x2} g_{y1} -
-      (x_1 - x_3)(y_1 - y_3) g_{x1} g_{y1} - (x_2 - x_3) (y_2 - y_3) g_{x2} g_{y2} \right] - \\
-      - \left[ (x_1 - x_3)(y_2 - y_3) g_{x2} g_{y1} + (x_2 - x_3)(y_2 - y_3) g_{x1} g_{y2} - 
-      (x_1 - x_3)(y_1 - y_3) g_{x2} g_{y2} - (x_2 - x_3) (y_2 - y_3) g_{x1} g_{y1} \right] ) = \\
-      = \frac{1}{\Delta^2} (\Delta g_{x1} g_{y2} - \Delta g_{x2} g_{y1} - \left[(x_1 - x_3) (y_1 - y_3) - (x_2 - x_3)(y_2 - y_3)\right] (g_{x1} g_{y1} - g_{x2} g_{y2}) ) = \\
-      = \frac{1}{\Delta} (
+      \frac{\partial f_x}{\partial x} \frac{\partial f_y}{\partial y} - \frac{\partial f_x}{\partial y} \frac{\partial f_y}{\partial x} = \frac{1}{\Delta^2} 
+      \left[(b_y g_{x1} - a_y g_{x2})(a_x g_{y2} - b_x g_{y1}) - (a_x g_{x2} - b_x g_{x1})(b_y g_{y1} - a_y g_{y2}) \right] = \\
+      \frac{1}{\Delta^2}\left[b_y a_x (g_{x1} g_{y2} - g_{x2} g_{y1}) + a_y b_x (g_{x2} g_{y1} - g_{x1} g_{y2}) +
+      b_y b_x ( g_{x1} g_{y1} - g_{x1} g_{y1} ) + a_y a_x (g_{x2} g_{y2} - g_{x2} g_{y2}) \right] = \\
+      \frac{1}{\Delta^2}(a_x b_y - a_y b_x)(g_{x1} g_{y2} - g_{x2} g_{y1}) = 
+      \frac{1}{\Delta} \left[ (f_{x1} - f_{x3}) (f_{y2} - f_{y3}) - (f_{x2} - f_{x3})(f_{y1} - f_{y3}) \right] = \\
+      \frac{1}{\Delta} \left[ (f_{x1} f_{y2} - f_{x2} f_{y1}) + (f_{x3} f_{y1} - f_{x1} f_{y3}) + (f_{x2} f_{y3} - f_{x3} f_{y2}) \right] = \frac{i}{2 \Delta} \left[(f_1f_2^* - f_1^* f_2) + (f_2f_3^* - f_2^* f_3) + (f_3f_1^* - f_3^* f_1) \right]
     \end{multline*}
     
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
