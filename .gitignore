@@ -9,3 +9,4 @@ bin
 *.swp
 \#*\#
 src/stdafx.h.gch
+.makepp

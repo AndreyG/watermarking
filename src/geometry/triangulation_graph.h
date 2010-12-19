@@ -3,24 +3,9 @@
 
 namespace geometry
 {
+	/*
     namespace 
     {
-        double ctg( point_t p1, point_t const & q, point_t p2 )
-        {
-            p1 -= q;
-            p2 -= q;
-
-            double c = p1 * p2;
-            double s = p1 ^ p2;
-            if ( s == 0 )
-            {
-                if ( c > 0 )
-                    return std::numeric_limits< double >::max();
-                else
-                    return -std::numeric_limits< double >::max();
-            }
-            return c / s;
-        }
 
         double magic_k( point_t const & p, point_t const & q, double l )
         {
@@ -38,6 +23,7 @@ namespace geometry
             return k_q * (2 * k_q - (k_p1 + k_p2));
         }
     }
+	*/
 
 	/*
     template< class Triangulation >
@@ -312,7 +298,12 @@ namespace geometry
 				else
 					edge.right = v2i[vertex(f, v)];
 				
-				assert(edge.left < vertices_num() || edge.right < vertices_num());
+				assert(is_valid(edge.left) || is_valid(edge.right));
+				if (!is_valid(edge.left))
+				{
+					std::swap(edge.b, edge.e);
+					std::swap(edge.left, edge.right);
+				}
 				edges_.push_back( edge );
 			}
 		}
@@ -340,6 +331,11 @@ namespace geometry
 		edge_t const & edge( size_t e ) const
 		{
 			return edges_[e];
+		}
+
+		bool is_valid( size_t v ) const
+		{
+			return v < vertices_num();
 		}
 
 		size_t vertices_num() const

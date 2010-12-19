@@ -1,8 +1,8 @@
 MKLROOT=/opt/intel/mkl
 MKLLIB=$(MKLROOT)/lib/ia32
 
-compile: bin/main.o bin/embedding.o bin/stopwatch.o bin/data_reading.o bin/data_writing.o bin/graph_fixing.o bin/debug_stream.o
-	g++ -m32 -w bin/main.o bin/embedding.o bin/stopwatch.o bin/data_reading.o bin/data_writing.o bin/graph_fixing.o bin/debug_stream.o \
+compile: bin/main.o bin/embedding.o bin/extracting.o bin/stopwatch.o bin/data_reading.o bin/data_writing.o bin/graph_fixing.o bin/debug_stream.o
+	g++ -m32 -w bin/main.o bin/embedding.o bin/extracting.o bin/stopwatch.o bin/data_reading.o bin/data_writing.o bin/graph_fixing.o bin/debug_stream.o \
 	-Wl,--start-group \
     "$(MKLLIB)/libmkl_intel.a" \
     "$(MKLLIB)/libmkl_gnu_thread.a" \
@@ -14,11 +14,26 @@ compile: bin/main.o bin/embedding.o bin/stopwatch.o bin/data_reading.o bin/data_
 src/stdafx.h.gch: src/stdafx.h 
 	g++ -std=c++0x -c -Wall src/stdafx.h -I"$(MKLROOT)/include" -o src/stdafx.h.gch
 
-bin/main.o: src/main.cpp src/stdafx.h.gch
+bin/main.o: src/main.cpp src/watermarking/embedding.h src/watermarking/extracting.h src/stdafx.h.gch
 	g++ -std=c++0x -c -Wall src/main.cpp -o bin/main.o 
 
-bin/embedding.o: src/watermarking/embedding.cpp src/watermarking/weights/unweighted.h src/stdafx.h.gch
+bin/embedding.o: src/watermarking/embedding.cpp src/watermakring/embedding.h src/stdafx.h.gch \
+	src/geometry/triangulation_graph.h src/geometry/plane_subdivision.h src/inout/inout.h \
+	src/watermarking/weights/unweighted.h src/watermarking/weights/conformal.h
 	g++ -std=c++0x -c -Wall src/watermarking/embedding.cpp -o bin/embedding.o 
+
+src/watermakring/embedding.h: src/watermarking/common.h
+
+src/watermarking/weights/unweighted.h: src/geometry/triangulation_graph.h src/watermarking/spectral_analysis.h
+
+src/watermarking/weights/conformal.h: src/geometry/triangulation_graph.h src/geometry/trigonometry.h src/watermarking/spectral_analysis.h
+
+bin/extracting.o: src/watermarking/extracting.cpp src/watermakring/extracting.h src/stdafx.h.gch
+	g++ -std=c++0x -c -Wall src/watermarking/extracting.cpp -o bin/extracting.o 
+
+src/watermakring/extracting.h: src/watermarking/common.h
+
+src/watermarking/common.h: src/watermarking/spectral_analysis.h src/geometry/planar_graph.h
 
 bin/stopwatch.o: src/utility/stopwatch.cpp src/stdafx.h.gch 
 	g++ -std=c++0x -c -Wall src/utility/stopwatch.cpp -o bin/stopwatch.o
@@ -34,3 +49,6 @@ bin/data_writing.o: src/inout/data_writing.cpp src/stdafx.h.gch
 
 bin/graph_fixing.o: src/utility/graph_fixing.cpp src/stdafx.h.gch
 	g++ -std=c++0x -c -Wall src/utility/graph_fixing.cpp -o bin/graph_fixing.o
+
+clean:
+	rm -f bin/*.o src/stdafx.h.gch

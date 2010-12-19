@@ -1,8 +1,7 @@
 #ifndef _EMBEDDING_H_
 #define _EMBEDDING_H_
 
-#include "../spectral_analysis.h"
-#include "../geometry/planar_graph.h"
+#include "common.h"
 
 using boost::lexical_cast;
 
@@ -12,14 +11,12 @@ namespace watermarking
     {
         enum Type
         {
-            Unweighted, Ctg, SinSum, ConstrainedSinSum
+            Unweighted, Conformal, Ctg, SinSum, ConstrainedSinSum, TypeSize
         };
 
         Type from_str(std::string const & str);
     }
     
-	typedef std::vector< int > message_t;
-
     struct embedding_impl
     {
         typedef geometry::planar_graph_t  								graph_t;
@@ -28,7 +25,6 @@ namespace watermarking
 
 		typedef graph_t::vertex_t										vertex_t;
         typedef std::vector< vertex_t >                                 vertices_t;
-		typedef boost::shared_ptr< spectral_analyser >					analyser_ptr;
 
         enum step_t
         {

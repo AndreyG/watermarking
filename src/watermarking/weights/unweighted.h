@@ -1,4 +1,4 @@
-#include "../../spectral_analysis.h"
+#include "../spectral_analysis.h"
 #include "../../geometry/triangulation_graph.h"
 
 namespace watermarking

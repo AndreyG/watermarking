@@ -6,6 +6,7 @@
 
 #include "watermarking/embedding.h"
 #include "watermarking/extracting.h"
+#include "algorithms/util.h"
 
 typedef geometry::planar_graph_t                         graph_t;
 typedef std::auto_ptr< watermarking::embedding_impl >    embedding_impl_ptr;
@@ -218,13 +219,6 @@ int main( int argc, char** argv )
     graph_t const & rearranged_graph = ew->rearranged_graph();
     graph_t modified_graph = ew->modified_graph();
     
-    auto analyser_vec = ew->get_analysers();
-    std::vector< size_t > const & subdivision = ew->get_subdivision();
-
-    size_t attempts_num = boost::lexical_cast< size_t >( argv[8] );
-    size_t noises_num   = boost::lexical_cast< size_t >( argv[9] );
-    assert((size_t) argc == 10 + noises_num);
-    
     dump_graph(modified_graph, (const char *) argv[6]);
     {
         std::ofstream out(argv[7]);
@@ -234,6 +228,13 @@ int main( int argc, char** argv )
             << "\n" << boost::get<1>(ad);
     }
 
+    auto analyser_vec = ew->get_analysers();
+    std::vector< size_t > const & subdivision = ew->get_subdivision();
+
+    size_t attempts_num = boost::lexical_cast< size_t >( argv[8] );
+    size_t noises_num   = boost::lexical_cast< size_t >( argv[9] );
+    assert((size_t) argc == 10 + noises_num);
+    
     for (size_t i = 0; i != noises_num; ++i)
     {
         double noise = boost::lexical_cast< double >( argv[10 + i] );

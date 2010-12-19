@@ -1,8 +1,8 @@
 #ifndef _SPECTRAL_ANALYSIS_H_
 #define _SPECTRAL_ANALYSIS_H_
 
-#include "utility/stopwatch.h"
-#include "geometry/point.h"
+#include "../utility/stopwatch.h"
+#include "../geometry/point.h"
 
 namespace watermarking
 {
@@ -79,7 +79,7 @@ namespace watermarking
             {
                 for ( size_t j = 0; j != K; ++j )
                 {
-                    vertices[i] += Traits::mult( r[j], e_[i * N + j] );
+                    vertices[i] += Traits::mult( r[j], e_[j * N + i] );
                 }
             }
 
@@ -105,9 +105,24 @@ namespace watermarking
         vector_t e_;
     };
 
+	namespace
+	{
+		template< class Scalar >
+		Scalar dot_prod( Scalar const * a, Scalar const * b, const size_t N )
+		{
+			Scalar res = 0;
+			for ( size_t i = 0; i != N; ++i, ++a, ++b )
+			{
+				res += (*a * *b);
+			}
+			return res;
+		}
+	}
+
     struct real_traits
     {
-		typedef std::vector< double > vector_t;
+		typedef double 						scalar_t;
+		typedef std::vector< scalar_t > 	vector_t;
 
         static geometry::point_t mult( double r, double e )
         {
@@ -129,77 +144,43 @@ namespace watermarking
             return points_to_flat_type(x, y);
         }
 
-        static double get_coeff( double const * e, size_t N, points_to_flat_type const & pts )
+        static double get_coeff( scalar_t const * e, const size_t N, points_to_flat_type const & pts )
         {
 			vector_t const & a = boost::get< 0 >( pts );
 			vector_t const & b = boost::get< 1 >( pts );
 			assert(a.size() == N);
 			assert(b.size() == N);
-			return dot_prod(&a[0], e, N) + dot_prod(&b[0], e, N);
+			return 	dot_prod< scalar_t >(&a[0], e, N) + 
+					dot_prod< scalar_t >(&b[0], e, N);
         }
-
-	private:
-
-		static double dot_prod( double const * a, double const * b, const size_t N )
-		{
-			double res = 0;
-			for ( size_t i = 0; i != N; ++i, ++a, ++b )
-			{
-				res += (*a * *b);
-			}
-			return res;
-		}
     };
 
-/*
-    namespace details
-    {
-        template< class Matrix >
-        void check_symmetry( Matrix const & a )
+	struct complex_traits
+	{
+		typedef std::complex< double > 		scalar_t;
+		typedef std::vector< scalar_t > 	vector_t;
+
+		typedef vector_t points_to_flat_type;
+
+		static points_to_flat_type points_to_flat( std::vector< geometry::point_t > const & pts )
+		{
+			points_to_flat_type	res;
+			foreach ( geometry::point_t const & pt, pts )
+				res.push_back( scalar_t( pt.x(), pt.y() ) );
+			return res;
+		}
+
+		static geometry::point_t mult( double r, scalar_t e )
+		{
+			return geometry::point_t( r * e.real(), r * e.imag() );
+		}
+
+		static double get_coeff( scalar_t const * e, const size_t N, points_to_flat_type const & pts )
         {
-            const size_t N = a.rows();
-            for ( size_t v = 0; v + 1 != N; ++v )
-            {
-                for ( size_t u = v + 1; u != N; ++u )
-                    assert( a(v, u) == a(u, v) );
-            }
-        }
-
-        template< class Graph, class Matrix >
-        void fill_matrix_by_chen( Graph const & graph, Matrix & a )
-        {
-            util::stopwatch _("creation of adjacency matrix");
-            const size_t N = graph.vertices_num();
-
-            for ( size_t v = 0; v != N; ++v )
-            {
-                for ( size_t u = 0; u != N; ++u )
-                    a(v, u) = 0;
-                a(v, v) = graph.degree( v );
-                for ( typename Graph::edges_iterator e = graph.edges_begin( v ); e != graph.edges_end( v ); ++e )
-                    a(v, e->end) = -e->weight;
-            }
-            check_symmetry( a );
-        }
-
-        template< class Graph, class Matrix >
-        void fill_matrix_by_obuchi( Graph const & graph, Matrix & a )
-        {
-            util::stopwatch _("creation of adjacency matrix");
-            const size_t N = graph.vertices_num();
-
-            for ( size_t v = 0; v != N; ++v )
-            {
-                for ( size_t u = 0; u != N; ++u )
-                    a(v, u) = 0;
-                a(v, v) = 1;
-                const double d = graph.degree( v );
-                for ( typename Graph::edges_iterator e = graph.edges_begin( v ); e != graph.edges_end( v ); ++e )
-                    a(v, e->end) = -e->weight / d;
-            }
-        }
-    }
-  	*/       
+			scalar_t r = dot_prod< scalar_t >(e, &pts[0], N);
+			return r.real();
+		}
+	};
 }
 
 #endif /* _SPECTRAL_ANALYSIS_H_ */

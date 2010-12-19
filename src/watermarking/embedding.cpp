@@ -4,6 +4,7 @@
 #include "../geometry/plane_subdivision.h"
 #include "../geometry/triangulation_graph.h"
 #include "weights/unweighted.h"
+#include "weights/conformal.h"
 #include "../inout/inout.h"
 
 namespace watermarking
@@ -14,6 +15,8 @@ namespace watermarking
         {
             if (str == "unweighted")
                 return Unweighted;
+			if (str == "conformal")
+				return Conformal;
             if (str == "ctg")
                 return Ctg;
             if (str == "sin-sum")
@@ -22,6 +25,15 @@ namespace watermarking
                 return ConstrainedSinSum;
             throw std::logic_error("There is no weight type with name = " + str);
         }
+
+		const char * to_str( Type t )
+		{
+			static const char * name[TypeSize];
+			name[Unweighted] = "unweighted";
+			name[Conformal] = "conformal";
+
+			return name[t];
+		}
 	}
 
     embedding_impl::embedding_impl(    graph_t const & graph, size_t max_patch_size, 
@@ -119,6 +131,7 @@ namespace watermarking
 				++N;
             
 			vertices_t old_vertices( graph_.vertices_begin() + v, graph_.vertices_begin() + v + N );
+			v += N;
 
             std::vector< double > r( N );
 
@@ -190,7 +203,7 @@ namespace watermarking
 		for ( size_t i = 0; i != subareas_num; ++i )
 			assert( vertices_iterator[i] == trgs_[i].finite_vertices_end() );
     }
-    
+
     void embedding_impl::factorize( size_t subareas_num, WeightType::Type type )
     {
         util::stopwatch _("coordinate vectors factorization");
@@ -210,6 +223,11 @@ namespace watermarking
 			case WeightType::Unweighted:
 				analyser.reset( new unweighted_spectral_analyser( geometry::triangulation_graph< trg_t >( trg ) ) );
 				break;
+			case WeightType::Conformal:
+				analyser.reset( new conformal_spectral_analyser( geometry::triangulation_graph< trg_t >( trg ) ) );
+				break;
+			default:
+				throw std::logic_error("unsupported type of analyser");
 			}
         }
     }
@@ -226,6 +244,8 @@ namespace watermarking
 			in >> type;
 			if (type == "unweighted")
 				analyser.reset( new unweighted_spectral_analyser( in ) );
+			else if (type == "conformal")
+				analyser.reset( new conformal_spectral_analyser( in ) );
 			else
 				throw std::logic_error("unsupported type of analyser");
         }
@@ -242,6 +262,7 @@ namespace watermarking
         out << subareas_num_ << std::endl;
         foreach (analyser_ptr const & analyser, analysers_ )
         {
+			out << to_str(weight_type_) << "\n";
             analyser->dump(out);
         }
         inout::write_graph(graph_, out);
