@@ -17,7 +17,7 @@ src/stdafx.h.gch: src/stdafx.h
 bin/main.o: src/main.cpp src/stdafx.h.gch
 	g++ -std=c++0x -c -Wall src/main.cpp -o bin/main.o 
 
-bin/embedding.o: src/watermarking/embedding.cpp src/stdafx.h.gch
+bin/embedding.o: src/watermarking/embedding.cpp src/watermarking/weights/unweighted.h src/stdafx.h.gch
 	g++ -std=c++0x -c -Wall src/watermarking/embedding.cpp -o bin/embedding.o 
 
 bin/stopwatch.o: src/utility/stopwatch.cpp src/stdafx.h.gch 

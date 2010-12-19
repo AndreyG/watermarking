@@ -36,12 +36,34 @@ namespace watermarking
 				}
 			}
 
-			vector_t tmp(N);
-			vector_t ans(N * N);
+			vector_t lambda_real(N), lambda_imag(N);
+			vector_t vectors_left(N * N), vectors_right(N * N);
 
-			MKL_INT info = LAPACKE_dgeev(LAPACK_COL_MAJOR, 'N', 'V', N, &e_[0], N, &tmp[0], &tmp[0], &ans[0], 0, &ans[0], N * N);
+			MKL_INT info = LAPACKE_dgeev(	LAPACK_COL_MAJOR, 'N', 'V', N, &e_[0], N, 
+											&lambda_real[0], &lambda_imag[0], 
+											&vectors_left[0], N, &vectors_right[0], N);
+			check(vectors_right, lambda_real, lambda_imag, e_);
 			assert(info == 0);
-			e_.swap(ans);
+			e_.swap(vectors_right);
+		}
+
+		void check(vector_t const & e, vector_t const & vr, vector_t const & vi, vector_t const & a)
+		{
+			foreach ( double d, vi )
+				assert( d == 0 );
+
+			for ( size_t k = 0; k != N; ++k )
+			{
+				for ( size_t i = 0; i != N; ++i )
+				{
+					double r = 0;
+					for ( size_t j = 0; j != N; ++j )
+					{
+						r += e[k * N + j] * a[i * N + j];
+					}
+					assert(abs(e[k * N + i] * vr[k] - r) < 1e-6);
+				}
+			}
 		}
 	};
 }
