@@ -1,1 +1,1 @@
-pdflatex main.tex && open main.pdf
+pdflatex main.tex && bibtex main && open main.pdf
