@@ -22,11 +22,14 @@
 \maketitle
 %
 \begin{abstract}
-  This paper proposes some modifications to the known digital watemarking algorithm for 2D vector digital maps.  
+Two main claims for digital watermarking algorithms for 2D vector data are robustness against attacks and minimization of original data distortion. 
+This paper proposes conformal energy as measure of original data distortion to formalize the second claim. The most satisfied the first claim among known to authors watermarking algorithms is modified 
+to minimize proposed distortion measure. It can be assumed that input and output data of the watermarking algorithm is planar graph without loss of generality. 
+Carried out experiments show that modified algorithm is no less resilient against random noise than original and changes angles between corresponding adjacent edges of the input and output graphs less.
 \end{abstract}
 %
 \begin{keywords}
-Laplacian, mesh spectra, conformal map, quadratic form, Delaunay triangulation
+Laplacian, Dirichlet energy, conformal map, quadratic form, Delaunay triangulation
 \end{keywords}
 %
 \section{Introduction}
@@ -48,7 +51,7 @@ but on the other hand it reduces a possibility of watermark extracting.
 
 The most robust against different attacks (global affine transformation, object order scrambling, vertex insertion or deletion, additive random noise, cropping) algorithm among known to authors 
 was proposed by Ohbuchi and others in~\cite{Ohbuchi}. It is well-informed ``frequency-domain'' algorithm, its main idea is to apply techniques developed for 3D polygonal mesh~\cite{Ohbuchi3D} to 2D-vector map. 
-Hereinafter this algorithm is referred as the base algorithm. It's described briefly in section~\ref{sec:base}. Solving in this work problem is to develop quantative measure of the original map distortion, 
+Hereinafter this algorithm is referred as the base algorithm. It's described briefly in section~\ref{sec:base}. Solving in this paper problem is to develop quantative measure of the original map distortion, 
 our proposal is presented in section~\ref{sec:dist_measure}. We then describe the results of evaluation experiments in section~\ref{sec:results}, 
 followed by a conclusion and future work in section~\ref{sec:conclusion}.
 
@@ -58,7 +61,7 @@ Concerned algorithm embeds message bits into a 2D vector digital map by modifyin
 To compute the ``frequency'' domain representation, the algorithm first establishes connectivity among vertices of the map by using Delaunay triangulation, creating a 2D mesh that covers every vertex in the map.
 The mesh is then transformed into a frequency domain representation using mesh spectral analysis proposed by Karny and others~\cite{Karni1, Karni2}. Modification of the frequency domain coefficients 
 according to the message bits embeds a watermark. Inverse transforming the modified coefficient back into the coordinate domain produces a map with the watermark embedded. The modification of coefficients in the
-frequency domain utlimately displaces vertex coordinates is the spatial domain.
+frequency domain ultimately displaces vertex coordinates in the spatial domain.
 
 For computational efficiency and for robustness against cropping, a map is first divided into many rectangular subareas. Aforementioned mesh spectral analysis and watermark embedding is performed 
 for each of the subareas. By embedding the same watermark repeatedly in multiple subareas, the watermark becomes resilient against cropping.
@@ -104,10 +107,14 @@ Let $\mathbf{x'}, \mathbf{y'}$ are coordinates of the vertices of the watermarke
 On the other words it's possible to express embedding of watermarking as constructing vector 
 \begin{equation}
 \label{formula:g}
-  \mathbf{g} = \left((x_1' - x_1, y_1' - y_1), (x_2' - x_2, y_2' - y_2), \dots, (x_n' - x_n) \right)^T 
+ \mathbf{g} = \alpha \left[ p_1 \mathbf{w}_1 + p_2 \mathbf{w}_2 + \dots + p_k \mathbf{w}_k \right]; 
 \end{equation}
-$$ \mathbf{g} = \alpha \left[ p_1 \mathbf{w}_1 + p_2 \mathbf{w}_2 + \dots + p_k \mathbf{w}_k \right]; $$
 $$ \mathbf{w_i} = \left( (e_{i, 1}, e_{i, 1}), (e_{i, 2}, e_{i, 2}), \dots, (e_{i, n}, e_{i, n}) \right) \mbox{ for } 1 \le i \le n. $$
+If the vectors $\{\mathbf{e}_i\}_{i=1}^n$ are orthogonal and $|\mathbf{e}_i| = \frac{\sqrt{2}}{2}$ then it is possible to estimate mean length of displacement of an vertex $\Delta v_{mean}$.
+\begin{equation}
+\label{formula:mean_displacement}
+|\mathbf{g}| = \alpha * \sqrt {k}; \mbox{      } \Delta v_{mean} = \alpha * \frac{\sqrt{k}}{n}. 
+\end{equation}
 
 To extract watermark from the watermarked map decompose vectors $\mathbf{x'} - \mathbf{x}$, $\mathbf{y'} - \mathbf{y}$ in the basis $\{\mathbf{e}_i\}_{i=1}^k$, or calculate coefficients 
 $\mathbf{u} = (u_1, u_2, \dots, u_k)$, $\mathbf{w} = (w_1, w_2, \dots, w_k)$, 
@@ -120,8 +127,8 @@ $$q_i = \sgn(p_i * (u_i + w_i), m_i = (q_i + 1) / 2.$$
 
 \section{Measure of distortion} 
 \label{sec:dist_measure}
-\subsection{Continious case}
-\label{sec:continious}
+\subsection{Continuous case}
+\label{sec:continuous}
 We suppose that distortion of the refernce map is defined by the change of the angles. Let's consider some domain $\Omega \subset \mathbb{R}^2$ and function $f: \Omega \to \mathbb{R}^2$, 
 $f = \begin{pmatrix} f_x(x, y) \\ f_y(x, y) \end{pmatrix}$. We assume that $f_x, f_y$ have partial derivatives with respect to $x$ and $y$. In the sequel we will use following designations:
 $$
@@ -134,15 +141,6 @@ $$
 $$
 Let's estimate change of an local angle after applying function $f$. Let $\vect{r}~=~\begin{pmatrix} x \\ y \end{pmatrix}$ is an arbitrary point, $\vect{r_1}$ is the point displaced relative to $\vect{r}$ by an arbitrary 
 small vector $\vect{dr}$, 
-$$\vect{r_1} = \vect{r} + \vect{dr} = \begin{pmatrix} x + dx \\ y + dy \end{pmatrix}$$
-and $\vec{r_2}$ is the point equaled to $\vec{r_1}$ rotated relative to $\vec{r}$ by an arbitrary angle $\alpha$,
-$$\vect{r_2} = \vect{r} + R^\alpha \vect{dr} = \begin{pmatrix} x \\ y \end{pmatrix} + \begin{pmatrix} \cos \alpha & -\sin \alpha \\ \sin \alpha & \cos \alpha \end{pmatrix} \begin{pmatrix} dx \\ dy \end{pmatrix},$$
-where $R^\alpha$ is the rotation by angle $\alpha$ (fig. \ref{fig:local_angles}). This points are mapped to 
-\begin{multline*}
-  \vect{f(r)}, 
-  \vect{f(r_1)} = \vect{f(r + dr)} = \vect{f(r)} + \vect{df} \approx \vect{f(r)} + (\nabla f) \vect{dr}, \\
-  \vect{f(r_2)} = \vect{f(r + R^\alpha dr)} ~\approx \vect{f(r)} + (\nabla f)(R^\alpha \vect{dr}).
-\end{multline*}
 \begin{figure}[htb]
   \begin{minipage}[b]{1.0\linewidth}
     \begin{tikzpicture} 
@@ -180,6 +178,15 @@ where $R^\alpha$ is the rotation by angle $\alpha$ (fig. \ref{fig:local_angles})
   \caption{Change of local angle.}
   \label{fig:local_angles}
 \end{figure}
+$$\vect{r_1} = \vect{r} + \vect{dr} = \begin{pmatrix} x + dx \\ y + dy \end{pmatrix}$$
+and $\vec{r_2}$ is the point equaled to $\vec{r_1}$ rotated relative to $\vec{r}$ by an arbitrary angle $\alpha$,
+$$\vect{r_2} = \vect{r} + R^\alpha \vect{dr} = \begin{pmatrix} x \\ y \end{pmatrix} + \begin{pmatrix} \cos \alpha & -\sin \alpha \\ \sin \alpha & \cos \alpha \end{pmatrix} \begin{pmatrix} dx \\ dy \end{pmatrix},$$
+where $R^\alpha$ is the rotation by angle $\alpha$ (fig. \ref{fig:local_angles}). This points are mapped to 
+\begin{multline*}
+  \vect{f(r)}, 
+  \vect{f(r_1)} = \vect{f(r + dr)} = \vect{f(r)} + \vect{df} \approx \vect{f(r)} + (\nabla f) \vect{dr}, \\
+  \vect{f(r_2)} = \vect{f(r + R^\alpha dr)} ~\approx \vect{f(r)} + (\nabla f)(R^\alpha \vect{dr}).
+\end{multline*}
 If $f$ preserves local angles then $f(r_2)$ must be equal to the point $f(r_1)$ rotated relative to the point~$f(r)$ by the angle $\alpha$. Otherwise we can employ length of the vector $\vect{q(r, dr, \alpha)}$
 $$\vect{q(r, dr, \alpha)} = \left(\vect{f(r)} + R^\alpha \vect{df}\right) - \vect{f(r_2)}$$ as measure of the angle change.
 \begin{multline}
@@ -284,8 +291,8 @@ where $\alpha_{ij}$ is the angle opposite the edge $(v_i, v_j)$ in the triangle 
 \label{formula:EDOverEdges}
   E_D(f) = \frac{1}{4} \sum_{\left( i, j \right) \in E\left(\mathfrak{T}\right)}{w_{ij} |f_i - f_j|^2}, 
 \end{equation}
-where $E(\mathfrak{T})$ is the set of edges of the triangulation $\mathfrak{T}$, $w_{ij}=\cot\alpha_{ij} + \cot\alpha_{ji}$, $\alpha_{\left\{{ij, ji}\right\}}$ are the angles opposite 
-to the edge~$v_i v_j$ in adjacent triangles $\triangle T_1=v_i v_j v_{k_1}$, $\triangle T_2=v_j v_i v_{k_2}$. If the edge~$v_i v_j$ is contained in only triangle $\triangle T=v_i v_j v_k$ 
+where $E(\mathfrak{T})$ is the edges of $\mathfrak{T}$, $w_{ij}~=~\cot\alpha_{ij}~+~\cot\alpha_{ji}$, $\alpha_{\left\{{ij, ji}\right\}}$ are the angles opposite 
+to the edge~$v_i v_j$ in adjacent triangles $\triangle T_1=v_i v_j v_{k_1}$, $\triangle T_2~=~v_j v_i v_{k_2}$. If the edge~$v_i v_j$ is contained in only triangle $\triangle T=v_i v_j v_k$ 
 ($v_i v_j$ is contained in the bound of $\Omega$) then $w_{ij} = \cot \alpha_{ij}$.
 
 If we assume that $f$ is complex-valued function and 
@@ -352,7 +359,7 @@ applicable to $f$, $f(v) = v + g(v)$. But $$E_C(g) = E_C(f - v) = E_C(f) - E_C(v
 Thereby, if one wants to use algorithm described in the section \ref{sec:base} and to minimize the distortion measure defined as conformal energy, it's necessary to select the vectors $\{\mathbf{w}_i\}_{i=1}^k$ 
 from formula (\ref{formula:g}) as the eigenvectors of $L''$ corresponding to the lowest eigenvalues where $L''$ is described above.
 
-In the section \ref{sec:continious} we establish that $E_C(f)$ is the measure of the change of local angles. Let's consider what $E_C(f)$ expresses in the sense of the angles of the triangulation $\mathfrak{T}$ 
+In the section \ref{sec:continuous} we establish that $E_C(f)$ is the measure of the change of local angles. Let's consider what $E_C(f)$ expresses in the sense of the angles of the triangulation $\mathfrak{T}$ 
 \begin{multline*}
   E_C(f) = E_D(f) - \int_{\Omega} \det (\nabla f) d\Omega = \\ = \frac{1}{4} \sum_{v_i v_j v_k \in \mathfrak{T}} \cot{\alpha_{ij}}|f_i - f_j|^2 + \cot{\alpha_{jk}}|f_j - f_k|^2 + \\
   + \cot{\alpha_{ki}}|f_k - f_i|^2 - 4S(f_i f_j f_k),
@@ -370,14 +377,26 @@ where $\alpha_{ij}'$, $\alpha_{jk}'$, $\alpha_{ki}'$ are the angles opposite to 
 \end{multline*}
 
 Up to this point we have assumed that the triangulation $\mathfrak{T}$ is an arbitrary, but it is obvious that $E_C$ depends on $\mathfrak{T}$. We employ the triangulation $\mathfrak{T}$ for passing 
-from discrete function values to continious function, consequently we have to select the triangulation which minimize the roughness of a PLIS. According to theorem of Rippa \cite{Rippa, Chen} 
+from discrete function values to continuous function, consequently we have to select the triangulation which minimize the roughness of a PLIS. According to theorem of Rippa \cite{Rippa, Chen} 
 it is the Delaunay triangulation.  
 
 \section{Experiment results}
 \label{sec:results}
+The base and modified algorithm have been tested on the two maps. The first reference map is map of rivers, it consists of polylines, 44482~vertices, 88548~edges. When magnitude $\alpha = 0.5$m, 
+the watermark is 19 bits, it is embedded into 64 regions separately and duplicated 4 times, mean displacement of an vertex is 0.03m according to formula~(\ref{formula:mean_displacement}). This watermark can be restored
+after applying to map additive white noise with magnitude 1.5m. Mean change of an angle between adjacent edges after applying the base algorithm is $0.64^\circ$ and after applying the proposed algorithm is $0.57^\circ$.
+
+The second reference map is map of buildings of Saint~Petersburg, it consists of polygons, 386257~vertices. When magnitude $\alpha = 0.1$m, the watermark is 119 bits, it is embedded into 1024 regions separately 
+and duplicated 3 times, mean displacement of an vertex is 0.01m. This watermark can be restored after applying to map additive white noise with magnitude 1.5m. 
+Mean change of an angle after applying the base algorithm is $1.72^\circ$ and after applying the proposed algorithm is $0.97^\circ$.  
 
 \section{Conclusion}
 \label{sec:conclusion}
+In this paper we presented measure of the original data distortion aroused by embedding watermark. We proposed employ conformal energy because minimization of this functional implies 
+minimization of reference map angles change. Proposed measure was applied for modification of the known watermarking algorithm \cite{Ohbuchi}. Modified algorithm is equivalent to the base algorithm in the sense of 
+resilience against random noise attack and changes angles less.
+
+Our future work includes improvement of the distortion measure to take into account distortion of topology of the reference map, what can be happened in the case of intersection edges of the watermarked map.
 
 \bibliographystyle{IEEEbib}
 \bibliography{main}
