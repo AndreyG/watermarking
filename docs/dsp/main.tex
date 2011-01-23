@@ -13,19 +13,18 @@
 \newcommand{\im}{\operatorname{Im}}
 
 \title{DISTORTION MEASURE OF WATERMARKING 2D VECTOR MAPS IN THE MESH-SPECTRAL DOMAIN}
-\name{A. Davydov, A. Kovalev}
-\address{SPb SU ITMO}
+\twoauthors
+{A. Davydov, A. Kovalev} 
+{SPb SU ITMO}
+{K. Izyurov\thanks{The work of K. I. was supported by the Chebyshev Laboratory (Faculty of Mathematics and Mechanics, St Petersburg State University) under the grant 11.G34.31.2006 of the Government of the Russian Federation.}}{University of Geneva and SPb SU}
 
 \begin{document}
-%\ninept
-%
 \maketitle
-%
 \begin{abstract}
-Two main claims for digital watermarking algorithms for 2D vector data are robustness against attacks and minimization of original data distortion. 
-This paper proposes conformal energy as measure of original data distortion to formalize the second claim. The most satisfied the first claim among known to authors watermarking algorithms is modified 
-to minimize proposed distortion measure. It can be assumed that input and output data of the watermarking algorithm is planar graph without loss of generality. 
-Carried out experiments show that modified algorithm is no less resilient against random noise than original and changes angles between corresponding adjacent edges of the input and output graphs less.
+The two main properties of digital watermarking algorithms for 2D vector data are robustness against attacks and minimization of the original data distortion. 
+This paper proposes conformal energy as a measure of original data distortion to quantify the second property. We modify the watermarking algorithm proposed by Ohbuchy et al., 
+which is, to the best of our knowledge, the most robust one against attacks. Experiments show that the modified algorithm is as resistent against random noise as the original one, but has 
+smaller angle distorsion.
 \end{abstract}
 %
 \begin{keywords}
@@ -39,29 +38,30 @@ GIS-data are sometimes watermarked to protect the copyrights and customers’ re
 the precise point coordinates of the restored data are highly desired compared with its original version.  
 
 Research on digital watermarking has focused mainly on multimedia data, the research on vector data remaining relatively insufficient. 
-Digital watermarking algorithms regarding vector data can be divided roughly into two categories. The first category is about spatial domain method. This methods are more studied \cite{Voight, Kim, Chang, Bazin}, 
-because it allows easily to control distortion. Unfortunately, the algorithms from the first category aren't resistant enough against such attacks as random noise or inserting/deleting vertices.
+Digital watermarking algorithms regarding vector data can be divided roughly into two categories. The first category is about spatial domain methods. These methods are more studied \cite{Voight, Kim, Chang, Bazin}, 
+because they allow to control distortion easily. Unfortunately, the algorithms from the first category aren't resistant enough against such attacks as random noise or inserting/deleting vertices.
 Another category of algorithms of watermarking is about frequency domain method. These algorithms \cite{Ohbuchi, Ohbuchi3D, Praun} are robust against attacks, 
-but on the other hand it is hard to estimate aroused distortion of the original data.
+but on the other hand it is hard to estimate distortion of the original data.
  
 Another classification criterion for watermarking algorithms is using the original data during watermark extracting. Some watermarking algorithms need the original document to extract the watermark, 
-they are called well-informed algorithms. By opposition, those which don’t need the original document to extract the watermark are called blind.
+they are called well-informed algorithms. By contrast, those not using the original document to extract the watermark are called blind.
 Blindness is an interesting property in case of huge and on the fly production of different documents as it doesn't oblige the producer to store every original document, 
 but on the other hand it reduces a possibility of watermark extracting.
 
-The most robust against different attacks (global affine transformation, object order scrambling, vertex insertion or deletion, additive random noise, cropping) algorithm among known to authors 
-was proposed by Ohbuchi and others in~\cite{Ohbuchi}. It is well-informed ``frequency-domain'' algorithm, its main idea is to apply techniques developed for 3D polygonal mesh~\cite{Ohbuchi3D} to 2D-vector map. 
-Hereinafter this algorithm is referred as the base algorithm. It's described briefly in section~\ref{sec:base}. Solving in this paper problem is to develop quantative measure of the original map distortion, 
-our proposal is presented in section~\ref{sec:dist_measure}. We then describe the results of evaluation experiments in section~\ref{sec:results}, 
+Among algorithms known to the authors, the most robust one against different attacks (global affine transformation, object order scrambling, vertex insertion or deletion, additive random noise, cropping)
+was proposed by Ohbuchi at al. in~\cite{Ohbuchi}. It is well-informed ``frequency-domain'' algorithm, its main idea is to apply techniques developed for 3D polygonal mesh~\cite{Ohbuchi3D} to 2D-vector map. 
+Hereinafter this algorithm is referred as the base algorithm. It's described briefly in section~\ref{sec:base}. The goal of this paper is to develop quantative measure of the original map distortion, 
+and to modify the base algorithm accordingly.
+This is presented in section~\ref{sec:dist_measure}. We then describe the results of evaluation experiments in section~\ref{sec:results}, 
 followed by a conclusion and future work in section~\ref{sec:conclusion}.
 
 \section{Base algorithm}
 \label{sec:base}
-Concerned algorithm embeds message bits into a 2D vector digital map by modifying a ``frequency'' domain representation of the map. 
-To compute the ``frequency'' domain representation, the algorithm first establishes connectivity among vertices of the map by using Delaunay triangulation, creating a 2D mesh that covers every vertex in the map.
+The base algorithm embeds message bits into a 2D vector digital map by modifying a ``frequency'' domain representation of the map. 
+To compute the ``frequency'' domain representation, the algorithm provides the set of vertices of the map with a structure of planar graph, using Delaunay triangulation, creating a 2D mesh that covers every vertex in the map.
 The mesh is then transformed into a frequency domain representation using mesh spectral analysis proposed by Karny and others~\cite{Karni1, Karni2}. Modification of the frequency domain coefficients 
-according to the message bits embeds a watermark. Inverse transforming the modified coefficient back into the coordinate domain produces a map with the watermark embedded. The modification of coefficients in the
-frequency domain ultimately displaces vertex coordinates in the spatial domain.
+according to the message bits embeds a watermark. Inverse transformation of the modified coefficients back into the coordinate domain produces a map with the watermark embedded. Modification of coefficients in the
+frequency domain therefore leads to a displacement of vertices in the spatial domain.
 
 For computational efficiency and for robustness against cropping, a map is first divided into many rectangular subareas. Aforementioned mesh spectral analysis and watermark embedding is performed 
 for each of the subareas. By embedding the same watermark repeatedly in multiple subareas, the watermark becomes resilient against cropping.
@@ -89,14 +89,14 @@ $\mathbf{y} = (y_1, y_2, \dots, y_n)^T$ correspondingly in the basis $\{\mathbf{
 \end{eqnarray*}
 If the vectors $\{\mathbf{e}_i\}_{i=1}^n$ are orthogonal then $r_i = (\mathbf{x}, \mathbf{e}_i)$, $s_i~=~(\mathbf{y}, \mathbf{e}_i)$, but it is wrong in general case. 
 
-Let embedded message $\mathbf{m} = (m_1, m_2, \dots, m_k)$ consists of $k$ bits, where $k \le n$, $m_i \in \{0, 1\}$. Let $q_i = 2 * m_i - 1$, $q_i \in \{-1, 1\}$.
+Assume the embedded message $\mathbf{m} = (m_1, m_2, \dots, m_k)$ consists of $k$ bits, where $k \le n$, $m_i \in \{0, 1\}$. Let $q_i = 2 * m_i - 1$, $q_i \in \{-1, 1\}$.
 Then change coefficients $r_i, s_i$, $1 \le k \le n$ in the following way
 \begin{eqnarray*}
   r_i' = r_i + \alpha p_i q_i; \\
   s_i' = s_i + \alpha p_i q_i, 
 \end{eqnarray*}
-where the $\{p_i\}$ is pseudo-random number sequence generated from a private key, $\alpha$ is some positive constant. Incrementing~$\alpha$ increments resilience against attacks of the watermark, 
-but simultaneously increments distortion of the reference map. And vice versa decrementing $\alpha$ decrements resilience against attacks and decrements distortion of the reference map.
+where the $\{p_i\}$ is pseudo-random number sequence generated from a private key, $\alpha$ is some positive constant. Increasing~$\alpha$ increases resilience against attacks of the watermark, 
+but simultaneously leads to a greater distortion of the reference map. 
 
 Let $\mathbf{x'}, \mathbf{y'}$ are coordinates of the vertices of the watermarked map. 
 \begin{eqnarray*}
@@ -130,7 +130,7 @@ $$q_i = \sgn(p_i * (u_i + w_i), m_i = (q_i + 1) / 2.$$
 \subsection{Continuous case}
 \label{sec:continuous}
 We suppose that distortion of the refernce map is defined by the change of the angles. Let's consider some domain $\Omega \subset \mathbb{R}^2$ and function $f: \Omega \to \mathbb{R}^2$, 
-$f = \begin{pmatrix} f_x(x, y) \\ f_y(x, y) \end{pmatrix}$. We assume that $f_x, f_y$ have partial derivatives with respect to $x$ and $y$. In the sequel we will use following designations:
+$f = \begin{pmatrix} f_x(x, y) \\ f_y(x, y) \end{pmatrix}$. We assume that $f_x, f_y$ have partial derivatives with respect to $x$ and $y$. We will use following notation:
 $$
   \nabla f_x = \begin{pmatrix} \frac{\partial f_x}{\partial x} \\ \frac{\partial f_x}{\partial y} \end{pmatrix}, 
   \nabla f_y = \begin{pmatrix} \frac{\partial f_y}{\partial x} \\ \frac{\partial f_y}{\partial x} \end{pmatrix}, 
@@ -139,7 +139,7 @@ $$
     \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} \\
   \end{pmatrix}. 
 $$
-Let's estimate change of an local angle after applying function $f$. Let $\vect{r}~=~\begin{pmatrix} x \\ y \end{pmatrix}$ is an arbitrary point, $\vect{r_1}$ is the point displaced relative to $\vect{r}$ by an arbitrary 
+Let's estimate change of a local angle after applying function $f$. Let $\vect{r}~=~\begin{pmatrix} x \\ y \end{pmatrix}$ is an arbitrary point, $\vect{r_1}$ is the point displaced relative to $\vect{r}$ by an arbitrary 
 small vector $\vect{dr}$, 
 \begin{figure}[htb]
   \begin{minipage}[b]{1.0\linewidth}
@@ -255,7 +255,7 @@ and doesn't depend on direction of $\vect{dr}$.
   \left(\frac{\left| {q(r, dr, \pm \frac{\pi}{2})} \right|}{|dr|}\right)^2 = 
   \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2 + \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 
 \end{equation*}
-I propose to use the functional 
+We propose to use the functional 
 \begin{equation*}
   E_C(f) = \frac{1}{2} \int_{\Omega}\left[{\left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 + \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2}\right] d\Omega   
 \end{equation*}
@@ -265,7 +265,7 @@ called \textit{conformal energy} (\cite{Polthier}) as measure of distortion of t
 \label{sec:discrete}
 Let's consider sets $V = \left\{v_1, v_2, ... , v_n\right\}$, $V' = \left\{v_1', v_2', ... , v_n'\right\}$, $v_i, v_i' \in \mathbb{R}^2$, $|V| = |V'| = n$. Let function $f: V \to V'$ maps set $V$ to set $V'$, 
 $f(v_i) = v_i'$ for $1 \le i \le n$. Let $\Omega$ denote convex hull of the set $V$. We can construct Piecewise Linear Interpolation Surface (PLIS) of function values $\left\{f(v_i)\right\}_{i=1}^n$ 
-using some triangulation $\mathfrak{T}$ of the set $V$, consequently $f$ can be viewed as function from $\Omega$ to~$\mathbb{R}^2$. If point $v$ is in triangle $\triangle T = (v_i v_j v_k)$, $\triangle T \in \mathfrak{T}$; 
+using some triangulation $\mathfrak{T}$ of the set $V$, consequently $f$ can be viewed as function from $\Omega$ to~$\mathbb{R}^2$. If a point $v$ is in triangle $\triangle T = (v_i v_j v_k)$, $\triangle T \in \mathfrak{T}$; 
 $v = \alpha v_i + \beta v_j + \gamma v_k$, $0 \le \alpha, \beta, \gamma \le 1$, $\alpha + \beta + \gamma = 1$, then $f(v) = \alpha f(v_i) + \beta f(v_j) + \gamma f(v_k)$.
 \begin{multline}
 \label{formula:EC}
@@ -354,12 +354,12 @@ If $$\mathbf{f} = \alpha \left[ p_1 + \mathbf{e}_1 + p_2 \mathbf{e}_2 + \dots + 
 and $\{\mathbf{e}_i\}_{i=1}^k$ is system of orthonormal vectors, then $E_C(f)$ will be minimized when $\{\mathbf{e}_i\}_{i=1}^k$ are the eigenvectors of $L''$ corresponding to $k$ lowest eigenvalues. 
 
 The watermark embedding algorithm described in the section \ref{sec:base} constructs vector $\mathbf{g}$ of differences between old and new coordinates of the vertices (formula (\ref{formula:g})) and $E_C$ is functional 
-applicable to $f$, $f(v) = v + g(v)$. But $$E_C(g) = E_C(f - v) = E_C(f) - E_C(v) = E_C(f),$$ because $E_C$ is linear and the identity function $v$ is conformal. 
+applicable to $f$, $f(v) = v + g(v)$. But $$E_C(g) = E_C(f - v) = E_C(f),$$ because $E_C$ is quadratic and the identity function $v$ is conformal. 
 
 Thereby, if one wants to use algorithm described in the section \ref{sec:base} and to minimize the distortion measure defined as conformal energy, it's necessary to select the vectors $\{\mathbf{w}_i\}_{i=1}^k$ 
 from formula (\ref{formula:g}) as the eigenvectors of $L''$ corresponding to the lowest eigenvalues where $L''$ is described above.
 
-In the section \ref{sec:continuous} we establish that $E_C(f)$ is the measure of the change of local angles. Let's consider what $E_C(f)$ expresses in the sense of the angles of the triangulation $\mathfrak{T}$ 
+In the section \ref{sec:continuous} we argued that $E_C(f)$ is the measure of the change of local angles. Let's consider what $E_C(f)$ expresses in the sense of the angles of the triangulation $\mathfrak{T}$ 
 \begin{multline*}
   E_C(f) = E_D(f) - \int_{\Omega} \det (\nabla f) d\Omega = \\ = \frac{1}{4} \sum_{v_i v_j v_k \in \mathfrak{T}} \cot{\alpha_{ij}}|f_i - f_j|^2 + \cot{\alpha_{jk}}|f_j - f_k|^2 + \\
   + \cot{\alpha_{ki}}|f_k - f_i|^2 - 4S(f_i f_j f_k),
@@ -376,7 +376,7 @@ where $\alpha_{ij}'$, $\alpha_{jk}'$, $\alpha_{ki}'$ are the angles opposite to 
   + (\cot{\alpha_{jk}} - \cot{\alpha_{jk}'})|f_j - f_k|^2 + (\cot{\alpha_{ki}} - \cot{\alpha_{ki}'})|f_k - f_i|^2.
 \end{multline*}
 
-Up to this point we have assumed that the triangulation $\mathfrak{T}$ is an arbitrary, but it is obvious that $E_C$ depends on $\mathfrak{T}$. We employ the triangulation $\mathfrak{T}$ for passing 
+Up to this point we have assumed that the triangulation $\mathfrak{T}$ is arbitrary, but it is obvious that $E_C$ depends on $\mathfrak{T}$. We employ the triangulation $\mathfrak{T}$ for passing 
 from discrete function values to continuous function, consequently we have to select the triangulation which minimize the roughness of a PLIS. According to theorem of Rippa \cite{Rippa, Chen} 
 it is the Delaunay triangulation.  
 
@@ -392,11 +392,11 @@ Mean change of an angle after applying the base algorithm is $1.72^\circ$ and af
 
 \section{Conclusion}
 \label{sec:conclusion}
-In this paper we presented measure of the original data distortion aroused by embedding watermark. We proposed employ conformal energy because minimization of this functional implies 
+In this paper we presented a measure of the original data distortion aroused by embedding watermark. We proposed to employ the conformal energy because minimization of this functional implies 
 minimization of reference map angles change. Proposed measure was applied for modification of the known watermarking algorithm \cite{Ohbuchi}. Modified algorithm is equivalent to the base algorithm in the sense of 
 resilience against random noise attack and changes angles less.
 
-Our future work includes improvement of the distortion measure to take into account distortion of topology of the reference map, what can be happened in the case of intersection edges of the watermarked map.
+Our future work includes improvement of the distortion measure to take into account distortion of topology of the reference map, what can happend in the case of intersection edges of the watermarked map.
 
 \bibliographystyle{IEEEbib}
 \bibliography{main}
