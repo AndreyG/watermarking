@@ -21,9 +21,9 @@ namespace watermarking
     template< class Traits >
     struct spectral_analyser_impl : spectral_analyser
     {
-        typedef typename Traits::vector_t vector_t;
-
 	protected:
+        typedef typename Traits::vector_t vector_t;
+		typedef Traits traits;
 
 		template< class Graph >
         spectral_analyser_impl( Graph const & g )
@@ -48,6 +48,7 @@ namespace watermarking
 
         void dump( std::ostream & out ) const
         {
+			out << N << std::endl;
             for (size_t i = 0; i != N; ++i) 
             {
                 for (size_t j = 0; j != N; ++j) 
@@ -166,7 +167,7 @@ namespace watermarking
 		{
 			points_to_flat_type	res;
 			foreach ( geometry::point_t const & pt, pts )
-				res.push_back( scalar_t( pt.x(), pt.y() ) );
+				res.push_back( scalar_t( pt.x(), -pt.y() ) );
 			return res;
 		}
 

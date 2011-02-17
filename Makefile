@@ -19,7 +19,7 @@ bin/main.o: src/main.cpp src/watermarking/embedding.h src/watermarking/extractin
 
 bin/embedding.o: src/watermarking/embedding.cpp src/watermakring/embedding.h src/stdafx.h.gch \
 	src/geometry/triangulation_graph.h src/geometry/plane_subdivision.h src/inout/inout.h \
-	src/watermarking/weights/unweighted.h src/watermarking/weights/conformal.h
+	src/watermarking/weights/unweighted.h src/watermarking/weights/conformal.h src/watermarking/weights/dirichlet.h
 	g++ -std=c++0x -c -Wall src/watermarking/embedding.cpp -o bin/embedding.o 
 
 src/watermakring/embedding.h: src/watermarking/common.h
@@ -27,6 +27,8 @@ src/watermakring/embedding.h: src/watermarking/common.h
 src/watermarking/weights/unweighted.h: src/geometry/triangulation_graph.h src/watermarking/spectral_analysis.h
 
 src/watermarking/weights/conformal.h: src/geometry/triangulation_graph.h src/geometry/trigonometry.h src/watermarking/spectral_analysis.h
+
+src/watermarking/weights/dirichlet.h: src/geometry/triangulation_graph.h src/geometry/trigonometry.h src/watermarking/spectral_analysis.h
 
 bin/extracting.o: src/watermarking/extracting.cpp src/watermakring/extracting.h src/stdafx.h.gch
 	g++ -std=c++0x -c -Wall src/watermarking/extracting.cpp -o bin/extracting.o 

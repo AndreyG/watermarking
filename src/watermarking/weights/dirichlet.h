@@ -6,16 +6,16 @@
 
 namespace watermarking
 {
-	struct conformal_spectral_analyser : spectral_analyser_impl< complex_traits >
+	struct dirichlet_spectral_analyser : spectral_analyser_impl< real_traits >
 	{
-		typedef spectral_analyser_impl< complex_traits > 	base_t;
+		typedef spectral_analyser_impl< traits > 	base_t;
 
-		explicit conformal_spectral_analyser( std::istream & in )
+		explicit dirichlet_spectral_analyser( std::istream & in )
 				: base_t( in )
 		{}
 
 		template< class Trg >
-		explicit conformal_spectral_analyser( geometry::triangulation_graph< Trg > const & g )
+		explicit dirichlet_spectral_analyser( geometry::triangulation_graph< Trg > const & g )
 				: base_t( g )
 		{
 			util::stopwatch _("conformal_spectral_analyser::ctor");
@@ -28,7 +28,7 @@ namespace watermarking
 			{
 				util::stopwatch _("calculating eigenvectors");
 
-				MKL_INT info = LAPACKE_zheev( LAPACK_COL_MAJOR, 'V', 'L', N, &e_[0], N, &lambda[0] );
+				MKL_INT info = LAPACKE_dsyev( LAPACK_COL_MAJOR, 'V', 'L', N, &e_[0], N, &lambda[0] );
 				assert(info == 0);
 			}
 
@@ -78,14 +78,6 @@ namespace watermarking
 				if (g.is_valid(edge.right))
 					e_[b * N + e] -= safe(ctg(g.vertex(b), g.vertex(edge.right), g.vertex(e)));
 				e_[b * N + b] -= e_[b * N + b];
-				
-				if (!g.is_valid(edge.right))
-				{
-					if (edge.b < edge.e)
-						e_[edge.b * N + edge.e] -= complex_traits::scalar_t(0, 1);
-					else
-						e_[edge.e * N + edge.b] += complex_traits::scalar_t(1, 0);
-				}
 			}
 		}
  
@@ -97,7 +89,7 @@ namespace watermarking
 			{
 				for ( size_t i = 0; i != N; ++i )
 				{
-					complex_traits::scalar_t r = 0;
+					real_traits::scalar_t r = 0;
 					for ( size_t j = 0; j != N; ++j )
 					{
 						r += e[k * N + j] * ((i < j) ? a[i * N + j] : a[j * N + i]);
@@ -111,3 +103,4 @@ namespace watermarking
 		}
 	};
 }
+

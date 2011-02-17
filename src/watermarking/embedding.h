@@ -11,7 +11,7 @@ namespace watermarking
     {
         enum Type
         {
-            Unweighted, Conformal, Ctg, SinSum, ConstrainedSinSum, TypeSize
+            Unweighted, Conformal, Dirichlet, SinSum, ConstrainedSinSum, TypeSize
         };
 
         Type from_str(std::string const & str);

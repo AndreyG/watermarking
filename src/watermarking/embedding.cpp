@@ -5,6 +5,7 @@
 #include "../geometry/triangulation_graph.h"
 #include "weights/unweighted.h"
 #include "weights/conformal.h"
+#include "weights/dirichlet.h"
 #include "../inout/inout.h"
 
 namespace watermarking
@@ -17,8 +18,8 @@ namespace watermarking
                 return Unweighted;
 			if (str == "conformal")
 				return Conformal;
-            if (str == "ctg")
-                return Ctg;
+            if (str == "dirichlet")
+                return Dirichlet;
             if (str == "sin-sum")
                 return SinSum;
             if (str == "constrained-sin-sum")
@@ -31,6 +32,7 @@ namespace watermarking
 			static const char * name[TypeSize];
 			name[Unweighted] = "unweighted";
 			name[Conformal] = "conformal";
+			name[Dirichlet] = "dirichlet";
 
 			return name[t];
 		}
@@ -226,6 +228,9 @@ namespace watermarking
 			case WeightType::Conformal:
 				analyser.reset( new conformal_spectral_analyser( geometry::triangulation_graph< trg_t >( trg ) ) );
 				break;
+			case WeightType::Dirichlet:
+				analyser.reset( new dirichlet_spectral_analyser( geometry::triangulation_graph< trg_t >( trg ) ) );
+				break;
 			default:
 				throw std::logic_error("unsupported type of analyser");
 			}
@@ -246,8 +251,12 @@ namespace watermarking
 				analyser.reset( new unweighted_spectral_analyser( in ) );
 			else if (type == "conformal")
 				analyser.reset( new conformal_spectral_analyser( in ) );
+			else if (type == "dirichlet")
+				analyser.reset( new dirichlet_spectral_analyser( in ) );
 			else
-				throw std::logic_error("unsupported type of analyser");
+			{
+				throw std::logic_error("unsupported type of analyser: " + type);
+			}
         }
         inout::read_graph( graph_, in );
         subdivision_.resize( graph_.vertices_num( ) );
@@ -269,6 +278,4 @@ namespace watermarking
         foreach (size_t s, subdivision_ )
             out << s << " ";
     }
-
-
 }
