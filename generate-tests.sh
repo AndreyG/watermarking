@@ -1,3 +1,3 @@
 cd tester && ant && cd .. &&
-scala -classpath tester/classes TestGenerator 10 river '.*' '.*' 0.0 2.5 0.1 &&
+scala -classpath tester/classes TestGenerator conf/gen-test.conf &&
 chmod +x test-run.sh 

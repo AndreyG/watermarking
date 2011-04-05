@@ -1,106 +1,85 @@
 import java.io.{File, PrintStream, FileOutputStream}
 import java.lang.Double.parseDouble
-import Common._
+import java.lang.Integer.parseInt
+import common.{StreamWrapper, DirWrapper, matchPattern}
 
 object TestGenerator {
-  val out = new PrintStream(new FileOutputStream(new File("test-run.sh")))
-
-  def genRange(start: Double, finish: Double, step: Double): Array[String] = {
-    import scala.collection.mutable.ArrayBuffer
-    val res: ArrayBuffer[String] = new ArrayBuffer
+  def genRange(start: Double, finish: Double, step: Double): Iterable[Double] = {
+    import scala.collection.mutable.{Buffer, ArrayBuffer}
+    val res: Buffer[Double] = new ArrayBuffer
     var i = start
     while (i <= finish) {
-      res += i.toString
+      res += i
       i += step
     }
-    res.toArray
+    res.toIterable
   }
 
-  def genNameByTime() = {
-    import java.util.Calendar._
+  /*
+  *   args(0) -- config file name
+  */
+  def main(args: Array[String]) {
+    assert(args.size == 1)
+    val attrs = new common.Attributes(new File(args(0)))
 
-    val calendar = getInstance
-    
-    def extend(value: Int) = {
-      val s: String = calendar.get(value).toString
-      if (s.length == 1) "0" + s else s
-    }
- 
-    val date = extend(DAY_OF_MONTH) + "-" + extend(MONTH) + "-" + extend(YEAR)
-    val time = extend(HOUR_OF_DAY) + "-" + extend(MINUTE)
-    date + "__" + time
-  }
+    val inputDir    = new DirWrapper(new File(attrs("input-dir")))
+    val outputDir   = new DirWrapper(new File(attrs("output-dir")), toMake=true)
+   
+    val out = new StreamWrapper(new PrintStream(new FileOutputStream(new File("test-run.sh"))))
 
-  def mkdirIfNotExists(root: File, name: String): File = {
-    val res = new File(root, name)
-    if (!res.exists)
-      res.mkdir()
-    res
-  }
+    val noiseRange = genRange(parseDouble(attrs("noise-lower-bound")),
+                              parseDouble(attrs("noise-upper-bound")),
+                              parseDouble(attrs("noise-step")))
 
-  def deleteReqursively(dir: File) {
-	assert(dir.exists && dir.isDirectory)
-	for (file <- dir.listFiles) {
-	  if (file.isDirectory) {
-		deleteReqursively(file)
-	  }
-	  file.delete()
-	}
-  }
+    for (graphDir <- inputDir.subdirs(matchPattern(attrs("graph-name")))) {
+      for (factorizationDir <- graphDir.subdirs(matchPattern(attrs("factorization-name")))) {
+        var first = true
+        for (embeddingDir <- factorizationDir.subdirs(matchPattern(attrs("embedding-name")))) {
+          val outDir = new DirWrapper(
+            new DirWrapper(
+              new DirWrapper(
+                outputDir,
+                graphDir.name
+              ),
+              factorizationDir.name
+            ),
+            embeddingDir.name
+          )
   
-  def and[T](preds: (T => Boolean)*): (T => Boolean) = t => preds.forall(_(t))
-  
-  def main(params: Array[String]) {
-    assert(params.size == 7)
-    val range = genRange(parseDouble(params(4)), parseDouble(params(5)), parseDouble(params(6)))
-    val args = new Array[String](10 + range.size)
-    Array.copy(range, 0, args, args.size - range.size, range.size)
-    args(0) = "bin/watermarking"
-    val attemptsNum = java.lang.Integer.parseInt(params(0))
-    args(8) = params(0)
-    args(9) = range.size.toString
-    val outDirName = "result"
-    for (graphDir <- dirs(inputDir, matchPattern(params(1)))) {
-      args(1) = graphDir.getAbsolutePath + "/input-graph.txt" 
-      for (factorizationDir <- dirs(graphDir, matchPattern(params(2)))) {
-		var first = true
-		args(3) = factorizationDir.getAbsolutePath
-		for (embeddingDir <- dirs(factorizationDir, and(nameStarts("alpha"), matchPattern(params(3))))) {
-		  args(2) = {
-			val factorizationParams = new File(factorizationDir, "factorization.params")
-			if (factorizationParams.exists() || !first) {
-			  "dump" 
-			} else {
-			  factorizationDir.getAbsolutePath + "/factorization.conf"
+          for (noise <- noiseRange) {
+			val noiseDir = new DirWrapper(outDir, "noise-" + noise)
+			for (attempt <- 0 until parseInt(attrs("attempts-num"))) {
+			  new DirWrapper(noiseDir, "attempt-" + attempt)
 			}
-		  }
-		  first = false
-		  args(4) = embeddingDir.getAbsolutePath + "/embedding.conf"
- 		  val outDir = new File(embeddingDir, outDirName)
-		  if (outDir.exists)
-			deleteReqursively(outDir)
-		  else
-			outDir.mkdir()
-		  for (noise <- range) {
-			val noiseDir = mkdirIfNotExists(outDir, "noise-" + noise)
-			for (attempt <- 0 until attemptsNum) {
-			  mkdirIfNotExists(noiseDir, "attempt-" + attempt)
-			}
-		  }
-		  args(5) = outDir.getAbsolutePath
-		  args(6) = new File(embeddingDir, "modified_graph.txt").getAbsolutePath
-		  args(7) = new File(embeddingDir, "difference.txt").getAbsolutePath
-		  val logDir = mkdirIfNotExists(outDir, "log")
-		  val errStream = logDir.getAbsolutePath + "/err.txt"
-		  val outStream = logDir.getAbsolutePath + "/out.txt" 
-		  for (arg <- args) {
-			out.print(arg + " ")
-		  }
-		  out.print(" 1> " + outStream)
-		  out.print(" 2> " + errStream)
-		  out.println()
-		}
+          }
+
+          val resultDir = new DirWrapper(outDir, "result")
+          val logDir = new DirWrapper(outDir, "log")
+
+          import common.details.{feed, endl}
+
+          out << 
+              "bin/watermarking" << feed << 
+              "      --input-graph " << (graphDir / "input-graph.txt") << feed << 
+              "      --factorization " << {
+                                val cacheFile = factorizationDir / "factorization.params"
+                                if (!first || cacheFile.exists)
+                                  cacheFile
+                                else
+                                  factorizationDir / "factorization.conf"
+                              } << feed << 
+              "      --embedding " << (embeddingDir / "embedding.conf") << feed << 
+              "      --noise-lower-bound " << attrs("noise-lower-bound") << feed <<
+              "      --noise-upper-bound " << attrs("noise-upper-bound") << feed <<
+              "      --noise-step " << attrs("noise-step") << feed <<
+              "      --watermarked-graph-name " << (resultDir / "modified-graph.txt") << feed <<
+              "      --statistics-file-name " << (resultDir / "statistics.txt") << feed <<
+              "      1> " << (logDir / "err.txt") << feed <<
+              "      2> " << (logDir / "out.txt") << endl
+
+          first = false
+        }
       }
-	}
+    }
   }
-}
+}		      
