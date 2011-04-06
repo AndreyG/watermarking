@@ -31,49 +31,40 @@ object TestGenerator {
                               parseDouble(attrs("noise-upper-bound")),
                               parseDouble(attrs("noise-step")))
 
-    for (graphDir <- inputDir.subdirs(matchPattern(attrs("graph-name")))) {
-      for (factorizationDir <- graphDir.subdirs(matchPattern(attrs("factorization-name")))) {
+    for (inGraphDir <- inputDir.subdirs(matchPattern(attrs("graph-name")))) {
+      val outGraphDir = new DirWrapper(outputDir, inGraphDir.name)
+      for (inFactorizationDir <- inGraphDir.subdirs(matchPattern(attrs("factorization-name")))) {
+        val outFactorizationDir = new DirWrapper(outGraphDir, inFactorizationDir.name)
         var first = true
-        for (embeddingDir <- factorizationDir.subdirs(matchPattern(attrs("embedding-name")))) {
-          val outDir = new DirWrapper(
-            new DirWrapper(
-              new DirWrapper(
-                outputDir,
-                graphDir.name
-              ),
-              factorizationDir.name
-            ),
-            embeddingDir.name
-          )
+        for (inEmbeddingDir <- inFactorizationDir.subdirs(matchPattern(attrs("embedding-name")))) {
+          val outDir = new DirWrapper(outFactorizationDir, inEmbeddingDir.name)
+          val resultDir = new DirWrapper(outDir, "result")
+          val logDir = new DirWrapper(outDir, "log")
   
           for (noise <- noiseRange) {
-			val noiseDir = new DirWrapper(outDir, "noise-" + noise)
+			val noiseDir = new DirWrapper(resultDir, "noise-" + noise)
 			for (attempt <- 0 until parseInt(attrs("attempts-num"))) {
 			  new DirWrapper(noiseDir, "attempt-" + attempt)
 			}
           }
 
-          val resultDir = new DirWrapper(outDir, "result")
-          val logDir = new DirWrapper(outDir, "log")
+          val factorizationDumpFile = outFactorizationDir / "factorization.params"
 
           import common.details.{feed, endl}
 
           out << 
               "bin/watermarking" << feed << 
-              "      --input-graph " << (graphDir / "input-graph.txt") << feed << 
-              "      --factorization " << {
-                                val cacheFile = factorizationDir / "factorization.params"
-                                if (!first || cacheFile.exists)
-                                  cacheFile
-                                else
-                                  factorizationDir / "factorization.conf"
-                              } << feed << 
-              "      --embedding " << (embeddingDir / "embedding.conf") << feed << 
+              "      --input-graph " << (inGraphDir / "input-graph.txt") << feed << 
+              "      --dump-exists " << (if (factorizationDumpFile.exists) "true" else "false") << feed <<
+              "      --factorization-dump " << factorizationDumpFile << feed <<
+              "      --factorization " << inFactorizationDir / "factorization.conf" << feed << 
+              "      --embedding " << (inEmbeddingDir / "embedding.conf") << feed << 
+              "      --result-dir " << resultDir << feed <<
               "      --noise-lower-bound " << attrs("noise-lower-bound") << feed <<
               "      --noise-upper-bound " << attrs("noise-upper-bound") << feed <<
               "      --noise-step " << attrs("noise-step") << feed <<
-              "      --watermarked-graph-name " << (resultDir / "modified-graph.txt") << feed <<
-              "      --statistics-file-name " << (resultDir / "statistics.txt") << feed <<
+              "      --watermarked-graph " << (resultDir / "modified-graph.txt") << feed <<
+              "      --statistics-file " << (resultDir / "statistics.txt") << feed <<
               "      1> " << (logDir / "err.txt") << feed <<
               "      2> " << (logDir / "out.txt") << endl
 

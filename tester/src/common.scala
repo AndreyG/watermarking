@@ -22,6 +22,7 @@ package common {
     })
 
     val name = dir.getName
+    val absolutePath = dir.getAbsolutePath
 
     def subdirs(filter: (File => Boolean)): Iterable[DirWrapper] = {
       val res = dir.listFiles.filter(file => isDir(file) && filter(file))
@@ -56,6 +57,11 @@ package common {
 
     def << (f: File) : StreamWrapper = {
       out.print(f.getAbsolutePath)
+      return this
+    }
+
+    def << (dir: DirWrapper) : StreamWrapper = {
+      out.print(dir.absolutePath)
       return this
     }
   }

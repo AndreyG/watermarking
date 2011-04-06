@@ -4,6 +4,54 @@
 
 namespace inout
 {
+
+namespace
+{
+    template<typename T>
+    void read(boost::program_options::variables_map const & vm, T & t, const char * name)
+    {
+        t = vm[name].as<T>();
+    }
+}
+
+config_t::config_t(int argc, char** argv)
+{
+    namespace po = boost::program_options;
+
+    po::options_description desc;
+    desc.add_options()
+        ("input-graph",         po::value< std::string >())
+        ("dump-exists",         po::value< std::string >())
+        ("factorization-dump",  po::value< std::string >())
+        ("factorization",       po::value< std::string >())
+        ("embedding",           po::value< std::string >())
+        ("result-dir",          po::value< std::string >())
+        ("watermarked-graph",   po::value< std::string >())
+        ("statistics-file",     po::value< std::string >())
+        ("noise-lower-bound",   po::value< double >())
+        ("noise-upper-bound",   po::value< double >())
+        ("noise-step",          po::value< double >())
+    ;
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+
+    dump_exists = vm["dump-exists"].as< std::string >() == "true";
+    read(vm, dump_path,         "factorization-dump");
+    read(vm, input_graph,       "input-graph");
+    read(vm, factorization,     "factorization");
+    read(vm, embedding,         "embedding");
+
+    read(vm, result_dir,        "result-dir");
+    read(vm, watermarked_graph, "watermarked_graph");
+    read(vm, statistics_file,   "statistics-file");
+
+    read(vm, noise_lower_bound, "noise_lower_bound");
+    read(vm, noise_upper_bound, "noise_upper_bound");
+    read(vm, noise_step,        "noise_step");
+}
+
 message_params_t read_message_params(const char * filepath)
 {
     std::ifstream conf(filepath);

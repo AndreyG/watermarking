@@ -25,11 +25,10 @@ graph_t create_graph( const char * filepath, bool fix = true )
     return graph;
 }
 
-embedding_impl_ptr create_embedding( graph_t const & graph, const char * filepath )
+embedding_impl_ptr create_embedding( graph_t const & graph, std::string const & factorization_conf )
 {
     namespace po = boost::program_options;
 
-    std::ifstream conf(filepath);
     po::options_description desc;
     desc.add_options()
         ( "step-by-step", po::value<bool>() )
@@ -39,13 +38,14 @@ embedding_impl_ptr create_embedding( graph_t const & graph, const char * filepat
     ;
     
     po::variables_map params;       
+    std::ifstream conf(factorization_conf);
     po::store(po::parse_config_file(conf, desc), params);
 
-    const auto weight_type        = watermarking::WeightType::from_str( params["weight-type"].as< std::string >() );
+    const auto weight_type        = watermarking::WeightType::from_str(params["weight-type"].as< std::string >());
     const bool use_edges          = params["use-edges"].as< bool >();
     const size_t max_subarea_size = params["max-subarea-size"].as< size_t >();
     const bool step_by_step       = params["step-by-step"].as< bool >();
-    return embedding_impl_ptr( new watermarking::embedding_impl( graph, max_subarea_size, weight_type, use_edges, step_by_step ) );
+    return embedding_impl_ptr(new watermarking::embedding_impl(graph, max_subarea_size, weight_type, use_edges, step_by_step));
 }
 
 namespace
@@ -191,37 +191,38 @@ tuple<double, size_t> angle_difference(graph_t const& g1, graph_t const& g2)
 
 int main( int argc, char** argv )
 {
+    using inout::config_t;
+    config_t config(argc, argv);
+
     embedding_impl_ptr ew;
     {
-        auto dumppath = (std::string(argv[3]) + "/factorization.params"); 
-        if ( std::string(argv[2]) == std::string("dump") )
+        if (config.dump_exists)
         {
-            std::ifstream in( dumppath.c_str() ); 
-            ew.reset( new watermarking::embedding_impl( in ) );
+            std::ifstream in(config.dump_path.c_str()); 
+            ew.reset(new watermarking::embedding_impl(in));
         }
         else
         {
-            auto graph = create_graph(argv[1]);
+            auto graph = create_graph(config.input_graph.c_str());
             assert(!loops_exist(graph));
             assert(!has_duplicate_vertices(graph));
             
-            auto inputpath = std::string(argv[2]); 
-            ew = create_embedding( graph, inputpath.c_str() );
-            std::ofstream out( dumppath.c_str() ); 
-            ew->dump( out );
+            ew = create_embedding(graph, config.factorization);
+            std::ofstream out(config.dump_path.c_str()); 
+            ew->dump(out);
         }
     }
-    auto message_params = inout::read_message_params(argv[4]);
-    auto message = encode( message_params.text );
+    auto message_params = inout::read_message_params(config.embedding.c_str());
+    auto message = encode(message_params.text);
     
-    ew->modify_vertices( message, message_params.chip_rate, message_params.key, message_params.alpha );
+    ew->modify_vertices(message, message_params.chip_rate, message_params.key, message_params.alpha);
 
     graph_t const & rearranged_graph = ew->rearranged_graph();
     graph_t modified_graph = ew->modified_graph();
     
-    dump_graph(modified_graph, (const char *) argv[6]);
+    dump_graph(modified_graph, config.watermarked_graph.c_str());
     {
-        std::ofstream out(argv[7]);
+        std::ofstream out(config.statistics_file.c_str());
         auto ad = angle_difference(rearranged_graph, modified_graph); 
         out << std::setprecision(32) << boost::get<0>(ad) / boost::get<1>(ad) 
             << "\n" << boost::get<0>(ad) 
@@ -231,19 +232,17 @@ int main( int argc, char** argv )
     auto analyser_vec = ew->get_analysers();
     std::vector< size_t > const & subdivision = ew->get_subdivision();
 
-    size_t attempts_num = boost::lexical_cast< size_t >( argv[8] );
-    size_t noises_num   = boost::lexical_cast< size_t >( argv[9] );
-    assert((size_t) argc == 10 + noises_num);
-    
-    for (size_t i = 0; i != noises_num; ++i)
+    for (double noise = config.noise_lower_bound; noise <= config.noise_upper_bound; noise += config.noise_step)
     {
-        double noise = boost::lexical_cast< double >( argv[10 + i] );
-        for (size_t j = 0; j != attempts_num; ++j)
+        for (size_t j = 0; j != config.attempts_num; ++j)
         {
             std::stringstream outdirstream;
-            outdirstream << argv[5] << std::string("/noise-") << std::string(argv[8 + i]) << std::string("/attempt-") << j << std::string("/");
+            outdirstream    << config.result_dir 
+                            << "/noise-" << std::setprecision(2) << noise
+                            << "/attempt-" << j << "/";
             std::string out_dir = outdirstream.str();
-            graph_t noised_graph = geometry::add_noise( modified_graph, noise );
+
+            graph_t noised_graph = geometry::add_noise(modified_graph, noise);
 	        //dump_graph(noised_graph, (out_dir + "noised_graph.txt").c_str());
 	        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 
 			                                    					    analyser_vec, message_params.key,

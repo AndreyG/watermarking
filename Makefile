@@ -8,7 +8,7 @@ compile: bin/main.o bin/embedding.o bin/extracting.o bin/stopwatch.o bin/data_re
     "$(MKLLIB)/libmkl_gnu_thread.a" \
     "$(MKLLIB)/libmkl_core.a" \
     -Wl,--end-group \
-	-lgomp -lpthread -lgmp -lboost_filesystem -lboost_program_options -lCGAL -o bin/watermarking
+	-lgomp -lpthread -lgmp -lboost_program_options -lCGAL -o bin/watermarking
 
 src/stdafx.h.gch: src/stdafx.h 
 	g++ $(CXXFLAGS) src/stdafx.h -I"$(MKLROOT)/include" -o src/stdafx.h.gch

@@ -43,7 +43,7 @@ namespace watermarking
 			assert( x != std::numeric_limits< double >::signaling_NaN() );
 			if ( abs(x) == std::numeric_limits< double >::max() )
 				return 0;
-			if ( abs(x) == std::numeric_limits< double >::infinity() );
+			if ( abs(x) == std::numeric_limits< double >::infinity() )
 				return 0;
 			return x;
 		}
