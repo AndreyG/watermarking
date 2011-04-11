@@ -6,6 +6,7 @@ namespace util
 {
     stopwatch::stopwatch( const char * message ) { init(message); }
     stopwatch::stopwatch( std::string const & message ) { init(message.c_str()); }
+    stopwatch::stopwatch( boost::format const & message ) { init(message.str().c_str()); }
 
     void stopwatch::init( const char * message )
     {

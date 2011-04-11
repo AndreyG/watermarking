@@ -10,6 +10,7 @@ namespace util
     public:
         explicit stopwatch( const char * message );
         explicit stopwatch( std::string const & message );
+        explicit stopwatch( boost::format const & fmt );
         ~stopwatch();
 
     private:
