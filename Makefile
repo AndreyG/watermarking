@@ -1,5 +1,5 @@
 MKLLIB=/opt/intel/mkl/lib/intel64
-CXXFLAGS=-std=c++0x -Wall -c -g3 -frounding-math
+CXXFLAGS=-std=c++0x -O2 -Wall -c -g3 -frounding-math
 
 OBJ_FILES=	bin/main.o bin/embedding.o bin/extracting.o bin/stopwatch.o bin/data_reading.o \
 			bin/data_writing.o bin/graph_fixing.o bin/graph_checking.o bin/debug_stream.o bin/statistics.o
@@ -11,7 +11,7 @@ compile: $(OBJ_FILES)
     "$(MKLLIB)/libmkl_gnu_thread.a" \
     "$(MKLLIB)/libmkl_core.a" \
     -Wl,--end-group \
-	-lgomp -lpthread -lgmp -lboost_program_options -lCGAL -o bin/watermarking
+	-O2 -lgomp -lpthread -lgmp -lboost_program_options -lCGAL -o bin/watermarking
 
 src/stdafx.h.gch: src/stdafx.h 
 	g++ $(CXXFLAGS) src/stdafx.h -I"$(MKLROOT)/include" -o src/stdafx.h.gch
@@ -86,6 +86,15 @@ bin/statistics.o:	src/statistics.cpp \
 					src/statistics.h \
 					src/stdafx.h.gch
 	g++ $(CXXFLAGS) src/statistics.cpp -o bin/statistics.o
+
+preprocessing: bin/preprocessing.o bin/stopwatch.o bin/debug_stream.o bin/graph_fixing.o bin/data_reading.o bin/data_reading.o
+	g++ -O2 bin/preprocessing.o bin/stopwatch.o bin/debug_stream.o bin/graph_fixing.o bin/data_reading.o bin/data_writing.o -lboost_program_options -lCGAL -o bin/preprocessing
+
+bin/preprocessing.o: src/preprocessing.cpp \
+					 src/geometry/planar_graph.h \
+					 src/inout/inout.h \
+					 src/stdafx.h 
+	g++ $(CXXFLAGS) src/preprocessing.cpp -o bin/preprocessing.o
 
 clean:
 	rm -f bin/*.o src/stdafx.h.gch

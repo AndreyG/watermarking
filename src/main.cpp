@@ -10,16 +10,12 @@
 typedef geometry::planar_graph_t                         graph_t;
 typedef std::auto_ptr< watermarking::embedding_impl >    embedding_impl_ptr;
 
-void fix_graph( graph_t & graph );
-
-graph_t create_graph( std::string const & filepath, bool fix = true )
+graph_t create_graph( std::string const & filepath )
 {
     std::ifstream in(filepath);
     
     graph_t graph;
     inout::read_graph( graph, in );
-    if (fix)
-        fix_graph( graph );
 
     return graph;
 }
