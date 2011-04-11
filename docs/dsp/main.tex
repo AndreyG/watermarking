@@ -22,9 +22,9 @@
 \maketitle
 \begin{abstract}
 The two main properties of digital watermarking algorithms for 2D vector data are robustness against attacks and minimization of the original data distortion. 
-This paper proposes conformal energy as a measure of original data distortion to quantify the second property. We modify the watermarking algorithm proposed by Ohbuchy et al., 
-which is, to the best of our knowledge, the most robust one against attacks. Experiments show that the modified algorithm is as resistent against random noise as the original one, but has 
-smaller angle distorsion.
+This paper proposes conformal energy as a measure of original data distortion to quantify the second property. 
+We modify the watermarking algorithm proposed by Ohbuchy et al., which is, to the best of our knowledge, the most robust one against attacks. 
+Experiments show that the modified algorithm is as resistent against random noise as the original one, but has smaller angle distorsion.
 \end{abstract}
 %
 \begin{keywords}
@@ -33,25 +33,30 @@ Laplacian, Dirichlet energy, conformal map, quadratic form, Delaunay triangulati
 %
 \section{Introduction}
 \label{sec:intro}
-2D-vector data are typically used in Geographical Information System (GIS) related applications. For its high material value due to high efforts and costs in the acquisition of the point coordinates, 
-GIS-data are sometimes watermarked to protect the copyrights and customers’ registration information~\cite{Voight} or to authenticate the original GIS-data. In some special cases such as military map watermarking, 
-the precise point coordinates of the restored data are highly desired compared with its original version.  
+2D-vector data are typically used in Geographical Information System (GIS) related applications. For its high material value due to high efforts and costs 
+in the acquisition of the point coordinates, GIS-data are sometimes watermarked to protect the copyrights and customers’ registration information~\cite{Voight} 
+or to authenticate the original GIS-data. In some special cases such as military map watermarking, the precise point coordinates of the restored data 
+are highly desired compared with its original version.  
 
 Research on digital watermarking has focused mainly on multimedia data, the research on vector data remaining relatively insufficient. 
-Digital watermarking algorithms regarding vector data can be divided roughly into two categories. The first category is about spatial domain methods. These methods are more studied \cite{Voight, Kim, Chang, Bazin}, 
-because they allow to control distortion easily. Unfortunately, the algorithms from the first category aren't resistant enough against such attacks as random noise or inserting/deleting vertices.
+Digital watermarking algorithms regarding vector data can be divided roughly into two categories. 
+The first category is about spatial domain methods. These methods are more studied \cite{Voight, Kim, Chang, Bazin}, 
+because they allow to control distortion easily. Unfortunately, the algorithms from the first category 
+aren't resistant enough against such attacks as random noise or inserting/deleting vertices.
 Another category of algorithms of watermarking is about frequency domain method. These algorithms \cite{Ohbuchi, Ohbuchi3D, Praun} are robust against attacks, 
 but on the other hand it is hard to estimate distortion of the original data.
  
-Another classification criterion for watermarking algorithms is using the original data during watermark extracting. Some watermarking algorithms need the original document to extract the watermark, 
-they are called well-informed algorithms. By contrast, those not using the original document to extract the watermark are called blind.
-Blindness is an interesting property in case of huge and on the fly production of different documents as it doesn't oblige the producer to store every original document, 
-but on the other hand it reduces a possibility of watermark extracting.
+Another classification criterion for watermarking algorithms is using the original data during watermark extracting. 
+Some watermarking algorithms need the original document to extract the watermark, they are called well-informed algorithms. 
+By contrast, those not using the original document to extract the watermark are called blind.
+Blindness is an interesting property in case of huge and on the fly production of different documents 
+as it doesn't oblige the producer to store every original document, but on the other hand it reduces a possibility of watermark extracting.
 
-Among algorithms known to the authors, the most robust one against different attacks (global affine transformation, object order scrambling, vertex insertion or deletion, additive random noise, cropping)
-was proposed by Ohbuchi at al. in~\cite{Ohbuchi}. It is well-informed ``frequency-domain'' algorithm, its main idea is to apply techniques developed for 3D polygonal mesh~\cite{Ohbuchi3D} to 2D-vector map. 
-Hereinafter this algorithm is referred as the base algorithm. It's described briefly in section~\ref{sec:base}. The goal of this paper is to develop quantative measure of the original map distortion, 
-and to modify the base algorithm accordingly.
+Among algorithms known to the authors, the most robust one against different attacks (global affine transformation, object order scrambling, 
+vertex insertion or deletion, additive random noise, cropping) was proposed by Ohbuchi at al. in~\cite{Ohbuchi}. It is well-informed ``frequency-domain'' algorithm, 
+its main idea is to apply techniques developed for 3D polygonal mesh~\cite{Ohbuchi3D} to 2D-vector map. 
+Hereinafter this algorithm is referred as the base algorithm. It's described briefly in section~\ref{sec:base}. 
+The goal of this paper is to develop quantative measure of the original map distortion, and to modify the base algorithm accordingly.
 This is presented in section~\ref{sec:dist_measure}. We then describe the results of evaluation experiments in section~\ref{sec:results}, 
 followed by a conclusion and future work in section~\ref{sec:conclusion}.
 
@@ -129,49 +134,48 @@ $$q_i = \sgn(p_i * (u_i + w_i), m_i = (q_i + 1) / 2.$$
 \label{sec:dist_measure}
 \subsection{Continuous case}
 \label{sec:continuous}
-We suppose that distortion of the refernce map is defined by the change of the angles. Let's consider some domain $\Omega \subset \mathbb{R}^2$ and function $f: \Omega \to \mathbb{R}^2$, 
-$f = \begin{pmatrix} f_x(x, y) \\ f_y(x, y) \end{pmatrix}$. We assume that $f_x, f_y$ have partial derivatives with respect to $x$ and $y$. We will use following notation:
+We suppose that distortion of the refernce map is defined by the change of the angles. 
+Let's consider some domain $\Omega \subset \mathbb{R}^2$ and function $f: \Omega \to \mathbb{R}^2$, 
+$f = \begin{pmatrix} f_x(x, y) \\ f_y(x, y) \end{pmatrix}$. We assume that $f_x, f_y$ have partial derivatives with respect to $x$ and $y$. 
+We will use following notation:
 $$
   \nabla f_x = \begin{pmatrix} \frac{\partial f_x}{\partial x} \\ \frac{\partial f_x}{\partial y} \end{pmatrix}, 
-  \nabla f_y = \begin{pmatrix} \frac{\partial f_y}{\partial x} \\ \frac{\partial f_y}{\partial x} \end{pmatrix}, 
+  \nabla f_y = \begin{pmatrix} \frac{\partial f_y}{\partial x} \\ \frac{\partial f_y}{\partial y} \end{pmatrix}, 
   \nabla f = \begin{pmatrix} 
     \frac{\partial f_x}{\partial x} & \frac{\partial f_x}{\partial y} \\
     \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} \\
   \end{pmatrix}. 
 $$
-Let's estimate change of a local angle after applying function $f$. Let $\vect{r}~=~\begin{pmatrix} x \\ y \end{pmatrix}$ is an arbitrary point, $\vect{r_1}$ is the point displaced relative to $\vect{r}$ by an arbitrary 
-small vector $\vect{dr}$, 
+Let's estimate change of a local angle after applying function~$f$. Let $\vect{r}~=~\begin{pmatrix} x \\ y \end{pmatrix}$ is an arbitrary point, 
+$\vect{r_1}$ is the point displaced relative to $\vect{r}$ by an arbitrary small vector $\vect{dr}$, 
 \begin{figure}[htb]
   \begin{minipage}[b]{1.0\linewidth}
     \begin{tikzpicture} 
-  \coordinate[label=below:$r$]        (origin)      at (0, 0);
-  \coordinate[label=above:$r_1$]   (dxdy)        at origin + (30:2);
-  \coordinate[label=above:$r_2$]  (dxdyrot)     at origin + (100:2);
+      \coordinate[label=below:$r$]        (origin)      at (0, 0);
+      \coordinate[label=above:$r_1$]   (dxdy)        at origin + (30:2);
+      \coordinate[label=above:$r_2$]  (dxdyrot)     at origin + (100:2);
 
-  \draw[->] (origin)--(dxdy);
-  \draw[->] (origin)--(dxdyrot);
+      \draw[->] (origin)--(dxdy);
+      \draw[->] (origin)--(dxdyrot);
 
-  \draw (origin) -- (30:0.5) arc (30:100:0.5);
-  \draw (60:0.74) node {$\alpha$};
+      \draw (origin) -- (30:0.5) arc (30:100:0.5);
+      \draw (60:0.74) node {$\alpha$};
   
-  \draw [help lines][ ->] (2.5, 1) -- (4.0, 1);
+      \draw [help lines][ ->] (2.5, 1) -- (4.0, 1);
 
-  \begin{scope}[shift={(0:5.5cm)}]
-    \coordinate[label=below:$f(r)$]       (forigin)      at (0, 0);
-    \coordinate[label=above:$f(r_1)$]  (fdxdy)        at ($(forigin) + (45:1.9)$);
-    \coordinate[label=above:$f(r_2)$] (fdxdyrot)     at ($(forigin) + (100:2.1)$);
-    \coordinate[label=left:$f(r) + R^\alpha df$] (rotfdxdy)    at ($(forigin) + (115:1.9)$);
+      \begin{scope}[shift={(0:5.5cm)}]
+        \coordinate[label=below:$f(r)$]   (forigin)      at (0, 0);
+        \coordinate[label=above:$f(r_1)$] (fdxdy)        at ($(forigin) + (45:1.9)$);
+        \coordinate[label=above:$f(r_2)$] (fdxdyrot)     at ($(forigin) + (100:2.1)$);
+        \coordinate[label=left:$f(r) + R^\alpha df$] (rotfdxdy)    at ($(forigin) + (115:1.9)$);
 
-    \draw[->] (forigin)--(fdxdy);
-    \draw[->] (forigin)--(fdxdyrot);
-    \draw[->][dashed] (forigin)--(rotfdxdy);
-    \draw[very thick] (rotfdxdy)--(fdxdyrot);
-    \draw (forigin) -- (45:0.5) arc (45:115:0.5);
-    \draw (80:0.74) node {$\alpha$};
-  \end{scope}
-  %\draw (60:0.74) node {$\alpha$};
-  %\draw (forigin) -- (30:0.5) arc (30:100:0.5);
-  %\draw (60:0.74) node {$\alpha$};
+        \draw[->] (forigin)--(fdxdy);
+        \draw[->] (forigin)--(fdxdyrot);
+        \draw[->][dashed] (forigin)--(rotfdxdy);
+        \draw[very thick] (rotfdxdy)--(fdxdyrot);
+        \draw (forigin) -- (45:0.5) arc (45:115:0.5);
+        \draw (80:0.74) node {$\alpha$};
+      \end{scope}
     \end{tikzpicture} 
   \end{minipage}
   
@@ -180,20 +184,24 @@ small vector $\vect{dr}$,
 \end{figure}
 $$\vect{r_1} = \vect{r} + \vect{dr} = \begin{pmatrix} x + dx \\ y + dy \end{pmatrix}$$
 and $\vec{r_2}$ is the point equaled to $\vec{r_1}$ rotated relative to $\vec{r}$ by an arbitrary angle $\alpha$,
-$$\vect{r_2} = \vect{r} + R^\alpha \vect{dr} = \begin{pmatrix} x \\ y \end{pmatrix} + \begin{pmatrix} \cos \alpha & -\sin \alpha \\ \sin \alpha & \cos \alpha \end{pmatrix} \begin{pmatrix} dx \\ dy \end{pmatrix},$$
+$$
+\vect{r_2} = \vect{r} + R^\alpha \vect{dr} = \begin{pmatrix} x \\ y \end{pmatrix} + 
+\begin{pmatrix} \cos \alpha & -\sin \alpha \\ \sin \alpha & \cos \alpha \end{pmatrix} \begin{pmatrix} dx \\ dy \end{pmatrix},
+$$
 where $R^\alpha$ is the rotation by angle $\alpha$ (fig. \ref{fig:local_angles}). This points are mapped to 
 \begin{multline*}
   \vect{f(r)}, 
   \vect{f(r_1)} = \vect{f(r + dr)} = \vect{f(r)} + \vect{df} \approx \vect{f(r)} + (\nabla f) \vect{dr}, \\
   \vect{f(r_2)} = \vect{f(r + R^\alpha dr)} ~\approx \vect{f(r)} + (\nabla f)(R^\alpha \vect{dr}).
 \end{multline*}
-If $f$ preserves local angles then $f(r_2)$ must be equal to the point $f(r_1)$ rotated relative to the point~$f(r)$ by the angle $\alpha$. Otherwise we can employ length of the vector $\vect{q(r, dr, \alpha)}$
+If $f$ preserves local angles then $f(r_2)$ must be equal to the point $f(r_1)$ rotated relative to the point~$f(r)$ by the angle $\alpha$. 
+Otherwise we can employ length of the vector $\vect{q(r, dr, \alpha)}$
 $$\vect{q(r, dr, \alpha)} = \left(\vect{f(r)} + R^\alpha \vect{df}\right) - \vect{f(r_2)}$$ as measure of the angle change.
 \begin{multline}
 \label{formula:angle_change_vec}
-  \vect{q(r, dr, \alpha)} = \left(f(r) + R^\alpha df\right) - f(r_2) \approx \\
-  \approx (f(r) + R^\alpha (\nabla f) dr) - (f(r) + (\nabla f)(R^\alpha dr)) = \\ 
-  \left[R^\alpha (\nabla f) - (\nabla f) R^\alpha \right] dr. 
+  \vect{q(r, dr, \alpha)} = \left(\vect{f(r)} + R^\alpha \vect{df} \right) - \vect{f(r_2)} \approx \\
+  \approx (\vect{f(r)} + R^\alpha (\nabla f) \vect{dr}) - (\vect{f(r)} + (\nabla f)(R^\alpha \vect{dr})) = \\ 
+  \left[R^\alpha (\nabla f) - (\nabla f) R^\alpha \right] \vect{dr}. 
 \end{multline}
 \begin{multline}
 \label{formula:ugly_commutant}
@@ -299,86 +307,98 @@ If we assume that $f$ is complex-valued function and
 $$f_x=\re{f}=\frac{1}{2}\left(f + \conjugate{f}\right), f_y=\im{f}=\frac{1}{2}\left(f - \conjugate{f}\right),$$ 
 then $$|f_i - f_j|^2 = \conjugate{(f_i - f_j)}(f_i - f_j) = (\conjugate{f_i} - \conjugate{f_j})(f_i - f_j).$$ 
 
-Let $G(\mathfrak{T})$ denote weighted graph of the triangulation $\mathfrak{T}$, $V(G) = V$, $E(G) = E(\mathfrak{T})$, $weight(u, v) = w_{uv}$. If we consider Laplacian $L$ of the graph $G$ defined as follows 
-$$L_{uv} = \begin{cases}
+Let $G(\mathfrak{T})$ denote weighted graph of the triangulation $\mathfrak{T}$, $V(G) = V$, $E(G) = E(\mathfrak{T})$, $weight(u, v) = w_{uv}$. 
+If we consider Laplacian $L$ of the graph $G$ defined as follows 
+$$ L_{uv} = \begin{cases}
   \sum_{(v, x) \in E(G)}{w_{vx}}&\text{if $u = v,$} \\
   -w_{uv}&\text{if $u \sim v,$} \\
   0 &\text{otherwise;}
 \end{cases}
 $$ then the formula~(\ref{formula:EDOverEdges}) is equivalent to the following:
 \begin{equation}
-\label{formula:EDOverLaplacian}
-E_D(f) = \frac{1}{4} \mathbf{f}^T L \mathbf{f},
+  \label{formula:EDOverLaplacian}
+  E_D(f) = \frac{1}{4} \conjugate{\mathbf{f}^T} L \mathbf{f},
 \end{equation}
-where $\mathbf{f} = (f_1, f_2, \dots f_n)^T$, $\conjugate{\mathbf{f}} = (\conjugate{f_1}, \conjugate{f_2}, \dots, \conjugate{f_n})^T$.
+where $\mathbf{f} = (f_1, f_2, \dots f_n)^T$, $\conjugate{\mathbf{f}^T} = (\conjugate{f_1}, \conjugate{f_2}, \dots, \conjugate{f_n})$.
 
-$\int_{\Omega} \det(\nabla f) d\Omega$ also can be viewed as value of some quadratic form applied to $\mathbf{f}$. Let's consider $\triangle T = v_i v_j v_k~\in~\mathfrak{T}$. $f$ is linear on $\triangle T$, consequently 
-$\det (\nabla f)$ is constant, hence $\int_{\triangle T} \det (\nabla f) dT$ is oriented area of $\triangle T' = f_i f_j f_k$. Let's suppose that $v_i$, $v_j$, $v_k$ constitute left turn then
+$\int_{\Omega} \det(\nabla f) d\Omega$ also can be viewed as value of some quadratic form applied to $\mathbf{f}$. 
+Let's consider $\triangle T = v_i v_j v_k~\in~\mathfrak{T}$. $f$ is linear on $\triangle T$, consequently $\det (\nabla f)$ is constant, 
+hence $\int_{\triangle T} \det (\nabla f) dT$ is oriented area of $\triangle T' = f_i f_j f_k$. 
+Let's suppose that $v_i$, $v_j$, $v_k$ constitute left turn then
 \begin{multline}
-\label{formula:det}
+  \label{formula:det}
   \int_{\triangle T} \det (\nabla f) dT = \frac{1}{2} (f_i - f_k) \times (f_j - f_k) = \\
   = \frac{1}{2} \left[(f_i - f_k)_x (f_j - f_k)_y - (f_i - f_k)_y (f_j - f_k)_y \right] = \\
   = \frac{i}{4} \left[ (f_i - f_k)\conjugate{(f_j - f_k)} - (f_j - f_k) \conjugate{(f_i - f_k)} \right] = \\
-  = \frac{i}{4} \left[ (f_i \conjugate{f_j} - \conjugate{f_i} f_j) + (f_j \conjugate{f_k} - \conjugate{f_j} f_k) + (f_k \conjugate{f_i} - \conjugate{f_k} f_i) \right].  
+  = \frac{i}{4} \left[ (f_i \conjugate{f_j} - \conjugate{f_i} f_j) + (f_j \conjugate{f_k} - \conjugate{f_j} f_k) + 
+    (f_k \conjugate{f_i} - \conjugate{f_k} f_i) \right].  
 \end{multline}
 Substituting (\ref{formula:det}) to the formula
 \begin{equation}
-\label{formula:det_global}
+  \label{formula:det_global}
   \int_{\Omega} \det {\left( \nabla f \right) } d\Omega = \sum_{\triangle T \in \mathfrak{T}}{ \int_{\triangle T} \det{ \left(\nabla f \right) } dT},
 \end{equation}
-we notice that for every edge $v_i v_j$ not contained in the bound of $\Omega$ there is the twin edge $v_j v_i$ and so expression $(f_i \conjugate{f_j}~-~\conjugate{f_i} f_j)$ is contained in the right side of 
-the equation (\ref{formula:det_global}) together with the opposite expression $(f_j \conjugate{f_i} - \conjugate{f_j} f_i)$. Consequently formula (\ref{formula:det_global}) can be rewritten as
+we notice that for every edge $v_i v_j$ not contained in the bound of $\Omega$ there is the twin edge $v_j v_i$ and so expression 
+$(f_i \conjugate{f_j}~-~\conjugate{f_i} f_j)$ is contained in the right side of the equation (\ref{formula:det_global}) together with the opposite expression 
+$(f_j \conjugate{f_i}~-~\conjugate{f_j} f_i)$. Consequently formula (\ref{formula:det_global}) can be rewritten as
 \begin{equation}
 \label{formula:det_over_edges}
   \int_{\Omega} \det {\left( \nabla f \right) } d\Omega = \frac{i}{4} \sum_{v_i v_j \in \partial E}{(f_i \conjugate{f_j} - \conjugate{f_i} f_j)},
 \end{equation}
-where $\partial E = \partial \Omega \cap E(\mathfrak{T})$ is set of the edges of the triangulation $\mathfrak{T}$ contained in the bound of $\Omega$. If we consider matrix $L'$ defined as follows 
+where $\partial E = \partial \Omega \cap E(\mathfrak{T})$ is set of the edges of the triangulation $\mathfrak{T}$ contained in the bound of $\Omega$. 
+If we consider matrix $L'$ defined as follows 
 \begin{equation*}
   L_{uv}' = \begin{cases}
-    i & \text{if edge $uv \in \partial E$ and $\Omega$ is left of the line $(u, v)$;} \\ 
+    i  & \text{if edge $uv \in \partial E$ and $\Omega$ is left of the line $(u, v)$;} \\ 
     -i & \text{if edge $uv \in \partial E$ and $\Omega$ is right of the line $(u, v)$;} \\ 
-    0 & \text{otherwise}
+    0  & \text{otherwise}
   \end{cases}
 \end{equation*}
 then formula~(\ref{formula:det_over_edges}) is equivalent to the following:
 \begin{equation}
 \label{formula:DetOverLaplacian}
-  \int_{\Omega} \det {\left( \nabla f \right) } d\Omega = \frac{1}{4} \conjugate{\mathbf{f}} L' \mathbf{f}.
+  \int_{\Omega} \det {\left( \nabla f \right) } d\Omega = \frac{1}{4} \conjugate{\mathbf{f}^T} L' \mathbf{f}.
 \end{equation}
-Using formulas (\ref{formula:EC}), (\ref{formula:EDOverLaplacian}), (\ref{formula:DetOverLaplacian}) we can express $E_C(f)$ as value of some quadratic form applied to $\mathbf{f}$
+Using formulas (\ref{formula:EC}), (\ref{formula:EDOverLaplacian}), (\ref{formula:DetOverLaplacian}) we can express $E_C(f)$ as value of some quadratic form 
+applied to $\mathbf{f}$
 \begin{equation*}
-  E_C(f) = \frac{1}{4}\conjugate{\mathbf{f}} L'' \mathbf{f},
+  E_C(f) = \frac{1}{4}\conjugate{\mathbf{f}^T} L'' \mathbf{f},
 \end{equation*}
-where $L'' = L - L'$. It is easy to see that $L''$ is Hermitian, consequently eigenvalues of $L''$ are real and nonnegative and eigenvectors of $L''$ are orthogonal.
-If $$\mathbf{f} = \alpha \left[ p_1 + \mathbf{e}_1 + p_2 \mathbf{e}_2 + \dots + p_k \mathbf{e}_k \right],$$ where $\alpha$ is some real positive constant, $p_i \in \left\{-1, 1 \right\}$ 
-and $\{\mathbf{e}_i\}_{i=1}^k$ is system of orthonormal vectors, then $E_C(f)$ will be minimized when $\{\mathbf{e}_i\}_{i=1}^k$ are the eigenvectors of $L''$ corresponding to $k$ lowest eigenvalues. 
+where $L'' = L - L'$. It is easy to see that $L''$ is Hermitian, consequently eigenvalues of $L''$ are real and eigenvectors of $L''$ are orthogonal.
+If $$\mathbf{f} = \alpha \left[ p_1 \mathbf{e}_1 + p_2 \mathbf{e}_2 + \dots + p_k \mathbf{e}_k \right],$$ 
+where $\alpha$ is some real positive constant, $p_i \in \left\{-1, 1 \right\}$ and $\{\mathbf{e}_i\}_{i=1}^k$ is system of orthonormal vectors, 
+then $E_C(f)$ will be minimized when $\{\mathbf{e}_i\}_{i=1}^k$ are the eigenvectors of $L''$ corresponding to $k$ lowest eigenvalues. 
 
-The watermark embedding algorithm described in the section \ref{sec:base} constructs vector $\mathbf{g}$ of differences between old and new coordinates of the vertices (formula (\ref{formula:g})) and $E_C$ is functional 
-applicable to $f$, $f(v) = v + g(v)$. But $$E_C(g) = E_C(f - v) = E_C(f),$$ because $E_C$ is quadratic and the identity function $v$ is conformal. 
+The watermark embedding algorithm described in the section \ref{sec:base} constructs vector $\mathbf{g}$ of differences between old and new coordinates 
+of the vertices (formula (\ref{formula:g})) and $E_C$ is functional applicable to $f$, $f(v) = v + g(v)$. 
+But $$E_C(g) = E_C(f - v) = E_C(f),$$ because $E_C$ is quadratic and the identity function $v$ is conformal. 
 
-Thereby, if one wants to use algorithm described in the section \ref{sec:base} and to minimize the distortion measure defined as conformal energy, it's necessary to select the vectors $\{\mathbf{w}_i\}_{i=1}^k$ 
-from formula (\ref{formula:g}) as the eigenvectors of $L''$ corresponding to the lowest eigenvalues where $L''$ is described above.
+Thereby, if one wants to use algorithm described in the section \ref{sec:base} and to minimize the distortion measure defined as conformal energy, 
+it's necessary to select the vectors $\{\mathbf{w}_i\}_{i=1}^k$  from formula (\ref{formula:g}) as the eigenvectors of $L''$ 
+corresponding to the lowest eigenvalues where $L''$ is described above.
 
-In the section \ref{sec:continuous} we argued that $E_C(f)$ is the measure of the change of local angles. Let's consider what $E_C(f)$ expresses in the sense of the angles of the triangulation $\mathfrak{T}$ 
+In the section \ref{sec:continuous} we argued that $E_C(f)$ is the measure of the change of local angles. 
+Let's consider what $E_C(f)$ expresses in the sense of the angles of the triangulation $\mathfrak{T}$ 
 \begin{multline*}
-  E_C(f) = E_D(f) - \int_{\Omega} \det (\nabla f) d\Omega = \\ = \frac{1}{4} \sum_{v_i v_j v_k \in \mathfrak{T}} \cot{\alpha_{ij}}|f_i - f_j|^2 + \cot{\alpha_{jk}}|f_j - f_k|^2 + \\
+  E_C(f) = E_D(f) - \int_{\Omega} \det (\nabla f) d\Omega = \\ 
+  = \frac{1}{4} \sum_{v_i v_j v_k \in \mathfrak{T}} \cot{\alpha_{ij}}|f_i - f_j|^2 + \cot{\alpha_{jk}}|f_j - f_k|^2 + \\ 
   + \cot{\alpha_{ki}}|f_k - f_i|^2 - 4S(f_i f_j f_k),
 \end{multline*}
-where $S(f_i f_j f_k)$ is oriented area of the triangule $\triangle f_i f_j f_k$. If we assume that the function $f$ distorts domain $\Omega$ a slightly, then orientation of $\triangle f_i f_j f_k$ is equal to 
-the orientation of $\triangle v_i v_j v_k$ and so $\triangle f_i f_j f_k$ is oriented counterclockwise,
+where $S(f_i f_j f_k)$ is oriented area of the triangule $\triangle f_i f_j f_k$. If we assume that the function $f$ distorts domain $\Omega$ a slightly, 
+then orientation of $\triangle f_i f_j f_k$ is equal to the orientation of $\triangle v_i v_j v_k$ and so $\triangle f_i f_j f_k$ is oriented counterclockwise,
 \begin{multline*}
-  4 S(f_i f_j f_k) = \cot{\alpha_{ij}'}|f_i - f_j|^2 + \\
-  + \cot{\alpha_{jk}'}|f_j - f_k|^2 + \cot{\alpha_{ki}'}|f_k - f_i|^2,
+  4 S(f_i f_j f_k) = \cot{\alpha_{ij}'}|f_i - f_j|^2 + \\ + \cot{\alpha_{jk}'}|f_j - f_k|^2 + \cot{\alpha_{ki}'}|f_k - f_i|^2,
 \end{multline*}
-where $\alpha_{ij}'$, $\alpha_{jk}'$, $\alpha_{ki}'$ are the angles opposite to the edges $f_i f_j$, $f_j f_k$, $f_k f_i$ correspondingly. Ans so under certain assumptions
+where $\alpha_{ij}'$, $\alpha_{jk}'$, $\alpha_{ki}'$ are the angles opposite to the edges $f_i f_j$, $f_j f_k$, $f_k f_i$ correspondingly. 
+Ans so under certain assumptions
 \begin{multline*}
   E_C(f) = \frac{1}{4} \sum_{v_i v_j v_k \in \mathfrak{T}} (\cot{\alpha_{ij}} - \cot{\alpha_{ij}'})|f_i - f_j|^2 + \\
   + (\cot{\alpha_{jk}} - \cot{\alpha_{jk}'})|f_j - f_k|^2 + (\cot{\alpha_{ki}} - \cot{\alpha_{ki}'})|f_k - f_i|^2.
 \end{multline*}
 
-Up to this point we have assumed that the triangulation $\mathfrak{T}$ is arbitrary, but it is obvious that $E_C$ depends on $\mathfrak{T}$. We employ the triangulation $\mathfrak{T}$ for passing 
-from discrete function values to continuous function, consequently we have to select the triangulation which minimize the roughness of a PLIS. According to theorem of Rippa \cite{Rippa, Chen} 
-it is the Delaunay triangulation.  
+Up to this point we have assumed that the triangulation $\mathfrak{T}$ is arbitrary, but it is obvious that $E_C$ depends on $\mathfrak{T}$. 
+We employ the trianguation $\mathfrak{T}$ for passing from discrete function values to continuous function, consequently we have to select 
+the triangulation which minimize the roughness of a PLIS. According to theorem of Rippa \cite{Rippa, Chen} it is the Delaunay triangulation.  
 
 \section{Experiment results}
 \label{sec:results}
