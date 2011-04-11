@@ -135,18 +135,15 @@ int main( int argc, char** argv )
         for (size_t j = 0; j != config.attempts_num; ++j)
         {
             util::stopwatch _("attempt: " + boost::lexical_cast< std::string >(j));
-            std::stringstream outdirstream;
-            outdirstream    << config.result_dir 
-                            << "/noise-" << std::setprecision(2) << noise
-                            << "/attempt-" << j << "/";
-            std::string out_dir = outdirstream.str();
+
+            std::string out_dir = (boost::format("%s/noise-%.3f/attempt-%d/") % config.result_dir % noise % j).str();
 
             graph_t noised_graph = geometry::add_noise(modified_graph, noise);
 	        //dump_graph(noised_graph, (out_dir + "noised_graph.txt").c_str());
 	        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 
 			                                    					    analyser_vec, message_params.key,
                                                                         message_params.chip_rate, message.size() ); 
-	        std::ofstream out((out_dir + "message.txt").c_str());
+	        std::ofstream out(out_dir + "message.txt");
 	        out << "Embedded message:  ";
             write_encoded_message( out, message );
             out << decode( message ) << std::endl;

@@ -42,7 +42,7 @@ object TestGenerator {
           val logDir = new DirWrapper(outDir, "log")
   
           for (noise <- noiseRange) {
-			val noiseDir = new DirWrapper(resultDir, "noise-" + noise)
+			val noiseDir = new DirWrapper(resultDir, format("noise-%.3f", noise))
 			for (attempt <- 0 until parseInt(attrs("attempts-num"))) {
 			  new DirWrapper(noiseDir, "attempt-" + attempt)
 			}

@@ -19,6 +19,7 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
 #include <boost/tuple/tuple.hpp>
 
 using boost::tuple;
