@@ -10,7 +10,6 @@ namespace
     template<typename T>
     void read(boost::program_options::variables_map const & vm, T & t, const char * name)
     {
-        std::cout << name << std::endl;
         t = vm[name].as<T>();
     }
 }
