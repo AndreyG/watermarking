@@ -34,6 +34,8 @@ namespace watermarking
         embedding_impl( graph_t const & graph, size_t max_patch_size, 
                         WeightType::Type, bool use_edges, bool step_by_step );
 
+        void modify_vertices( message_t const & message, size_t chip_rate, int key, double alpha );
+
         explicit embedding_impl( std::istream & in );
 
         void dump( std::ostream & out ) const;
@@ -48,30 +50,19 @@ namespace watermarking
             return res;
         }
 
-        graph_t const & rearranged_graph() const
-        {
-            return graph_;
-        }
+        graph_t const & rearranged_graph() const { return graph_; }
 
-        std::vector< analyser_ptr > const & get_analysers() const
-        {
-            return analysers_;
-        }
+        std::vector< analyser_ptr > const & get_analysers() const { return analysers_; }
 
-        std::vector< size_t > const & get_subdivision() const
-        {
-            return subdivision_;
-        }
+        std::vector< size_t > const & get_subdivision() const { return subdivision_; }
 
-//    private:
+    private:
 
         size_t subdivide_plane( size_t max_subarea_size );
 
         void build_trgs( size_t subareas_num );
 
         void factorize( size_t subareas_num, WeightType::Type );
-
-        void modify_vertices( message_t const & message, size_t chip_rate, int key, double alpha );
  
  	private:
 		Gt::Point_2 toCGAL( vertex_t const & pt ) const;

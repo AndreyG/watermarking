@@ -1,8 +1,11 @@
 MKLLIB=/opt/intel/mkl/lib/intel64
 CXXFLAGS=-std=c++0x -Wall -c -g3 -frounding-math
 
-compile: bin/main.o bin/embedding.o bin/extracting.o bin/stopwatch.o bin/data_reading.o bin/data_writing.o bin/graph_fixing.o bin/debug_stream.o
-	g++ bin/main.o bin/embedding.o bin/extracting.o bin/stopwatch.o bin/data_reading.o bin/data_writing.o bin/graph_fixing.o bin/debug_stream.o \
+OBJ_FILES=	bin/main.o bin/embedding.o bin/extracting.o bin/stopwatch.o bin/data_reading.o \
+			bin/data_writing.o bin/graph_fixing.o bin/graph_checking.o bin/debug_stream.o bin/statistics.o
+ 
+compile: $(OBJ_FILES)
+	g++ $(OBJ_FILES) \
 	-Wl,--start-group \
 	"$(MKLLIB)/libmkl_intel_lp64.a" \
     "$(MKLLIB)/libmkl_gnu_thread.a" \
@@ -74,6 +77,15 @@ bin/data_writing.o: src/inout/data_writing.cpp \
 bin/graph_fixing.o: src/utility/graph_fixing.cpp \
 					src/stdafx.h.gch
 	g++ $(CXXFLAGS) src/utility/graph_fixing.cpp -o bin/graph_fixing.o
+
+bin/graph_checking.o: 	src/utility/graph_checking.cpp \
+						src/stdafx.h.gch
+	g++ $(CXXFLAGS) src/utility/graph_checking.cpp -o bin/graph_checking.o
+
+bin/statistics.o:	src/statistics.cpp \
+					src/statistics.h \
+					src/stdafx.h.gch
+	g++ $(CXXFLAGS) src/statistics.cpp -o bin/statistics.o
 
 clean:
 	rm -f bin/*.o src/stdafx.h.gch

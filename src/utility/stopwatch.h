@@ -9,9 +9,11 @@ namespace util
     {
     public:
         explicit stopwatch( const char * message );
+        explicit stopwatch( std::string const & message );
         ~stopwatch();
 
     private:
+        void init( const char * message );
         clock_t start;
     };
 }

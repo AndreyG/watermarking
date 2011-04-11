@@ -50,23 +50,36 @@ object TestGenerator {
 
           val factorizationDumpFile = outFactorizationDir / "factorization.params"
 
+          val inputGraph            = inGraphDir            /   "input-graph.txt" 
+          val factorizationConfig   = inFactorizationDir    /   "factorization.conf" 
+          val embeddingConfig       = inEmbeddingDir        /   "embedding.conf" 
+
+          def checkFileExistance(file: File, message: String) {
+            assert(file.exists, println(message + " [" + file.getAbsolutePath + "]"))
+          }
+
+          checkFileExistance(inputGraph,            "there is no file with input graph!")
+          checkFileExistance(factorizationConfig,   "there is no file with factorization config")          
+          checkFileExistance(embeddingConfig,       "there is no file with message embedding config")
+
           import common.details.{feed, endl}
 
           out << 
               "bin/watermarking" << feed << 
-              "      --input-graph " << (inGraphDir / "input-graph.txt") << feed << 
-              "      --dump-exists " << (if (factorizationDumpFile.exists) "true" else "false") << feed <<
-              "      --factorization-dump " << factorizationDumpFile << feed <<
-              "      --factorization " << inFactorizationDir / "factorization.conf" << feed << 
-              "      --embedding " << (inEmbeddingDir / "embedding.conf") << feed << 
-              "      --result-dir " << resultDir << feed <<
-              "      --noise-lower-bound " << attrs("noise-lower-bound") << feed <<
-              "      --noise-upper-bound " << attrs("noise-upper-bound") << feed <<
-              "      --noise-step " << attrs("noise-step") << feed <<
-              "      --watermarked-graph " << (resultDir / "modified-graph.txt") << feed <<
-              "      --statistics-file " << (resultDir / "statistics.txt") << feed <<
-              "      1> " << (logDir / "err.txt") << feed <<
-              "      2> " << (logDir / "out.txt") << endl
+              "      --input-graph "        << inputGraph                                               << feed << 
+              "      --dump-exists "        << (if (factorizationDumpFile.exists) "true" else "false")  << feed <<
+              "      --factorization-dump " << factorizationDumpFile                                    << feed <<
+              "      --factorization "      << factorizationConfig                                      << feed << 
+              "      --embedding "          << embeddingConfig                                          << feed << 
+              "      --result-dir "         << resultDir                                                << feed <<
+              "      --noise-lower-bound "  << attrs("noise-lower-bound")                               << feed <<
+              "      --noise-upper-bound "  << attrs("noise-upper-bound")                               << feed <<
+              "      --noise-step "         << attrs("noise-step")                                      << feed <<
+              "      --attempts-num "       << attrs("attempts-num")                                    << feed <<
+              "      --watermarked-graph "  << (resultDir / "modified-graph.txt")                       << feed <<
+              "      --statistics-file "    << (resultDir / "statistics.txt")                           << feed <<
+              "      1> " << (logDir / "out.txt")                                                       << feed <<
+              "      2> " << (logDir / "err.txt")                                                       << endl
 
           first = false
         }

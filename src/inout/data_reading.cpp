@@ -10,6 +10,7 @@ namespace
     template<typename T>
     void read(boost::program_options::variables_map const & vm, T & t, const char * name)
     {
+        std::cout << name << std::endl;
         t = vm[name].as<T>();
     }
 }
@@ -31,6 +32,7 @@ config_t::config_t(int argc, char** argv)
         ("noise-lower-bound",   po::value< double >())
         ("noise-upper-bound",   po::value< double >())
         ("noise-step",          po::value< double >())
+        ("attempts-num",        po::value< size_t >())
     ;
 
     po::variables_map vm;
@@ -44,38 +46,58 @@ config_t::config_t(int argc, char** argv)
     read(vm, embedding,         "embedding");
 
     read(vm, result_dir,        "result-dir");
-    read(vm, watermarked_graph, "watermarked_graph");
+    read(vm, watermarked_graph, "watermarked-graph");
     read(vm, statistics_file,   "statistics-file");
 
-    read(vm, noise_lower_bound, "noise_lower_bound");
-    read(vm, noise_upper_bound, "noise_upper_bound");
-    read(vm, noise_step,        "noise_step");
+    read(vm, noise_lower_bound, "noise-lower-bound");
+    read(vm, noise_upper_bound, "noise-upper-bound");
+    read(vm, noise_step,        "noise-step");
+
+    read(vm, attempts_num,      "attempts-num");
 }
 
-message_params_t read_message_params(const char * filepath)
+factorization_params_t::factorization_params_t( std::string const & filepath )
 {
-    std::ifstream conf(filepath);
-                
     namespace po = boost::program_options;
 
     po::options_description desc;
     desc.add_options()
-        ( "message", po::value< std::string >() )
-        ( "key",     po::value< int >() )
-        ( "chip-rate", po::value< size_t >() )
-        ( "alpha",   po::value< double >() )
+        ( "step-by-step",       po::value< bool >()         )
+        ( "weight-type",        po::value< std::string >()  )
+        ( "use-edges",          po::value< bool >()         )
+        ( "max-subarea-size",   po::value< size_t >()       )
     ;
 
     po::variables_map vm;       
-    po::store( po::parse_config_file( conf, desc ), vm );
+    std::ifstream conf(filepath);
+    po::store(po::parse_config_file(conf, desc), vm);
 
-    message_params_t params;
-    params.text = vm["message"].as< std::string >();
-    params.key  = vm["key"].as< int >();
-    params.chip_rate = vm["chip-rate"].as< size_t >();
-    params.alpha = vm["alpha"].as< double >();
+    read(vm, weight_type,       "weight-type"       );
+    read(vm, use_edges,         "use-edges"         );
+    read(vm, max_subarea_size,  "max-subarea-size"  );
+    read(vm, step_by_step,      "step-by-step"      );
+}
 
-    return params;
+message_params_t::message_params_t(std::string const & filepath)
+{
+    namespace po = boost::program_options;
+
+    po::options_description desc;
+    desc.add_options()
+        ( "message",    po::value< std::string >() )
+        ( "key",        po::value< int >() )
+        ( "chip-rate",  po::value< size_t >() )
+        ( "alpha",      po::value< double >() )
+    ;
+
+    po::variables_map vm;       
+    std::ifstream conf(filepath);
+    po::store(po::parse_config_file(conf, desc ), vm);
+
+    read(vm, text,          "message");
+    read(vm, key,           "key");
+    read(vm, chip_rate,     "chip-rate");
+    read(vm, alpha,         "alpha");
 }
 
 template< class Stream >
