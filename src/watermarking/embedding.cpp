@@ -213,9 +213,7 @@ namespace watermarking
         analysers_.resize( subareas_num );
         for ( size_t s = 0; s != subareas_num; ++s )
         {
-            std::string step_title = "factorize coordinate vectors in subarea ";
-            step_title += lexical_cast< std::string >( s ); 
-            util::stopwatch _( step_title.c_str() );
+            util::stopwatch _( boost::format("factorize coordinate vectors in subarea %d") % s );
 
             trg_t const &   trg         = trgs_[s];
             analyser_ptr &  analyser    = analysers_[s];
@@ -245,17 +243,23 @@ namespace watermarking
         analysers_.resize( subareas_num_ );
         foreach (analyser_ptr & analyser, analysers_ )
         {
-			std::string type;
-			in >> type;
-			if (type == "unweighted")
-				analyser.reset( new unweighted_spectral_analyser( in ) );
-			else if (type == "conformal")
-				analyser.reset( new conformal_spectral_analyser( in ) );
-			else if (type == "dirichlet")
-				analyser.reset( new dirichlet_spectral_analyser( in ) );
-			else
+			std::string type_str;
+			in >> type_str;
+            weight_type_ = WeightType::from_str(type_str);
+
+			switch ( weight_type_ )
 			{
-				throw std::logic_error("unsupported type of analyser: " + type);
+			case WeightType::Unweighted:
+				analyser.reset( new unweighted_spectral_analyser( in ) );
+				break;
+			case WeightType::Conformal:
+				analyser.reset( new conformal_spectral_analyser( in ) );
+				break;
+			case WeightType::Dirichlet:
+				analyser.reset( new dirichlet_spectral_analyser( in ) );
+				break;
+			default:
+				throw std::logic_error("unsupported type of analyser");
 			}
         }
         inout::read_graph( graph_, in );
