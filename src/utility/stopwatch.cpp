@@ -23,6 +23,4 @@ namespace util
 		debug_stream::dec_indent();
         debug_stream() << double(end - start) / CLOCKS_PER_SEC << " sec";
     }
-
 }
-

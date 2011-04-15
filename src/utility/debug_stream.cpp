@@ -23,9 +23,13 @@ namespace util
 
 	debug_stream::~debug_stream()
 	{
-	    for ( size_t i = 0; i != tabs_num; ++i )
-            std::cout << "|   ";
-		std::cout << ss_.str() << std::endl;
+        std::string s;
+        while (getline(ss_, s, '\n'))
+	    {
+            for ( size_t i = 0; i != tabs_num; ++i )
+                std::cout << "|   ";
+            std::cout << s << std::endl;
+        }
 	}
 
 	size_t debug_stream::tabs_num = 0;

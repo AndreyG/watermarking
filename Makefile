@@ -1,5 +1,5 @@
 MKLLIB=/opt/intel/mkl/lib/intel64
-CXXFLAGS=-std=c++0x -O2 -Wall -c -g3 -frounding-math
+CXXFLAGS=-std=c++0x -Wall -c -g3 -frounding-math
 
 OBJ_FILES=	bin/main.o bin/embedding.o bin/extracting.o bin/stopwatch.o bin/data_reading.o \
 			bin/data_writing.o bin/graph_fixing.o bin/graph_checking.o bin/debug_stream.o bin/statistics.o
@@ -93,8 +93,14 @@ preprocessing: bin/preprocessing.o bin/stopwatch.o bin/debug_stream.o bin/graph_
 bin/preprocessing.o: src/preprocessing.cpp \
 					 src/geometry/planar_graph.h \
 					 src/inout/inout.h \
-					 src/stdafx.h 
+					 src/stdafx.h.gch 
 	g++ $(CXXFLAGS) src/preprocessing.cpp -o bin/preprocessing.o
 
+tests: 	bin/tests.o bin/stopwatch.o bin/debug_stream.o
+	g++ -O2 bin/tests.o bin/stopwatch.o bin/debug_stream.o -lCGAL -o bin/tests
+
+bin/tests.o: src/tests.cpp src/stdafx.h.gch src/algorithms/median.h 
+	g++ $(CXXFLAGS) src/tests.cpp -o bin/tests.o
+	 
 clean:
 	rm -f bin/*.o src/stdafx.h.gch

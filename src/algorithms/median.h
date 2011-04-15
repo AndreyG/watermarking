@@ -4,6 +4,9 @@
 #include <algorithm>
 #include <boost/utility.hpp>
 
+#include "../utility/stopwatch.h"
+#include "../utility/debug_stream.h"
+
 namespace algorithm
 {
     namespace 
@@ -41,7 +44,7 @@ namespace algorithm
         template< class T, class Comparator >
         struct operator_binder
         {
-            operator_binder( T const & value, Comparator & comp )
+            operator_binder( T const & value, Comparator const & comp )
                     : value_( value )
                     , comp_( comp )
             {}
@@ -51,26 +54,31 @@ namespace algorithm
                 return comp_( t, value_ );
             }
         private :
-            T const & value_;
-            Comparator & comp_;
+            T           const & value_;
+            Comparator  const & comp_;
         };
 
         template< class Iter, class Comparator >
-        Iter part( Iter p, Iter q, Comparator comp )
+        Iter part( Iter p, Iter q, Comparator const & comp )
         {
             typedef typename std::iterator_traits< Iter >::value_type value_type;
-            int size = std::distance( p, q );
-            value_type middle = *( p + rand() % size );
+            const typename std::iterator_traits< Iter >::difference_type size = std::distance( p, q );
+            value_type middle = *( p + (size / 2) );
             typedef operator_binder< value_type, Comparator > predicate; 
+
             Iter bound = std::partition( p, q, predicate( middle, comp ) ); 
-            assert( sequence_is_valid( p, q, bound, middle, comp ) );            
+            std::swap( *bound, *std::find( bound, q, middle ) );
+            
+            assert( sequence_is_valid( p, q, bound, middle, comp ) );
             return bound;
         }
 
         template< class Iter, class Comparator >
-        Iter kth( Iter p, Iter q, size_t k, Comparator comp )
+        Iter kth( Iter p, Iter q, typename std::iterator_traits< Iter >::difference_type k, Comparator const & comp )
         {
-            size_t dist = std::distance( p, q );
+            typename std::iterator_traits< Iter >::difference_type dist = std::distance( p, q );
+            assert(k <= dist);
+
             if ( dist == 1 )
                 return p;
             if ( dist == 2 )
@@ -79,16 +87,16 @@ namespace algorithm
                     std::swap( *p, *next( p ) );
                 return p + k;
             }
+
             Iter m = part( p, q, comp );
             dist = std::distance( p, m );
-            if ( dist == k )
-            {
-                return m;
-            }
-            else if ( dist > k )
+            
+            if ( k < dist )
                 return kth( p, m, k, comp );
+            else if ( k == dist ) 
+                return m;
             else
-                return kth( m, q, k - dist, comp );
+                return kth( m + 1, q, k - (dist + 1), comp );
         }
     }
 
@@ -97,15 +105,14 @@ namespace algorithm
     {
         Iter res = kth( p, q, std::distance( p, q ) / 2, comp );
         assert( ::abs( std::distance( p, res ) - std::distance( res, q ) ) <= 1 );
-        typedef typename std::iterator_traits< Iter >::value_type value_type;
         for ( ; p != res; ++p )
         {
-            assert( !comp( *boost::next( res ), *p ) );
+            assert( !comp( *res, *p ) );
         }
         --q;
         for ( ; q != res; --q )
         {
-            assert( !comp( *q, *boost::prior( res ) ) );
+            assert( !comp( *q, *res ) );
         }
         return res;
     }

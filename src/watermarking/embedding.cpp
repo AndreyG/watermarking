@@ -112,7 +112,7 @@ namespace watermarking
 
         for( size_t i = 0; i != M; ++i )
         {
-			graph_t::edge_t & edge = graph_.edge( i );
+			edge_t & edge = graph_.edge( i );
 			edge.b = old2new[edge.b];
 			edge.e = old2new[edge.e];
         }
