@@ -29,7 +29,11 @@ namespace watermarking
 				util::stopwatch _("calculating eigenvectors");
 
 				MKL_INT info = LAPACKE_zheev( LAPACK_COL_MAJOR, 'V', 'L', N, &e_[0], N, &lambda[0] );
-				assert(info == 0);
+                if (info != 0)
+                {
+                    std::cerr << info << std::endl;
+				    throw std::exception();
+                }
 			}
 
 			//check(e_, lambda, a);
@@ -59,32 +63,25 @@ namespace watermarking
 			{
 				typename graph_t::edge_t const & edge = g.edge( i );
 
-				size_t b, e;
-				if (edge.b < edge.e)
-				{
-					b = edge.b;
-					e = edge.e;
-				}
-				else
-				{
-					e = edge.b;
-					b = edge.e;
-				}
+				size_t b = edge.b, e = edge.e;
 
 				using geometry::ctg;
 
-				e_[b * N + e] -= safe(ctg(g.vertex(b), g.vertex(edge.left), g.vertex(e)));
+				e_[b * N + e] = -safe(ctg(g.vertex(b), g.vertex(edge.left), g.vertex(e)));
 				
 				if (g.is_valid(edge.right))
 					e_[b * N + e] -= safe(ctg(g.vertex(b), g.vertex(edge.right), g.vertex(e)));
+                e_[e * N + b] = e_[b * N + e];
+
 				e_[b * N + b] -= e_[b * N + b];
-				
+                e_[e * N + e] -= e_[b * N + b];
+
 				if (!g.is_valid(edge.right))
 				{
-					if (edge.b < edge.e)
-						e_[edge.b * N + edge.e] -= complex_traits::scalar_t(0, 1);
-					else
-						e_[edge.e * N + edge.b] += complex_traits::scalar_t(1, 0);
+                    // важно, что мы используем COL_MAJOR_ORDER
+                    // т.е., e_[e * N + b] бьет из b в е.
+				    e_[e * N + b] -= complex_traits::scalar_t(0, 1);
+				    e_[b * N + e] += complex_traits::scalar_t(0, 1);
 				}
 			}
 		}
