@@ -40,6 +40,18 @@ namespace watermarking
 		}
 
 	private:
+        void check_matrix()
+        {
+            for ( size_t i = 0; i + 1 != N; ++i )
+            {
+                for ( size_t j = i + 1; j != N; ++j )
+                {
+                    assert( e_[i * N + j].real() ==  e_[j * N + i].real() );
+                    assert( e_[i * N + j].imag() == -e_[j * N + i].imag() );
+                }
+            }
+        }
+
 
 		double safe( double x ) const
 		{

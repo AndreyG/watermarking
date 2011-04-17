@@ -146,7 +146,7 @@ $$
     \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} \\
   \end{pmatrix}. 
 $$
-Let's estimate change of a local angle after applying function~$f$. Let $\vect{r}~=~\begin{pmatrix} x \\ y \end{pmatrix}$ is an arbitrary point, 
+Let's estimate change of a local angle after applying function~$f$. Let $\vect{r}~=~\begin{pmatrix} x \\ y \end{pmatrix}$ be an arbitrary point, 
 $\vect{r_1}$ is the point displaced relative to $\vect{r}$ by an arbitrary small vector $\vect{dr}$, 
 \begin{figure}[htb]
   \begin{minipage}[b]{1.0\linewidth}
@@ -257,28 +257,33 @@ $$\begin{cases}
   \frac{\partial f_x}{\partial x} = \frac{\partial f_y}{\partial y} \\
   \frac{\partial f_x}{\partial y} = -\frac{\partial f_y}{\partial x} 
 \end{cases}$$
-i.e. $f_x$ and $f_y$ satisfy Cauchy-Riemann equations and the function $f$ is conformal. If $f$ is not conformal then length of the vector $\vect{q(r, dr, \alpha)}$ is maximal when $\alpha = \pm \frac{\pi}{2}$ 
-and doesn't depend on direction of $\vect{dr}$. 
+i.e. $f_x$ and $f_y$ satisfy Cauchy-Riemann equations and the function $f$ is conformal. If $f$ is not conformal then length of 
+the vector $\vect{q(r, dr, \alpha)}$ is maximal when $\alpha = \pm \frac{\pi}{2}$ and doesn't depend on direction of $\vect{dr}$. 
 \begin{equation*}
   \left(\frac{\left| {q(r, dr, \pm \frac{\pi}{2})} \right|}{|dr|}\right)^2 = 
-  \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2 + \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 
+  \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2 + 
+  \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 
 \end{equation*}
 We propose to use the functional 
 \begin{equation*}
-  E_C(f) = \frac{1}{2} \int_{\Omega}\left[{\left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 + \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2}\right] d\Omega   
+  E_C(f) = \frac{1}{2} \int_{\Omega}\left[{ \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 + 
+                                            \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2} \right] d\Omega   
 \end{equation*}
 called \textit{conformal energy} (\cite{Polthier}) as measure of distortion of the domain $\Omega$ after applying to it function $f$.
 
 \subsection{Discrete case}
 \label{sec:discrete}
-Let's consider sets $V = \left\{v_1, v_2, ... , v_n\right\}$, $V' = \left\{v_1', v_2', ... , v_n'\right\}$, $v_i, v_i' \in \mathbb{R}^2$, $|V| = |V'| = n$. Let function $f: V \to V'$ maps set $V$ to set $V'$, 
-$f(v_i) = v_i'$ for $1 \le i \le n$. Let $\Omega$ denote convex hull of the set $V$. We can construct Piecewise Linear Interpolation Surface (PLIS) of function values $\left\{f(v_i)\right\}_{i=1}^n$ 
-using some triangulation $\mathfrak{T}$ of the set $V$, consequently $f$ can be viewed as function from $\Omega$ to~$\mathbb{R}^2$. If a point $v$ is in triangle $\triangle T = (v_i v_j v_k)$, $\triangle T \in \mathfrak{T}$; 
-$v = \alpha v_i + \beta v_j + \gamma v_k$, $0 \le \alpha, \beta, \gamma \le 1$, $\alpha + \beta + \gamma = 1$, then $f(v) = \alpha f(v_i) + \beta f(v_j) + \gamma f(v_k)$.
+Let's consider sets $V = \left\{v_1, v_2, ... , v_n\right\}$, $V' = \left\{v_1', v_2', ... , v_n'\right\}$, $v_i, v_i' \in \mathbb{R}^2$, $|V| = |V'| = n$. 
+Let function $f: V \to V'$ maps set $V$ to set $V'$, $f(v_i) = v_i'$ for $1 \le i \le n$. Let $\Omega$ denote convex hull of the set $V$. 
+We can construct Piecewise Linear Interpolation Surface (PLIS) of function values $\left\{f(v_i)\right\}_{i=1}^n$ 
+using some triangulation $\mathfrak{T}$ of the set $V$, consequently $f$ can be viewed as function from $\Omega$ to~$\mathbb{R}^2$. 
+If a point $v$ is in triangle $\triangle T = (v_i v_j v_k)$, $\triangle T \in \mathfrak{T}$;  $v = \alpha v_i + \beta v_j + \gamma v_k$, 
+$0 \le \alpha, \beta, \gamma \le 1$, $\alpha + \beta + \gamma = 1$, then $f(v) = \alpha f(v_i) + \beta f(v_j) + \gamma f(v_k)$.
 \begin{multline}
 \label{formula:EC}
-  E_C(f) =
-  \frac{1}{2} \int_{\Omega}\left[{\left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 + \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2}\right] d\Omega = \\
+  E_C(f) = \frac{1}{2} \int_{\Omega}\left[{
+      \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 + 
+      \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2}\right] d\Omega = \\
   = \frac{1}{2} \int_{\Omega}\left[\left(\frac{\partial f_x}{\partial x}\right)^2 + \left(\frac{\partial f_y}{\partial y}\right)^2 + \left(\frac{\partial f_x}{\partial y}\right)^2 + 
   \left(\frac{\partial f_y}{\partial x}\right)^2 \right] d\Omega - \\
   - \int_{\Omega}\left[\frac{\partial f_x}{\partial x} \frac{\partial f_y}{\partial y} - \frac{\partial f_x}{\partial y} \frac{\partial f_y}{\partial x}\right] d\Omega = \\
@@ -390,7 +395,7 @@ then orientation of $\triangle f_i f_j f_k$ is equal to the orientation of $\tri
   4 S(f_i f_j f_k) = \cot{\alpha_{ij}'}|f_i - f_j|^2 + \\ + \cot{\alpha_{jk}'}|f_j - f_k|^2 + \cot{\alpha_{ki}'}|f_k - f_i|^2,
 \end{multline*}
 where $\alpha_{ij}'$, $\alpha_{jk}'$, $\alpha_{ki}'$ are the angles opposite to the edges $f_i f_j$, $f_j f_k$, $f_k f_i$ correspondingly. 
-Ans so under certain assumptions
+And so under certain assumptions
 \begin{multline*}
   E_C(f) = \frac{1}{4} \sum_{v_i v_j v_k \in \mathfrak{T}} (\cot{\alpha_{ij}} - \cot{\alpha_{ij}'})|f_i - f_j|^2 + \\
   + (\cot{\alpha_{jk}} - \cot{\alpha_{jk}'})|f_j - f_k|^2 + (\cot{\alpha_{ki}} - \cot{\alpha_{ki}'})|f_k - f_i|^2.
