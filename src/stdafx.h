@@ -7,21 +7,25 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
-#include <boost/utility.hpp>
 #include <assert.h>
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/mpl/assert.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/optional.hpp>
-#include <boost/program_options.hpp>
+
+#include <boost/utility.hpp>
+
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+
+#include <boost/shared_ptr.hpp>
+#include <boost/scoped_array.hpp>
+#include <boost/scoped_ptr.hpp>
+
+#include <boost/optional.hpp>
+
+#include <boost/program_options.hpp>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
-#include <boost/tuple/tuple.hpp>
 
+#include <boost/tuple/tuple.hpp>
 using boost::tuple;
 using boost::make_tuple;
 
@@ -35,5 +39,9 @@ using boost::make_tuple;
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
+
+#include <QApplication>
+#include <QColor>
+#include <QtOpenGL>
 
 #endif /*_STDAFX_*/

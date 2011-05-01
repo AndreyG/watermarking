@@ -7,6 +7,9 @@
 
 #include "statistics.h"
 
+#include "visualization/qtviewer.h"
+#include "visualization/subdivided_plane_viewer.h"
+
 typedef geometry::planar_graph_t                         graph_t;
 typedef std::auto_ptr< watermarking::embedding_impl >    embedding_impl_ptr;
 
@@ -88,6 +91,8 @@ bool has_duplicate_vertices(graph_t const &);
 
 int main( int argc, char** argv )
 {
+    vis_system::init(argc, argv);
+
     using inout::config_t;
     config_t config(argc, argv);
 

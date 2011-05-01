@@ -31,6 +31,7 @@ HEADERS += src/statistics.h \
            src/utility/stopwatch.h \
            src/visualization/my_visualizer.h \
            src/visualization/viewer.h \
+           src/visualization/qtviewer.h \
            src/watermarking/common.h \
            src/watermarking/embedding.h \
            src/watermarking/extracting.h \
@@ -46,6 +47,7 @@ SOURCES += src/main.cpp \
            src/utility/graph_checking.cpp \
            src/utility/graph_fixing.cpp \
            src/utility/stopwatch.cpp \
+           src/visualization/qtviewer.cpp \
            src/watermarking/embedding.cpp \
            src/watermarking/extracting.cpp
 
@@ -61,3 +63,5 @@ LIBS += -Wl,--start-group \
         -Wl,--end-group 
 
 LIBS += -lgomp -lgmp -lboost_program_options -lCGAL
+
+QT += opengl

@@ -26,16 +26,25 @@ namespace geometry
             , y_( pt.y() )
         {}
 
-#define OPERATOR_EQ(sign) point_t & operator sign##= (point_t const & pt ) \
+#define OPERATOR_APPLY_POINT(op) point_t & operator op##= (point_t const & pt ) \
     { \
-        x() sign##= pt.x(); \
-        y() sign##= pt.y(); \
+        x() op##= pt.x(); \
+        y() op##= pt.y(); \
         return *this; \
     }
 
-		OPERATOR_EQ()
-        OPERATOR_EQ(+)
-        OPERATOR_EQ(-)
+        OPERATOR_APPLY_POINT(+)
+        OPERATOR_APPLY_POINT(-)
+
+#define OPERATOR_APPLY_NUMBER(op) point_t & operator op##= (double d) \
+    { \
+        x() op##= d; \
+        y() op##= d; \
+        return *this; \
+    }
+
+        OPERATOR_APPLY_NUMBER(*)
+        OPERATOR_APPLY_NUMBER(/)
 
         double & x() { return x_; }
         double & y() { return y_; }
@@ -76,6 +85,20 @@ namespace geometry
     {
         point_t tmp(a);
         tmp -= b;
+        return tmp;
+    }
+
+    inline point_t operator * (point_t const & p, double d)
+    {
+        point_t tmp(p);
+        tmp *= d;
+        return tmp;
+    }
+
+    inline point_t operator / (point_t const & p, double d)
+    {
+        point_t tmp(p);
+        tmp /= d;
         return tmp;
     }
 

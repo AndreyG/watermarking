@@ -7,6 +7,7 @@
 #include "weights/conformal.h"
 #include "weights/dirichlet.h"
 #include "../inout/inout.h"
+#include "../visualization/subdivided_plane_viewer.h"
 
 namespace watermarking
 {
@@ -116,6 +117,10 @@ namespace watermarking
 			edge.b = old2new[edge.b];
 			edge.e = old2new[edge.e];
         }
+
+        subdivided_plane_viewer_t viewer; 
+        vis_system::run_viewer(&viewer);
+
         return res;
     }
 
