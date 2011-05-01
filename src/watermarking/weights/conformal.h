@@ -21,6 +21,7 @@ namespace watermarking
 			util::stopwatch _("conformal_spectral_analyser::ctor");
 
 			fill_matrix( g );
+            check_matrix();
 
 			std::vector< double > lambda( N );
 			vector_t a(e_);
