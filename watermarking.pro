@@ -23,7 +23,6 @@ HEADERS += src/statistics.h \
            src/geometry/point.h \
            src/geometry/triangulation_graph.h \
            src/geometry/trigonometry.h \
-           src/inout/data_reading.h \
            src/inout/dump.h \
            src/inout/inout.h \
            src/utility/debug_stream.h \

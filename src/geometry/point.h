@@ -36,6 +36,8 @@ namespace geometry
         OPERATOR_APPLY_POINT(+)
         OPERATOR_APPLY_POINT(-)
 
+#undef OPERATOR_APPLY_POINT
+
 #define OPERATOR_APPLY_NUMBER(op) point_t & operator op##= (double d) \
     { \
         x() op##= d; \
@@ -45,6 +47,8 @@ namespace geometry
 
         OPERATOR_APPLY_NUMBER(*)
         OPERATOR_APPLY_NUMBER(/)
+
+#undef OPERATOR_APPLY_NUMBER
 
         double & x() { return x_; }
         double & y() { return y_; }

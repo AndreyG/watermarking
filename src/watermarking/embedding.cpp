@@ -113,12 +113,12 @@ namespace watermarking
 
         for( size_t i = 0; i != M; ++i )
         {
-			edge_t & edge = graph_.edge( i );
+			edge_t & edge = graph_.edge(i);
 			edge.b = old2new[edge.b];
 			edge.e = old2new[edge.e];
         }
 
-        subdivided_plane_viewer_t viewer; 
+        subdivided_plane_viewer_t viewer(&graph_, &subdivision_, res); 
         vis_system::run_viewer(&viewer);
 
         return res;

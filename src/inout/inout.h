@@ -5,6 +5,30 @@
 
 namespace inout
 {
+	template< class Stream >
+	void skip_char( Stream & in, char barrier )
+	{
+		while ( in )
+		{
+			char c;
+			in >> c;
+			if ( c == barrier )
+				break;
+		}
+	}
+
+    template< class Stream >
+    geometry::point_t read_point( Stream & in  )
+    {
+        double x, y;
+        skip_char( in, '(' );
+        in >> x;
+        skip_char( in, ',' );
+        in >> y;
+        skip_char( in, ')' );   
+	    return geometry::point_t(x, y);
+    }
+
 	void read_graph( geometry::planar_graph_t & graph, std::istream & in );
 
     struct config_t
@@ -46,18 +70,6 @@ namespace inout
     	int         key;
     	double      alpha;
 	};
-
-	template< class Stream >
-	void skip_char( Stream & in, char barrier )
-	{
-		while ( in )
-		{
-			char c;
-			in >> c;
-			if ( c == barrier )
-				break;
-		}
-	}
 
 	void write_graph( geometry::planar_graph_t const & graph, std::ostream & out );
 }

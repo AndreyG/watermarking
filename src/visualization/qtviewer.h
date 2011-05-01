@@ -17,6 +17,7 @@ struct drawer_t
     virtual void set_color(QColor const & c) = 0;
     virtual void draw_line( geometry::point_t const & a,
                             geometry::point_t const & b) = 0;
+    virtual void draw_point(geometry::point_t const & pt, size_t radius) = 0;
     virtual std::unique_ptr<stream_t> corner_stream() = 0;
     virtual ~drawer_t();
 };

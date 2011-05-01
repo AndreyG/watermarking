@@ -99,18 +99,6 @@ message_params_t::message_params_t(std::string const & filepath)
     read(vm, alpha,         "alpha");
 }
 
-template< class Stream >
-geometry::point_t read_point( Stream & in  )
-{
-    double x, y;
-    skip_char( in, '(' );
-    in >> x;
-    skip_char( in, ',' );
-    in >> y;
-    skip_char( in, ')' );   
-	return geometry::point_t(x, y);
-}
-
 void read_graph( geometry::planar_graph_t & graph, std::istream & in )
 {
     size_t n, m;
