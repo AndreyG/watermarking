@@ -3,6 +3,7 @@
 #include "../../geometry/trigonometry.h"
 #include "../../utility/stopwatch.h"
 #include "../../utility/debug_stream.h"
+#include "../../visualization/triangulation_graph_viewer.h"
 
 namespace watermarking
 {
@@ -23,7 +24,7 @@ namespace watermarking
 			fill_matrix( g );
             check_matrix();
 
-			std::vector< double > lambda( N );
+			std::vector<double> lambda(N);
 			vector_t a(e_);
 
 			{
@@ -32,7 +33,9 @@ namespace watermarking
 				MKL_INT info = LAPACKE_zheev( LAPACK_COL_MAJOR, 'V', 'L', N, &e_[0], N, &lambda[0] );
                 if (info != 0)
                 {
-                    std::cerr << info << std::endl;
+                    triangulation_graph_viewer_t<Trg, complex_traits::scalar_t> viewer(&g, a);
+                    vis_system::run_viewer(&viewer);
+
 				    throw std::exception();
                 }
 			}

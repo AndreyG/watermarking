@@ -29,11 +29,14 @@ struct drawer_impl : drawer_t
     void draw_line(point_t const & a, point_t const & b);
     void draw_point(point_t const & pt, size_t radius);
     std::unique_ptr<stream_t> corner_stream();
+    std::unique_ptr<stream_t> global_stream(point_t const & pt);
 
-    drawer_impl(boost::function<void (int, int, const char *)> const & draw_string)
+    drawer_impl(boost::function<void (int, int, const char *)>          const & draw_string_corner,
+                boost::function<void (double, double, const char *)>    const & draw_string_global)
         : current_color_ (Qt::black)
         , corner_stream_height_indent_(15)
-        , draw_string_(draw_string)
+        , draw_string_corner_(draw_string_corner)
+        , draw_string_global_(draw_string_global)
     {}
 
     struct point_buffer_t
@@ -55,7 +58,8 @@ struct drawer_impl : drawer_t
 private:
     QColor current_color_;
     int corner_stream_height_indent_;
-    boost::function<void (int, int, const char *)> draw_string_;
+    boost::function<void (int, int, const char *)>          draw_string_corner_;
+    boost::function<void (double, double, const char *)>   draw_string_global_;
 };
 
 void drawer_impl::set_color(QColor const & c)
@@ -105,6 +109,7 @@ struct stream_impl : stream_t
     }
     PRINT(const char *)
     PRINT(size_t)
+    PRINT(std::complex<double> const &)
     PRINT(point_t const &)
 #undef PRINT
 
@@ -117,9 +122,14 @@ private:
 
 std::unique_ptr<stream_t> drawer_impl::corner_stream()
 {
-    std::unique_ptr<stream_t> stream(new stream_impl(boost::bind(draw_string_, 10, corner_stream_height_indent_, _1)));
+    std::unique_ptr<stream_t> stream(new stream_impl(boost::bind(draw_string_corner_, 10, corner_stream_height_indent_, _1)));
     corner_stream_height_indent_ += 15;
     return stream;
+}
+
+std::unique_ptr<stream_t> drawer_impl::global_stream(point_t const & pt)
+{
+    return std::unique_ptr<stream_t>(new stream_impl(boost::bind(draw_string_global_, pt.x(), pt.y(), _1)));
 }
 
 struct main_window_t : QGLWidget
@@ -147,6 +157,7 @@ private slots:
 
 private:
     void draw_string(int x, int y, const char * s);
+    void draw_string_global(double x, double y, const char * s);
 
 private:
     viewer_t const * viewer_;
@@ -206,7 +217,8 @@ void main_window_t::paintGL()
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    drawer_impl drawer(boost::bind(&main_window_t::draw_string, this, _1, _2, _3));
+    drawer_impl drawer( boost::bind(&main_window_t::draw_string, this, _1, _2, _3),
+                        boost::bind(&main_window_t::draw_string_global, this, _1, _2, _3));
 
     *drawer.corner_stream() << "Mouse pos: " << current_pos_;
     
@@ -316,6 +328,12 @@ void main_window_t::draw_string(int x, int y, const char * s)
 {
     qglColor(Qt::white);
     renderText(x, y, s);
+}
+
+void main_window_t::draw_string_global(double x, double y, const char * s)
+{
+    qglColor(Qt::white);
+    renderText(x, y, 0, s);
 }
 
 }

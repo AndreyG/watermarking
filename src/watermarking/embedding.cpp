@@ -119,8 +119,10 @@ namespace watermarking
 			edge.e = old2new[edge.e];
         }
 
+        /*
         subdivided_plane_viewer_t viewer(&graph_, &subdivision_, res); 
         vis_system::run_viewer(&viewer);
+        */
 
         return res;
     }
@@ -226,9 +228,6 @@ namespace watermarking
 
 			geometry::triangulation_graph< trg_t > graph(trg);
 
-            triangulation_graph_viewer_t<trg_t> viewer(&graph);
-            vis_system::run_viewer(&viewer);
-            
             switch ( type )
 			{
 			case WeightType::Unweighted:

@@ -8,6 +8,7 @@ struct stream_t
 #define PRINT(type) virtual stream_t & operator << (type) = 0;
     PRINT(const char *)
     PRINT(size_t)
+    PRINT(std::complex<double> const &)
     PRINT(geometry::point_t const &)
 #undef PRINT
     virtual ~stream_t();
@@ -20,6 +21,7 @@ struct drawer_t
                             geometry::point_t const & b) = 0;
     virtual void draw_point(geometry::point_t const & pt, size_t radius) = 0;
     virtual std::unique_ptr<stream_t> corner_stream() = 0;
+    virtual std::unique_ptr<stream_t> global_stream(geometry::point_t const & pt) = 0;
     virtual ~drawer_t();
 };
 
