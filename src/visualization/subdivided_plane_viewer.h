@@ -1,4 +1,5 @@
 #include "qtviewer.h"
+#include "../geometry/rectangle.h"
 
 struct subdivided_plane_viewer_t : viewer_t
 {
@@ -18,11 +19,25 @@ struct subdivided_plane_viewer_t : viewer_t
 
     void draw(drawer_t & drawer) const
     {
+        size_t const areas_num = color_.size();
+        
+        using geometry::point_t;
+        using geometry::rectangle_t;
+
+        std::vector<rectangle_t> rect(areas_num);
+
         for (size_t v = 0; v != graph_->vertices_num(); ++v)
         {
-            drawer.set_color(color_[subdivision_->at(v)]);
-            drawer.draw_point(graph_->vertex(v), 2);
+            size_t area = (*subdivision_)[v]; 
+            drawer.set_color(color_[area]);
+
+            graph_t::vertex_t const & pt = graph_->vertex(v);
+
+            rect[area] &= pt;
+
+            drawer.draw_point(pt, 2);
         }
+
         for (auto edge = graph_->edges_begin(); edge != graph_->edges_end(); ++edge)
         {
             size_t beg = edge->b;
@@ -43,6 +58,16 @@ struct subdivided_plane_viewer_t : viewer_t
                 drawer.set_color(color_[subdivision_->at(end)]);
                 drawer.draw_line(v_beg, v_end);
             }
+        }
+
+        drawer.set_color(Qt::red);
+
+        foreach (rectangle_t const & r, rect)
+        {
+            drawer.draw_line(r.xy(), r.Xy());
+            drawer.draw_line(r.Xy(), r.XY());
+            drawer.draw_line(r.XY(), r.xY());
+            drawer.draw_line(r.xY(), r.xy());
         }
     }
 

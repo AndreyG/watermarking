@@ -97,14 +97,15 @@ struct stream_impl : stream_t
         : write_(write)
     {}
 
-#define PRINT(type, t) \
+#define PRINT(type) \
     stream_t & operator << (type t) \
     { \
         ss_ << t; \
         return *this; \
     }
-    PRINT(const char *, s)
-    PRINT(point_t const &, pt)
+    PRINT(const char *)
+    PRINT(size_t)
+    PRINT(point_t const &)
 #undef PRINT
 
     ~stream_impl() { write_(ss_.str().c_str()); }
@@ -231,17 +232,24 @@ void main_window_t::paintGL()
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(2, GL_DOUBLE, 0, &buffer.segments[0]);
 
-        glDrawArrays(GL_LINES, 0, buffer.segments.size() / 4);
+        glDrawArrays(GL_LINES, 0, buffer.segments.size() / 2);
         glDisableClientState(GL_VERTEX_ARRAY);
     }
 }
 
 void main_window_t::wheelEvent(QWheelEvent * e)
 {
-    if (e->delta() > 0)
-        zoom_ *= 1.1;
-    else if (e->delta() < 0)
-        zoom_ /= 1.1;
+    int delta = e->delta() / 8 / 15;
+    if (delta > 0)
+    {
+        for (int i = 0; i != delta; ++i)
+            zoom_ *= 1.1;
+    }
+    else if (delta < 0)
+    {
+        for (int i = 0; i != delta; --i)
+            zoom_ /= 1.1;
+    }
     e->accept();
 
     resize_impl(size().width(), size().height());

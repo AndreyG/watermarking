@@ -21,6 +21,7 @@ HEADERS += src/statistics.h \
            src/geometry/planar_graph.h \
            src/geometry/plane_subdivision.h \
            src/geometry/point.h \
+           src/geometry/rectangle.h \
            src/geometry/triangulation_graph.h \
            src/geometry/trigonometry.h \
            src/inout/dump.h \
@@ -30,6 +31,8 @@ HEADERS += src/statistics.h \
            src/utility/stopwatch.h \
            src/visualization/my_visualizer.h \
            src/visualization/viewer.h \
+           src/visualization/planar_graph_viewer.h \
+           src/visualization/subdivided_plane_viewer.h \
            src/visualization/qtviewer.h \
            src/watermarking/common.h \
            src/watermarking/embedding.h \

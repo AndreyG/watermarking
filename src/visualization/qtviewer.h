@@ -7,6 +7,7 @@ struct stream_t
 {
 #define PRINT(type) virtual stream_t & operator << (type) = 0;
     PRINT(const char *)
+    PRINT(size_t)
     PRINT(geometry::point_t const &)
 #undef PRINT
     virtual ~stream_t();

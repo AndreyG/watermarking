@@ -8,6 +8,7 @@
 #include "statistics.h"
 
 #include "visualization/qtviewer.h"
+#include "visualization/planar_graph_viewer.h"
 
 typedef geometry::planar_graph_t                         graph_t;
 typedef std::auto_ptr< watermarking::embedding_impl >    embedding_impl_ptr;
@@ -107,7 +108,12 @@ int main( int argc, char** argv )
             auto graph = create_graph(config.input_graph);
             assert(!loops_exist(graph));
             assert(!has_duplicate_vertices(graph));
-            
+
+            /*
+            planar_graph_viewer_t viewer(&graph);
+            vis_system::run_viewer(&viewer);
+            */
+
             ew = create_embedding(graph, config.factorization);
             std::ofstream out(config.dump_path); 
             ew->dump(out);
