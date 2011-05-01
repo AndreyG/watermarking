@@ -82,6 +82,8 @@ void main_window_t::draw_line(point_t const & a, point_t const & b)
 
 void main_window_t::initializeGL()
 {
+	assert(doubleBuffer());
+    setAutoBufferSwap(true);
     qglClearColor(Qt::black);
 }
 
@@ -140,7 +142,8 @@ void main_window_t::mouseMoveEvent(QMouseEvent * event)
 
     if (start_point_)
     {
-        center_ += (current_pos_ - *start_point_);
+        center_ -= (current_pos_ - *start_point_);
+        start_point_ = current_pos_;
         resize_impl(size().width(), size().height());
     }
 
