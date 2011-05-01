@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "algorithms/median.h"
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
     std::vector<int> v(10);
     for (size_t i = 0; i != v.size(); ++i)
