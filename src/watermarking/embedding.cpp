@@ -8,6 +8,7 @@
 #include "weights/dirichlet.h"
 #include "../inout/inout.h"
 #include "../visualization/subdivided_plane_viewer.h"
+#include "../visualization/triangulation_graph_viewer.h"
 
 namespace watermarking
 {
@@ -223,16 +224,21 @@ namespace watermarking
             trg_t const &   trg         = trgs_[s];
             analyser_ptr &  analyser    = analysers_[s];
 
-			switch ( type )
+			geometry::triangulation_graph< trg_t > graph(trg);
+
+            triangulation_graph_viewer_t<trg_t> viewer(&graph);
+            vis_system::run_viewer(&viewer);
+            
+            switch ( type )
 			{
 			case WeightType::Unweighted:
-				analyser.reset( new unweighted_spectral_analyser( geometry::triangulation_graph< trg_t >( trg ) ) );
+				analyser.reset( new unweighted_spectral_analyser(graph) );
 				break;
 			case WeightType::Conformal:
-				analyser.reset( new conformal_spectral_analyser( geometry::triangulation_graph< trg_t >( trg ) ) );
+				analyser.reset( new conformal_spectral_analyser(graph) );
 				break;
 			case WeightType::Dirichlet:
-				analyser.reset( new dirichlet_spectral_analyser( geometry::triangulation_graph< trg_t >( trg ) ) );
+				analyser.reset( new dirichlet_spectral_analyser(graph) );
 				break;
 			default:
 				throw std::logic_error("unsupported type of analyser");
