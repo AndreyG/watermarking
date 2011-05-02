@@ -146,29 +146,33 @@ namespace watermarking
             size_t vectors_num = analysers_[s]->vectors_num(); 
             if (chip_rate * message.size() > vectors_num)
             {
-                 std::cout << chip_rate * message.size() << "\t" << vectors_num << std::endl;
-                 assert( false );
+                util::debug_stream(util::debug_stream::WARNING)
+                    << "area: " << s 
+                    << ": [wanted vectors num = " << chip_rate * message.size()
+                    << ", calculated vectors num = " << vectors_num << "]";
+                std::copy( old_vertices.begin(), old_vertices.end(), std::back_inserter( modified_vertices_ ) );
             }
-
-            std::vector<double> r(vectors_num);
-
-            srand(key);
-            for ( size_t i = 0, k = 0; i != message.size(); ++i )
+            else
             {
-                for ( size_t j = 0; j != chip_rate; ++j, ++k )
+                std::vector<double> r(vectors_num);
+
+                srand(key);
+                for ( size_t i = 0, k = 0; i != message.size(); ++i )
                 {
-                    int p = ( rand() % 2 ) * 2 - 1;
-                    int b = message[i] * 2 - 1;
-                    r[k] = b * p * alpha;
+                    for ( size_t j = 0; j != chip_rate; ++j, ++k )
+                    {
+                        int p = ( rand() % 2 ) * 2 - 1;
+                        int b = message[i] * 2 - 1;
+                        r[k] = b * p * alpha;
+                    }
                 }
+                vertices_t new_vertices = analysers_[s]->get_vertices(r);
+                for ( size_t i = 0; i != N; ++i )
+                {
+                    new_vertices[i] += old_vertices[i];
+                }
+                std::copy( new_vertices.begin(), new_vertices.end(), std::back_inserter( modified_vertices_ ) ); 
             }
-
-            vertices_t new_vertices = analysers_[s]->get_vertices(r);
-            for ( size_t i = 0; i != N; ++i )
-            {
-                new_vertices[i] += old_vertices[i];
-            }
-            std::copy( new_vertices.begin(), new_vertices.end(), std::back_inserter( modified_vertices_ ) ); 
         }
     }
 

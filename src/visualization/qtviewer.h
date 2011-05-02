@@ -38,7 +38,6 @@ public:
     static void run_viewer(viewer_t const * viewer);
 private:
     static boost::scoped_ptr<QApplication> app;
-    static boost::scoped_ptr<QGLWidget>    fake_widget;
 };
 
 #endif

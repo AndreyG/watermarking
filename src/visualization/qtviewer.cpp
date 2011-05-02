@@ -11,12 +11,11 @@ drawer_t::~drawer_t() {}
 viewer_t::~viewer_t() {}
 
 boost::scoped_ptr<QApplication> vis_system::app;
-boost::scoped_ptr<QGLWidget>    vis_system::fake_widget;
 
 void vis_system::init(int argc, char ** argv)
 {
     app.reset(new QApplication(argc, argv));
-    fake_widget.reset(new QGLWidget);
+    new QGLWidget;
 }
 
 namespace

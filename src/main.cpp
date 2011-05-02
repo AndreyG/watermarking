@@ -129,6 +129,8 @@ int main( int argc, char** argv )
     
     dump_graph(modified_graph, config.watermarked_graph);
     {
+        util::stopwatch _("dumping statistics");
+
         std::ofstream out(config.statistics_file.c_str());
         auto ad = angle_difference(rearranged_graph, modified_graph); 
         out << std::setprecision(32) << boost::get<0>(ad) / boost::get<1>(ad) 
@@ -136,7 +138,7 @@ int main( int argc, char** argv )
             << "\n" << boost::get<1>(ad);
     }
 
-    auto analyser_vec = ew->get_analysers();
+    std::vector< watermarking::analyser_ptr > const & analyser_vec = ew->get_analysers();
     std::vector< size_t > const & subdivision = ew->get_subdivision();
 
     for (double noise = config.noise_lower_bound; noise <= config.noise_upper_bound; noise += config.noise_step)
@@ -149,7 +151,6 @@ int main( int argc, char** argv )
             std::string out_dir = (boost::format("%s/noise-%.3f/attempt-%d/") % config.result_dir % noise % j).str();
 
             graph_t noised_graph = geometry::add_noise(modified_graph, noise);
-	        //dump_graph(noised_graph, (out_dir + "noised_graph.txt").c_str());
 	        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 
 			                                    					    analyser_vec, message_params.key,
                                                                         message_params.chip_rate, message.size() ); 

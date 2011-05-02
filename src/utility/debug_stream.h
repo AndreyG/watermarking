@@ -16,6 +16,13 @@ namespace util
 			return *this;
 		}
 
+        enum message_type 
+        {
+            INFO, WARNING, MESSAGE_TYPE_SIZE
+        };
+
+        debug_stream(message_type t = INFO);
+
 		~debug_stream();
 
 	private:

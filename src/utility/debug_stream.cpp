@@ -21,6 +21,17 @@ namespace util
 		return is_first_.top();
 	}
 
+    debug_stream::debug_stream(message_type t)
+    {
+        static const char * color[MESSAGE_TYPE_SIZE] =
+        {
+            "\033[0;30m", 
+            "\033[1;34m" 
+        };
+
+        ss_ << color[t];
+    }
+
 	debug_stream::~debug_stream()
 	{
         std::string s;

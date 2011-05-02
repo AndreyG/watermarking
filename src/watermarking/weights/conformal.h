@@ -36,9 +36,9 @@ namespace watermarking
                 MKL_INT il = 0, iu = 0;
 
 				//MKL_INT info = LAPACKE_zheev( LAPACK_COL_MAJOR, 'V', 'L', N, &e_[0], N, &lambda[0] );
-                MKL_INT info = LAPACKE_zheevr( LAPACK_COL_MAJOR, 'V', 'V', 'L', N, &a[0], N, 
-                        0.0, std::numeric_limits<double>::max(), il, iu, -1.0, &eigenvalues_num, 
-                        &lambda[0], &e_[0], N, &isuppz[0]);
+                MKL_INT info = LAPACKE_zheevr(  LAPACK_COL_MAJOR, 'V', 'V', 'L', N, &a[0], N, 
+                                                0.0, 1e6, il, iu, 1e-7,
+                                                &eigenvalues_num, &lambda[0], &e_[0], N, &isuppz[0] );
 
                 if (info > 0)
                 {
@@ -51,7 +51,7 @@ namespace watermarking
 
             K = eigenvalues_num;
 
-			check(e_, lambda, a_copy);
+			//check(e_, lambda, a_copy);
 		}
 
 	private:

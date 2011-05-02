@@ -51,6 +51,9 @@ namespace watermarking
         message_t res( message_size );
         for ( size_t subarea = 0; subarea != vertices.size(); ++subarea )
         {
+            if (message_size * chip_rate > analyser_vec[subarea]->vectors_num())
+                continue;
+
             std::vector< double > coeffs = analyser_vec[subarea]->get_coefficients( vertices[subarea] );
             srand( key );
             for ( size_t i = 0; i != message_size * chip_rate; )
