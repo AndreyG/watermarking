@@ -48,26 +48,26 @@ namespace watermarking
             vertices[subdivision[i]].push_back( graph.vertex( i ) - old_graph.vertex( i ) );
         }
 
-        message_t res( message_size );
+        message_t res(message_size);
         for ( size_t subarea = 0; subarea != vertices.size(); ++subarea )
         {
             if (message_size * chip_rate > analyser_vec[subarea]->vectors_num())
                 continue;
 
-            std::vector< double > coeffs = analyser_vec[subarea]->get_coefficients( vertices[subarea] );
-            srand( key );
+            std::vector<double> coeffs = analyser_vec[subarea]->get_coefficients( vertices[subarea] );
+            srand(key);
             for ( size_t i = 0; i != message_size * chip_rate; )
             {
                 double r = 0;
                 for ( size_t j = 0; j != chip_rate; ++j, ++i )
                 {
-                    int p = ( rand() % 2 ) * 2 - 1;
+                    int p = (rand() % 2) * 2 - 1;
                     r += p * coeffs[i];
                 }
-                res[i / chip_rate - 1] += sign( r );
+                res[i / chip_rate - 1] += sign(r);
             }
         }
-        for ( size_t i = 0; i != message_size; ++i )
+        for (size_t i = 0; i != message_size; ++i)
         {
             res[i] = (1 + sign(res[i])) / 2;
         }

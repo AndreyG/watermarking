@@ -260,7 +260,11 @@ namespace watermarking
         foreach (analyser_ptr & analyser, analysers_ )
         {
 			std::string type_str;
-			in >> type_str;
+            do
+            {
+                in >> type_str;
+                boost::trim(type_str);
+            } while (type_str.empty() && in);
             weight_type_ = WeightType::from_str(type_str);
 
 			switch ( weight_type_ )

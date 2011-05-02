@@ -28,6 +28,7 @@ struct drawer_t
 struct viewer_t
 {
     virtual void draw(drawer_t &) const = 0;
+    virtual bool on_key(int /*key*/) { return false; }
     virtual ~viewer_t();
 };
 
@@ -35,7 +36,7 @@ struct vis_system
 {
 public:
     static void init(int argc, char** argv);
-    static void run_viewer(viewer_t const * viewer);
+    static void run_viewer(viewer_t * viewer);
 private:
     static boost::scoped_ptr<QApplication> app;
 };

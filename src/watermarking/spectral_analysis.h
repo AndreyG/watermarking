@@ -52,7 +52,7 @@ namespace watermarking
 
         void dump( std::ostream & out ) const
         {
-			out << N << std::endl;
+			out << N << " " << K << std::endl;
             for (size_t i = 0; i != K; ++i) 
             {
                 for (size_t j = 0; j != N; ++j) 

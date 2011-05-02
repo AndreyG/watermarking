@@ -14,6 +14,8 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
+#include <boost/array.hpp>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -24,6 +26,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <boost/tuple/tuple.hpp>
 using boost::tuple;

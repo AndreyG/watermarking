@@ -9,6 +9,7 @@
 
 #include "visualization/qtviewer.h"
 #include "visualization/planar_graph_viewer.h"
+#include "visualization/graph_diff_viewer.h"
 
 typedef geometry::planar_graph_t                         graph_t;
 typedef std::auto_ptr< watermarking::embedding_impl >    embedding_impl_ptr;
@@ -143,24 +144,28 @@ int main( int argc, char** argv )
 
     for (double noise = config.noise_lower_bound; noise <= config.noise_upper_bound; noise += config.noise_step)
     {
-        util::stopwatch _("noise: " + boost::lexical_cast< std::string >(noise));
+        util::stopwatch _(boost::format("noise: %.3f") % noise);
         for (size_t j = 0; j != config.attempts_num; ++j)
         {
-            util::stopwatch _("attempt: " + boost::lexical_cast< std::string >(j));
+            //util::stopwatch _("attempt: " + boost::lexical_cast< std::string >(j));
 
             std::string out_dir = (boost::format("%s/noise-%.3f/attempt-%d/") % config.result_dir % noise % j).str();
 
             graph_t noised_graph = geometry::add_noise(modified_graph, noise);
+
+            graph_diff_viewer_t viewer(&rearranged_graph, &modified_graph, &noised_graph);
+            vis_system::run_viewer(&viewer);
+
 	        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 
 			                                    					    analyser_vec, message_params.key,
                                                                         message_params.chip_rate, message.size() ); 
 	        std::ofstream out((out_dir + "message.txt").c_str());
 	        out << "Embedded message:  ";
-            write_encoded_message( out, message );
-            out << decode( message ) << std::endl;
+            write_encoded_message(out, message);
+            out << decode(message) << std::endl;
             out << "Extracted message: ";
-            write_encoded_message( out, ex_message );
-            out << decode( ex_message ) << std::endl;
+            write_encoded_message(out, ex_message);
+            out << decode(ex_message) << std::endl;
         }
     }
 }

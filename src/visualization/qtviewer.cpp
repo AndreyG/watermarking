@@ -134,7 +134,7 @@ std::unique_ptr<stream_t> drawer_impl::global_stream(point_t const & pt)
 struct main_window_t : QGLWidget
 {
 public:
-    explicit main_window_t(viewer_t const * viewer);
+    explicit main_window_t(viewer_t * viewer);
     ~main_window_t() {}
 
 private:
@@ -159,8 +159,7 @@ private:
     void draw_string_global(double x, double y, const char * s);
 
 private:
-    viewer_t const * viewer_;
-
+    viewer_t * viewer_;
 
     point_t center_;
     point_t size_;
@@ -169,7 +168,7 @@ private:
     boost::optional<point_t> start_point_;
 };
 
-main_window_t::main_window_t(viewer_t const * viewer)
+main_window_t::main_window_t(viewer_t * viewer)
     : viewer_(viewer)
     , size_(100, 100)
     , current_pos_(center_)
@@ -301,12 +300,13 @@ void main_window_t::keyReleaseEvent(QKeyEvent * event)
             center_ = inout::read_point(ss);
             resize_impl(size().width(), size().height());
             updateGL();
-            event->accept();
         }
         break;
     default:
-        event->ignore();
+        if (viewer_->on_key(event->key()))
+            updateGL();
     }
+    event->accept();
 }
             
 
@@ -333,7 +333,7 @@ void main_window_t::draw_string_global(double x, double y, const char * s)
 
 }
 
-void vis_system::run_viewer(viewer_t const * viewer)
+void vis_system::run_viewer(viewer_t * viewer)
 {
     main_window_t * wnd = new main_window_t(viewer);
     wnd->show();

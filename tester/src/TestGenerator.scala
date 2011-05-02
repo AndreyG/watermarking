@@ -65,7 +65,7 @@ object TestGenerator {
           import common.details.{feed, endl}
 
           out << 
-              "bin/watermarking" << feed << 
+              "bin/watermarking.app/Contents/MacOS/watermarking" << feed << 
               "      --input-graph "        << inputGraph                                               << feed << 
               "      --dump-exists "        << (if (factorizationDumpFile.exists) "true" else "false")  << feed <<
               "      --factorization-dump " << factorizationDumpFile                                    << feed <<

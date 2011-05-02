@@ -34,6 +34,7 @@ HEADERS += src/statistics.h \
            src/visualization/planar_graph_viewer.h \
            src/visualization/subdivided_plane_viewer.h \
            src/visualization/qtviewer.h \
+           src/visualization/graph_diff_viewer.h \
            src/watermarking/common.h \
            src/watermarking/embedding.h \
            src/watermarking/extracting.h \
