@@ -13,9 +13,12 @@ namespace watermarking
         typedef std::vector< double >       coefficients_t;
         
         virtual ~spectral_analyser() {};
-        virtual vertices_t      get_vertices    ( coefficients_t    const & ) const = 0;
-        virtual coefficients_t  get_coefficients( vertices_t        const & ) const = 0;
-		virtual void			dump			( std::ostream &			) const = 0;
+
+        virtual size_t          vectors_num ()                                  const = 0;
+        virtual vertices_t      get_vertices    ( coefficients_t    const & )   const = 0;
+        virtual coefficients_t  get_coefficients( vertices_t        const & )   const = 0;
+
+		virtual void			dump			( std::ostream &			)   const = 0;
     };
 
     template< class Traits >
@@ -26,7 +29,7 @@ namespace watermarking
 		typedef Traits traits;
 
 		template< class Graph >
-        spectral_analyser_impl( Graph const & g )
+        spectral_analyser_impl(Graph const & g)
                 : N ( g.vertices_num() )
                 , e_( N * N )
         {}
@@ -34,12 +37,13 @@ namespace watermarking
 	public:
 
         explicit spectral_analyser_impl( std::istream & in )
-                : N( read_size( in ) )
+                : N( read_number( in ) )
+                , K( read_number( in ) )
 				, e_(N * N)
         {
             util::stopwatch _("spectral analyser: reading from file");
 
-            for (size_t i = 0; i != N; ++i)
+            for (size_t i = 0; i != K; ++i)
             {
                 for (size_t j = 0; j != N; ++j)
                     in >> e_[i * N + j];
@@ -49,7 +53,7 @@ namespace watermarking
         void dump( std::ostream & out ) const
         {
 			out << N << std::endl;
-            for (size_t i = 0; i != N; ++i) 
+            for (size_t i = 0; i != K; ++i) 
             {
                 for (size_t j = 0; j != N; ++j) 
                 {
@@ -61,7 +65,7 @@ namespace watermarking
 
     private:
 
-        size_t read_size( std::istream & in )
+        size_t read_number( std::istream & in )
         {
             size_t s;
             in >> s;
@@ -69,18 +73,19 @@ namespace watermarking
         }
 
     public:
+        // vectors_num -- число собственных векторов, которое мы смогли вычислить
+        size_t vectors_num() const { return K; }
 
         vertices_t get_vertices( coefficients_t const & r ) const
         {
-            const size_t K = r.size();
-            assert( K <= N );
+            assert(r.size() <= K);
             
             vertices_t vertices( N );
-            for ( size_t i = 0; i != N; ++i )
+            for (size_t i = 0; i != N; ++i)
             {
-                for ( size_t j = 0; j != K; ++j )
+                for (size_t k = 0; k != r.size(); ++k)
                 {
-                    vertices[i] += Traits::mult( r[j], e_[j * N + i] );
+                    vertices[i] += Traits::mult(r[k], e_[k * N + i]);
                 }
             }
 
@@ -89,13 +94,13 @@ namespace watermarking
 
         coefficients_t get_coefficients( vertices_t const & vertices ) const 
         {
-            assert( vertices.size() == N );
+            assert(vertices.size() == N);
 
-            auto pts = Traits::points_to_flat( vertices );   
+            auto pts = Traits::points_to_flat(vertices);   
             coefficients_t coefficients(N);
             for ( size_t i = 0; i != N; ++i )
             {
-                coefficients[i] = Traits::get_coeff( &e_[0] + i * N, N, pts );
+                coefficients[i] = Traits::get_coeff(&e_[0] + i * N, N, pts);
             }
             return coefficients;
         }
@@ -103,6 +108,7 @@ namespace watermarking
 	protected:
 
 		size_t N;
+        size_t K;
         vector_t e_;
     };
 

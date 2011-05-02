@@ -143,14 +143,16 @@ namespace watermarking
 			vertices_t old_vertices( graph_.vertices_begin() + v, graph_.vertices_begin() + v + N );
 			v += N;
 
-            std::vector< double > r( N );
-
-            srand( key );
-            if ( chip_rate * message.size() > N )
+            size_t vectors_num = analysers_[s]->vectors_num(); 
+            if (chip_rate * message.size() > vectors_num)
             {
-                 std::cout << chip_rate * message.size() << "\t" << r.size() << std::endl;
+                 std::cout << chip_rate * message.size() << "\t" << vectors_num << std::endl;
                  assert( false );
             }
+
+            std::vector<double> r(vectors_num);
+
+            srand(key);
             for ( size_t i = 0, k = 0; i != message.size(); ++i )
             {
                 for ( size_t j = 0; j != chip_rate; ++j, ++k )
@@ -161,7 +163,7 @@ namespace watermarking
                 }
             }
 
-            vertices_t new_vertices = analysers_[s]->get_vertices( r );
+            vertices_t new_vertices = analysers_[s]->get_vertices(r);
             for ( size_t i = 0; i != N; ++i )
             {
                 new_vertices[i] += old_vertices[i];

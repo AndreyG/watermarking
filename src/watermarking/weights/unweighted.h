@@ -45,6 +45,8 @@ namespace watermarking
 			check(vectors_right, lambda_real, lambda_imag, e_);
 			assert(info == 0);
 			e_.swap(vectors_right);
+
+            K = N;
 		}
 
 		void check(vector_t const & e, vector_t const & vr, vector_t const & vi, vector_t const & a)

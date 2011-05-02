@@ -68,7 +68,7 @@ factorization_params_t::factorization_params_t( std::string const & filepath )
     ;
 
     po::variables_map vm;       
-    std::ifstream conf(filepath);
+    std::ifstream conf(filepath.c_str());
     po::store(po::parse_config_file(conf, desc), vm);
 
     read(vm, weight_type,       "weight-type"       );
@@ -90,7 +90,7 @@ message_params_t::message_params_t(std::string const & filepath)
     ;
 
     po::variables_map vm;       
-    std::ifstream conf(filepath);
+    std::ifstream conf(filepath.c_str());
     po::store(po::parse_config_file(conf, desc ), vm);
 
     read(vm, text,          "message");

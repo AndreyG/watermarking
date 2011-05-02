@@ -213,8 +213,6 @@ void main_window_t::resizeGL(int screen_w, int screen_h)
 
 void main_window_t::paintGL()
 {
-    util::stopwatch _("paintGL");
-
     glClear(GL_COLOR_BUFFER_BIT);
 
     drawer_impl drawer( boost::bind(&main_window_t::draw_string, this, _1, _2, _3),
@@ -279,20 +277,18 @@ void main_window_t::mousePressEvent(QMouseEvent * event)
 void main_window_t::mouseMoveEvent(QMouseEvent * event)
 {
     current_pos_ = screen_to_global(event->pos());
-
-    if (start_point_)
-    {
-        center_ -= (current_pos_ - *start_point_);
-        start_point_ = current_pos_;
-        resize_impl(size().width(), size().height());
-    }
-
     updateGL();
 }
 
 void main_window_t::mouseReleaseEvent(QMouseEvent * )
 {
-    start_point_ = boost::none;
+    if (start_point_)
+    {
+        center_ -= (current_pos_ - *start_point_);
+        start_point_ = boost::none;
+        resize_impl(size().width(), size().height());
+        updateGL();
+    }
 }
 
 void main_window_t::keyReleaseEvent(QKeyEvent * event)
@@ -340,7 +336,7 @@ void main_window_t::draw_string_global(double x, double y, const char * s)
 
 void vis_system::run_viewer(viewer_t const * viewer)
 {
-    main_window_t wnd(viewer);
-    wnd.show();
+    main_window_t * wnd = new main_window_t(viewer);
+    wnd->show();
     app->exec(); 
 }

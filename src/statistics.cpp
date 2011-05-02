@@ -16,7 +16,7 @@ double angle(geometry::point_t const & u, geometry::point_t const & v, geometry:
     double c = (v1 * v2) / (sqrt(mod(v1)) * sqrt(mod(v2)));
     using algorithm::make_min;
     using algorithm::make_max;
-	assert(!isnan(c));
+	assert(!std::isnan(c));
     make_min(c, 1.0);
     make_max(c, -1.0);
     return acos(c);

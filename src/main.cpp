@@ -15,7 +15,7 @@ typedef std::auto_ptr< watermarking::embedding_impl >    embedding_impl_ptr;
 
 graph_t create_graph( std::string const & filepath )
 {
-    std::ifstream in(filepath);
+    std::ifstream in(filepath.c_str());
     
     graph_t graph;
     inout::read_graph( graph, in );
@@ -82,7 +82,7 @@ namespace
 
 void dump_graph(graph_t const & graph, std::string const & filepath)
 {
-    std::ofstream out(filepath);
+    std::ofstream out(filepath.c_str());
     inout::write_graph(graph, out);
 }
 
@@ -115,7 +115,7 @@ int main( int argc, char** argv )
             */
 
             ew = create_embedding(graph, config.factorization);
-            std::ofstream out(config.dump_path); 
+            std::ofstream out(config.dump_path.c_str()); 
             ew->dump(out);
         }
     }
@@ -129,7 +129,7 @@ int main( int argc, char** argv )
     
     dump_graph(modified_graph, config.watermarked_graph);
     {
-        std::ofstream out(config.statistics_file);
+        std::ofstream out(config.statistics_file.c_str());
         auto ad = angle_difference(rearranged_graph, modified_graph); 
         out << std::setprecision(32) << boost::get<0>(ad) / boost::get<1>(ad) 
             << "\n" << boost::get<0>(ad) 
@@ -153,7 +153,7 @@ int main( int argc, char** argv )
 	        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 
 			                                    					    analyser_vec, message_params.key,
                                                                         message_params.chip_rate, message.size() ); 
-	        std::ofstream out(out_dir + "message.txt");
+	        std::ofstream out((out_dir + "message.txt").c_str());
 	        out << "Embedded message:  ";
             write_encoded_message( out, message );
             out << decode( message ) << std::endl;

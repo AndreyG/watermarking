@@ -21,17 +21,26 @@ namespace watermarking
 		{
 			util::stopwatch _("conformal_spectral_analyser::ctor");
 
-			fill_matrix( g );
-            check_matrix();
+			fill_matrix(g);
 
 			std::vector<double> lambda(N);
 			vector_t a(e_);
+            vector_t a_copy(a);
+
+            MKL_INT eigenvalues_num = 0;
 
 			{
 				util::stopwatch _("calculating eigenvectors");
 
-				MKL_INT info = LAPACKE_zheev( LAPACK_COL_MAJOR, 'V', 'L', N, &e_[0], N, &lambda[0] );
-                if (info != 0)
+                std::vector<MKL_INT> isuppz(N);
+                MKL_INT il = 0, iu = 0;
+
+				//MKL_INT info = LAPACKE_zheev( LAPACK_COL_MAJOR, 'V', 'L', N, &e_[0], N, &lambda[0] );
+                MKL_INT info = LAPACKE_zheevr( LAPACK_COL_MAJOR, 'V', 'V', 'L', N, &a[0], N, 
+                        0.0, std::numeric_limits<double>::max(), il, iu, -1.0, &eigenvalues_num, 
+                        &lambda[0], &e_[0], N, &isuppz[0]);
+
+                if (info > 0)
                 {
                     triangulation_graph_viewer_t<Trg, complex_traits::scalar_t> viewer(&g, a);
                     vis_system::run_viewer(&viewer);
@@ -40,22 +49,12 @@ namespace watermarking
                 }
 			}
 
-			//check(e_, lambda, a);
+            K = eigenvalues_num;
+
+			check(e_, lambda, a_copy);
 		}
 
 	private:
-        void check_matrix()
-        {
-            for ( size_t i = 0; i + 1 != N; ++i )
-            {
-                for ( size_t j = i + 1; j != N; ++j )
-                {
-                    assert( e_[i * N + j].real() ==  e_[j * N + i].real() );
-                    assert( e_[i * N + j].imag() == -e_[j * N + i].imag() );
-                }
-            }
-        }
-
 
 		double safe( double x ) const
 		{
@@ -83,22 +82,29 @@ namespace watermarking
 
 				using geometry::ctg;
 
-				e_[b * N + e] = -safe(ctg(g.vertex(b), g.vertex(edge.left), g.vertex(e)));
+                size_t idx = (b < e) ? (b * N + e) : (e * N + b);
+
+                if (b < e)
+                {
+				    e_[idx] = -safe(ctg(g.vertex(b), g.vertex(edge.left), g.vertex(e)));
 				
-				if (g.is_valid(edge.right))
-					e_[b * N + e] -= safe(ctg(g.vertex(b), g.vertex(edge.right), g.vertex(e)));
-                e_[e * N + b] = e_[b * N + e];
+				    if (g.is_valid(edge.right))
+					    e_[idx] -= safe(ctg(g.vertex(b), g.vertex(edge.right), g.vertex(e)));
 
-				e_[b * N + b] -= e_[b * N + b];
-                e_[e * N + e] -= e_[b * N + b];
+				    e_[b * N + b] -= e_[idx];
+                    e_[e * N + e] -= e_[idx];
 
-				if (!g.is_valid(edge.right))
-				{
-                    // важно, что мы используем COL_MAJOR_ORDER
-                    // т.е., e_[e * N + b] бьет из b в е.
-				    e_[e * N + b] -= complex_traits::scalar_t(0, 1);
-				    e_[b * N + e] += complex_traits::scalar_t(0, 1);
-				}
+				    if (!g.is_valid(edge.right))
+				    {
+                        // важно, что мы используем COL_MAJOR_ORDER
+                        // т.е., e_[e * N + b] = e_[b][e] бьет из b в е.
+                        complex_traits::scalar_t imag_unit(0, 1);
+                        if (b < e)
+				            e_[idx] += imag_unit;
+                        else
+                            e_[idx] -= imag_unit;
+                    }
+                }
 			}
 		}
  
@@ -106,19 +112,24 @@ namespace watermarking
 		{
 			util::stopwatch _("eigenvectors checking");
 
-			for ( size_t k = 0; k != N; ++k )
+            // для каждого собственного вектора
+			for ( size_t k = 0; k != K; ++k )
 			{
+                // для каждой строки
 				for ( size_t i = 0; i != N; ++i )
 				{
-					complex_traits::scalar_t r = 0;
+					complex_traits::scalar_t r = 0.0;
 					for ( size_t j = 0; j != N; ++j )
 					{
-						r += e[k * N + j] * ((i < j) ? a[i * N + j] : a[j * N + i]);
+                        complex_traits::scalar_t a_ij = (i < j) ? a[i * N + j] : a[j * N + i];
+                        if (i < j)
+                            a_ij = complex_traits::scalar_t(a_ij.real(), -a_ij.imag());
+                        r += e[k * N + j] * a_ij;
 					}
-					if (abs(e[k * N + i] * v[k] - r) / abs(v[k]) > 1e-3)
-						util::debug_stream() 	<< "achtung!!!		e[i] = " << e[k * N + i] 
-												<< ", v = " << v[k] << ", sum = " << r << ", diff = " << abs(e[k * N + i] * v[k] - r);  
-					assert(abs(e[k * N + i] * v[k] - r) / abs(v[k]) < 1e-3);
+                    if (!(abs(e[k * N + i] * v[k] - r) < 1e-3))
+                        util::debug_stream() << v[k] << " " << r << " " << e[k * N + i] * v[k] 
+                                             << abs(e[k * N + i] * v[k] - r);
+					assert(abs(e[k * N + i] * v[k] - r) < 1e-3);
 				}
 			}
 		}
