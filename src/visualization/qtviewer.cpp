@@ -107,6 +107,7 @@ struct stream_impl : stream_t
         return *this; \
     }
     PRINT(const char *)
+    PRINT(std::string const &)
     PRINT(size_t)
     PRINT(std::complex<double> const &)
     PRINT(point_t const &)

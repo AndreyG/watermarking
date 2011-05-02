@@ -153,7 +153,8 @@ int main( int argc, char** argv )
 
             graph_t noised_graph = geometry::add_noise(modified_graph, noise);
 
-            graph_diff_viewer_t viewer(&rearranged_graph, &modified_graph, &noised_graph);
+            graph_diff_viewer_t viewer( &rearranged_graph, &modified_graph, &noised_graph,
+                                        "original", "watermarked", "noised" );
             vis_system::run_viewer(&viewer);
 
 	        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 

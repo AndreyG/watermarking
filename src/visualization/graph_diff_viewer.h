@@ -7,7 +7,10 @@ struct graph_diff_viewer_t : viewer_t
 
     graph_diff_viewer_t(graph_t const * original_graph,
                         graph_t const * modified_graph,
-                        graph_t const * noised_graph)
+                        graph_t const * noised_graph,
+                        const char * first_graph_name,
+                        const char * second_graph_name, 
+                        const char * third_graph_name )
     {
         graph_[0] = original_graph;
         graph_[1] = modified_graph;
@@ -16,19 +19,28 @@ struct graph_diff_viewer_t : viewer_t
         vertex_color_[0] = edge_color_[0] = Qt::green;
         vertex_color_[1] = edge_color_[1] = Qt::blue;
         vertex_color_[2] = edge_color_[2] = Qt::red;
+
+        std::fill(draw_.begin(), draw_.end(), true);
+
+        graph_name_[0] = first_graph_name;
+        graph_name_[1] = second_graph_name;
+        graph_name_[2] = third_graph_name;
     }
 
     void draw(drawer_t & drawer) const
     {
-        for (int i = 0; i != 3; ++i)
+        for (int i = 0; i != 3; ++i) if (draw_[i])
             draw_graph(drawer, graph_[i], vertex_color_[i], edge_color_[i]);
+        for (int i = 0; i != 3; ++i)
+            *drawer.corner_stream() << "key " << (i + 1) << ": " << graph_name_[i];
     }
 
     bool on_key(int key)
     {
-        if ((key >= Qt::Key_0) && (key <= Qt::Key_2))
+        key -= Qt::Key_1;
+        if ((key >= 0) && (key <= 2))
         {
-            draw_[key - Qt::Key_0] = !draw_[key - Qt::Key_0];
+            draw_[key] = !draw_[key];
             return true;
         }
         return false;

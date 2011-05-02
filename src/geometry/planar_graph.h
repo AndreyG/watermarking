@@ -76,7 +76,7 @@ namespace geometry
             double r = gen();
         	res.add_vertex( *v + from_polar(r, a) );  
         }
-        return g;
+        return res;
     }
 }
 

@@ -22,7 +22,7 @@ namespace util
         }
 
     private:        
-       typedef boost::normal_distribution< double > normal_distribution;
+        typedef boost::normal_distribution< double > normal_distribution;
 
         mt19937 rng_;
         variate_generator< mt19937&, normal_distribution > sampler_;
