@@ -53,17 +53,22 @@ SOURCES += src/main.cpp \
            src/watermarking/embedding.cpp \
            src/watermarking/extracting.cpp
 
+QMAKE_CXX=g++-mp-4.5
+QMAKE_LINK=g++-mp-4.5
 QMAKE_CXXFLAGS+=-std=c++0x
 QMAKE_CXXFLAGS+=-frounding-math
 
-MKLLIB=/opt/intel/mkl/lib/intel64
-
-LIBS += -Wl,--start-group \
-        	"$$MKLLIB/libmkl_intel_lp64.a" \
-            "$$MKLLIB/libmkl_gnu_thread.a" \
-            "$$MKLLIB/libmkl_core.a" \
-        -Wl,--end-group 
-
-LIBS += -lgomp -lgmp -lboost_program_options -lCGAL
+INCLUDEPATH+=/usr/local/include
+INCLUDEPATH+=/usr/local/boost_1_46_1
+INCLUDEPATH+=/opt/intel/mkl/include
+INCLUDEPATH+=/opt/local/include
 
 QT += opengl
+
+MKLLIB=/opt/intel/mkl/lib 
+
+LIBS += -L/usr/local/boost_1_46_1/stage/lib
+LIBS += -L/opt/local/lib
+LIBS += -L$$MKLLIB
+LIBS += -lgomp -lgmp -lboost_program_options -lCGAL
+LIBS += -lmkl_core -lmkl_intel -lmkl_intel_thread
