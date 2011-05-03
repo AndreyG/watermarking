@@ -144,7 +144,7 @@ int main( int argc, char** argv )
 
     for (double noise = config.noise_lower_bound; noise <= config.noise_upper_bound; noise += config.noise_step)
     {
-        util::stopwatch _(boost::format("noise: %.3f") % noise);
+        //util::stopwatch _(boost::format("noise: %.3f") % noise);
         for (size_t j = 0; j != config.attempts_num; ++j)
         {
             //util::stopwatch _("attempt: " + boost::lexical_cast< std::string >(j));
@@ -153,9 +153,11 @@ int main( int argc, char** argv )
 
             graph_t noised_graph = geometry::add_noise(modified_graph, noise);
 
+            /*
             graph_diff_viewer_t viewer( &rearranged_graph, &modified_graph, &noised_graph,
                                         "original", "watermarked", "noised" );
             vis_system::run_viewer(&viewer);
+            */
 
 	        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 
 			                                    					    analyser_vec, message_params.key,

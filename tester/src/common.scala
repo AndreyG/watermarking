@@ -39,6 +39,12 @@ package common {
     abstract sealed class SpecialSymbol
     object feed extends SpecialSymbol
     object endl extends SpecialSymbol
+
+    abstract sealed class Color
+    object black extends Color
+    object green extends Color
+    object red extends Color
+    object blue extends Color
   }
 
   class StreamWrapper(out: PrintStream) {
@@ -47,11 +53,26 @@ package common {
       return this
     }
 
+    def << (i: Int) : StreamWrapper = {
+      out.print(i)
+      return this
+    }
+
     def << (s: details.SpecialSymbol) : StreamWrapper = {
       s match {
         case details.feed => out.println(" \\")
         case details.endl => out.println()
       }
+      return this
+    }
+
+    def << (c: details.Color) : StreamWrapper = {
+      out.print(c match {
+        case details.black  => "\033[0;30m"
+        case details.red    => "\033[0;31m"
+        case details.green  => "\033[0;32m"
+        case details.blue   => "\033[0;34m"
+      })
       return this
     }
 

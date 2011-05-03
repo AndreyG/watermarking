@@ -15,6 +15,10 @@
     <target name="build" depends="compile">
     </target>
 
+    <path id="lib.path">
+        <fileset dir="${lib}" includes="*.jar"/>
+    </path>
+
     <target name="compile">
         <mkdir dir="${build}"/>
         <scalac
@@ -23,6 +27,21 @@
                 >
             <classpath>
                 <path refid="scala.lib.path"/>
+                <path refid="lib.path"/>
+            </classpath>
+        </scalac>
+        <javac
+                srcdir="src"
+                destdir="${build}"
+                classpathref="lib.path"
+                />
+        <scalac
+                srcdir="src"
+                destdir="${build}"
+                >
+            <classpath>
+                <path refid="scala.lib.path"/>
+                <path refid="lib.path"/>
             </classpath>
         </scalac>
     </target>
