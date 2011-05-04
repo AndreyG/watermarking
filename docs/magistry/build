@@ -1,0 +1,1 @@
+pdflatex thesis.tex && bibtex thesis && open thesis.pdf
