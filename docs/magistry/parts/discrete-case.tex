@@ -21,16 +21,17 @@ $\left\{f_i = f(v_i)\right\}_{i=1}^n$ по триангуляции $\mathfrak{T
 где $\alpha_{ij}$ --- угол противоположный ребру $(v_i, v_j)$ в треугольнике $\triangle T = (v_i, v_j, v_k)$.   
 
 \input{parts/pinkall-formula}
-Формула~(\ref{formula:Pinkall}) эквивалентна следующей: 
+Формула~(\ref{formula:Pinkall}) может быть записана как 
 \begin{equation}
 \label{formula:EDOverEdges}
   E_D(f) = \frac{1}{4} \sum_{\left( i, j \right) \in E\left(\mathfrak{T}\right)}{w_{ij} |f_i - f_j|^2}, 
 \end{equation}
 где $E(\mathfrak{T})$ множество ребер триангуляции $\mathfrak{T}$, 
-$w_{ij}~=~\cot\alpha_{ij}~+~\cot\alpha_{ji}$, $\alpha_{\left\{{ij, ji}\right\}}$ --- угла 
-противопоaлежащие ребру~$v_i v_j$ в смежных треугольках $\triangle T_1=v_i v_j v_{k_1}$, 
-$\triangle T_2~=~v_j v_i v_{k_2}$. Если ребро~$v_i v_j$ принадлежит тольно одному треугольнику $\triangle T=v_i v_j v_k$ ($v_i v_j$ принадлежит границе $\Omega$), то $w_{ij} = \cot \alpha_{ij}$.
-Если мы предположим, что $f$ --- комплексно-значеая функция, то есть  
+$w_{ij}~=~\cot\alpha_{ij}~+~\cot\alpha_{ji}$, $\alpha_{\left\{{ij, ji}\right\}}$~---~углы 
+противолежащие ребру~$v_i v_j$ в смежных треугольках $\triangle T_1=v_i v_j v_{k_1}$, 
+$\triangle T_2~=~v_j v_i v_{k_2}$. Если ребро~$v_i v_j$ принадлежит тольно одному треугольнику 
+$v_i v_j v_k$ ($v_i v_j$ принадлежит границе $\Omega$), то $w_{ij} = \cot \alpha_{ij}$.
+Если мы предположим, что $f$ --- комплексно-значная функция, то есть  
 $$f_x=\re{f}=\frac{1}{2}\left(f + \conjugate{f}\right), f_y=\im{f}=\frac{1}{2}\left(f - \conjugate{f}\right),$$ 
 то $$|f_i - f_j|^2 = \conjugate{(f_i - f_j)}(f_i - f_j) = (\conjugate{f_i} - \conjugate{f_j})(f_i - f_j).$$ 
 
@@ -46,5 +47,60 @@ $$ то формула~(\ref{formula:EDOverEdges}) будет эквивален
   \label{formula:EDOverLaplacian}
   E_D(f) = \frac{1}{4} \conjugate{\mathbf{f}^T} L \mathbf{f},
 \end{equation}
-где $\mathbf{f} = (f_1, f_2, \dots f_n)^T$, $\conjugate{\mathbf{f}^T} = (\conjugate{f_1}, \conjugate{f_2}, \dots, \conjugate{f_n})$.
+где $\mathbf{f} = (f_1, f_2, \dots f_n)^T$, $\conjugate{\mathbf{f}^T} = 
+(\conjugate{f_1}, \conjugate{f_2}, \dots, \conjugate{f_n})$. Заметим, что $L$ --- вещественный и 
+симметричный, а значит, эрмитов.
 
+$\int_{\Omega} \det(\nabla f) d\Omega$ также может быть выражен как некоторая 
+эрмитова квадратичная форма, примененная к $\mathbf{f}$. 
+Рассмотрим треугольник $\triangle T = v_i v_j v_k~\in~\mathfrak{T}$. 
+$f$ линейна на $\triangle T$, следовательно $\det (\nabla f)$ есть константа, 
+а следовательно, $\int_{\triangle T} \det (\nabla f) dT$ есть ориентированная площадь 
+$\triangle T' = f_i f_j f_k$. 
+Если предположить, чот $v_i$, $v_j$, $v_k$ образуют левый поворот, то
+\begin{multline}
+  \label{formula:det}
+  \int_{\triangle T} \det (\nabla f) dT = \frac{1}{2} (f_i - f_k) \times (f_j - f_k) = \\
+  = \frac{1}{2} \left[(f_i - f_k)_x (f_j - f_k)_y - (f_i - f_k)_y (f_j - f_k)_y \right] = \\
+  = \frac{i}{4} \left[ (f_i - f_k)\conjugate{(f_j - f_k)} - (f_j - f_k) \conjugate{(f_i - f_k)} \right] = \\
+  = \frac{i}{4} \left[ (f_i \conjugate{f_j} - \conjugate{f_i} f_j) + (f_j \conjugate{f_k} - \conjugate{f_j} f_k) + 
+    (f_k \conjugate{f_i} - \conjugate{f_k} f_i) \right].  
+\end{multline}
+Подставляя (\ref{formula:det}) в формулу
+\begin{equation}
+  \label{formula:det_global}
+  \int_{\Omega} \det {\left( \nabla f \right) } d\Omega = \sum_{\triangle T \in \mathfrak{T}}{ \int_{\triangle T} \det{ \left(\nabla f \right) } dT},
+\end{equation}
+можно заметить, что для каждого ребра $v_i v_j$ не содержащегося в $\Omega$ выпуклой оболочке
+существует парное ребро $v_j v_i$, а следовательно, выражение 
+$(f_i \conjugate{f_j}~-~\conjugate{f_i} f_j)$ содержится в правой части равенства (\ref{formula:det_global}) вместе с противоположным выражением, то есть аннигилирует.
+$(f_j \conjugate{f_i}~-~\conjugate{f_j} f_i)$. Следовательно, формулв (\ref{formula:det_global}) 
+может быть переписана следующим образом
+\begin{equation}
+\label{formula:det_over_edges}
+  \int_{\Omega} \det {\left( \nabla f \right) } d\Omega = \frac{i}{4} \sum_{v_i v_j \in \partial E}{(f_i \conjugate{f_j} - \conjugate{f_i} f_j)},
+\end{equation}
+где $\partial E = \partial \Omega \cap E(\mathfrak{T})$ --- множество ребер 
+триангуляции $\mathfrak{T}$ принадлежащих границе $\Omega$. 
+Если рассмотреть эрмитову матрицу $L'$ определенную следующим образом
+\begin{equation*}
+  L_{uv}' = \begin{cases}
+    i  & \text{if edge $uv \in \partial E$ and $\Omega$ is left of the line $(u, v)$;} \\ 
+    -i & \text{if edge $uv \in \partial E$ and $\Omega$ is right of the line $(u, v)$;} \\ 
+    0  & \text{otherwise}
+  \end{cases}
+\end{equation*}
+то формула~(\ref{formula:det_over_edges}) будет эквивалента следующией:
+\begin{equation}
+\label{formula:DetOverLaplacian}
+  \int_{\Omega} \det {\left( \nabla f \right) } d\Omega = \frac{1}{4} \conjugate{\mathbf{f}^T} L' \mathbf{f}.
+\end{equation}
+Пользуясь формулами (\ref{formula:EC}), (\ref{formula:EDOverLaplacian}), 
+(\ref{formula:DetOverLaplacian}) можно выразить $E_C(f)$ как значение некоторой квадратичной 
+формы, примененной к $\mathbf{f}$
+\begin{equation*}
+  E_C(f) = \frac{1}{4}\conjugate{\mathbf{f}^T} L'' \mathbf{f},
+\end{equation*}
+где $L'' = L - L'$. Легко видеть, что оператор $L''$ --- эрмитов (как разность двух эрмитовых), 
+следовательно, его собственные числа вещественны и из его из его собственных векторов можно составить ортонормированный базис 
+$\mathbb{C}^2$.
