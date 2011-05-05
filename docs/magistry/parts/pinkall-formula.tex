@@ -1,0 +1,101 @@
+Однако в работе \cite{Pinkall93} заявляется, что очевидно, что верен куда более общий факт, но доказательства не
+приводится. Докажем его для одного треугольника $T = \triangle ABC$ и функции $f: T \to \mathbb{R}^2$ линейной
+на нем. Заметим, что это практически то, что нам и требуется, так как $E_D(f) = E_D(f_x) + E_D(f_y)$. 
+
+Пусть $A=(x_1, y_1), B=(x_2, y_2), C=(x_3, y_3)$; $$E_D(f) = \int_{T}{||\nabla{f}||^2 dT} = 
+        \int_{T}{\left[\left(\frac{\partial f}{\partial x}\right)^2 + 
+                       \left(\frac{\partial f}{\partial y}\right)^2 \right] dx dy}.$$ 
+
+Перейдем к барицентрическим координатам $u, v$: $$T = \left\{(u, v)\mbox{ } | \mbox{ } (u, v) \in \left[0, 1 \right]^2 ,\mbox{ } u + v <= 1 \right\}.$$ 
+Введя обозначения \begin{multline*} \Delta = (x_1 - x_3) (y_2 - y_3) - (x_2 - x_3) (y_2 - y_3), \\ \Delta_u = (y_2 - y_3) x - (x_2 - x_3) y, \mbox{ } \Delta_v = -(y_1 - y_3) x + (x_1 - x_3) y, 
+\end{multline*}
+Легко вывести
+\begin{multline*} = \frac{\Delta_u}{\Delta}, \mbox{ } v = \frac{\Delta_v}{\Delta} \mbox{, } dxdy = |\Delta| dudv \\
+        \frac{\partial u}{\partial x} = \frac{1}{\Delta}(y_2 - y_3), \mbox{ } \frac{\partial u}{\partial y} = -\frac{1}{\Delta}(x_2 - x_3) \mbox{; }
+        \frac{\partial v}{\partial x} = -\frac{1}{\Delta}(y_1 - y_3), \mbox{ } \frac{\partial v}{\partial y} = \frac{1}{\Delta}(x_1 - x_3) \\
+        f(u, v) = f_1 u + f_2 v + f_3(1-u-v) = (f_1 - f_3) u + (f_2 - f_3) v \\
+        \frac{\partial f}{\partial u} = f_1 - f_3 \mbox{, } \frac{\partial f}{\partial v} = f_2 - f_3. 
+\end{multline*} 
+ \begin{multline*}
+        \frac{\partial f}{\partial x} = \frac{\partial f}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial f}{\partial v} \frac{\partial v}{\partial x} = 
+            \frac{1}{\Delta}(y_2 - y_3)(f_1 - f_3) - \frac{1}{\Delta}(y_1 - y_3)(f_2 - f_3) = \\
+            \frac{1}{\Delta}\left[(y_2 - y_3)(f_1 - f_3) - (y_1 - y_3)(f_2 - f_3)\right]. 
+    \end{multline*}
+    \begin{multline*}
+        \frac{\partial f}{\partial y} = \frac{\partial f}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial f}{\partial v} \frac{\partial v}{\partial y} = 
+            -\frac{1}{\Delta}(x_2 - y_3)(f_1 - f_3) + \frac{1}{\Delta}(x_1 - x_3)(f_2 - f_3) = \\
+            \frac{1}{\Delta}\left[-(x_2 - x_3)(f_1 - f_3) + (x_1 - x_3)(f_2 - f_3)\right]. 
+    \end{multline*}
+    \begin{multline*}
+        \left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] = 
+        \frac{1}{\Delta^2} 
+        [
+            (f_1 - f_3)^2 [(y_2 - y_3)^2 + (x_2 - x_3)^2] + \\ + (f_2 - f_3)^2 [(y_1 - y_3)^2 + (x_1 - x_3)^2] % - \\
+            - 2 (f_1 - f_3)(f_2 - f_3)((y_2 - y_3)(y_1 - y_3) + (x_2 - x_3)(x_1 - x_3))
+        ]
+    \end{multline*}
+    Введем обозначения: $\vec{AB} = \vec{c}$, $\vec{BC} = \vec{a}$, $\vec{CA} = \vec{b}$. Тогда предыдущую формулу можно записать следующим образом.
+    \begin{multline*}
+        \left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] = 
+        \frac{1}{\Delta^2} 
+        \left[
+            (f_1 - f_3)^2 a^2 + (f_2 - f_3)^2 b^2 - 2 (f_1 - f_3)(f_2 - f_3)(\vec{a}, \vec{b}) 
+        \right] = \\
+        = \frac{1}{\Delta^2} 
+        \left[
+            (f_1 - f_3)^2 a^2 + (f_2 - f_3)^2 b^2 - (f_1 - f_3)(f_2 - f_3)(a^2 + b^2 - c^2) 
+        \right] = \\
+        = \frac{1}{\Delta^2} 
+        \left[
+            a^2 (f_1 - f_3)^2 + b^2 (f_2 - f_3)^2 - (a^2 + b^2 - c^2)(f_1 f_2 - f_3(f_1 + f_2) + f_3^2)
+        \right] = \\
+        = \frac{1}{2 \Delta^2} 
+        [
+            2 a^2 (f_1 - f_3)^2 + 2 b^2 (f_2 - f_3)^2 - (a^2 + b^2 - c^2) \times \\
+            \times ([2 f_1 f_2 - f_1^2 - f_2 ^ 2] + [f_1 ^2 - 2 f_3 f_1 + f_3 ^ 2] + [f_2^2 - 2 f_3 f_2 + f_3^2])
+        ] = \\
+      \end{multline*}
+      \begin{multline*}
+        = \frac{1}{2 \Delta^2} 
+        [
+            2 a^2 (f_1 - f_3)^2 + 2 b^2 (f_2 - f_3)^2 - 
+            \left( a^2 + b^2 - c^2 \right) \times \\ \times \left(-(f_1 - f_2)^2 + (f_1 - f_3)^2 + (f_2 - f_3)^2 \right)
+        ] = \\
+        = \frac{1}{2 \Delta^2} 
+        \left[
+            (a^2 + b^2 - c^2)(f_1 - f_2)^2 + (a^2 + c^2 - b^2)(f_1 - f_3)^2 + (b^2 + c^2 - a^2)(f_2 - f_3)^2 
+        \right] = \\
+        = \frac{1}{\Delta^2} 
+        \left[
+            ab \cos{(\gamma)} (f_1 - f_2)^2 + ac \cos{(\beta)}(f_1 - f_3)^2 + bc \cos{(\alpha)}(f_2 - f_3)^2 
+        \right] = \\
+        = \frac{2S(T)}{\Delta^2} 
+        \left[
+            \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 
+        \right].
+    \end{multline*}
+    \begin{multline*}
+        \int_{T}{\left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] dx dy} = \\
+        = \int\limits_0^1\int\limits_0^{1-u} \frac{2S(T)}{\Delta^2} 
+        \left[
+            \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 
+        \right] 
+        |\Delta| du dv = \\
+        = \frac{2S(T)}{|\Delta|} 
+        \left[
+            \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 
+        \right]
+        \int\limits_0^1\int\limits_0^{1-u} du dv = \\ 
+        = \frac{S(T)}{|\Delta|} 
+        \left[
+            \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 
+        \right].
+    \end{multline*}
+    Осталось заметить, что $|\Delta| = 2S(T)$. Окончательно получаем 
+    $$
+        \int_T ||\nabla{f}||^2 dT = \frac{1}{2} \left[ \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 \right] 
+    $$
+\begin{equation}
+\label{formula:Pinkall}
+  E_D(f) = \frac{1}{4} \sum_{T \in \mathfrak{T}} \left[ \cot{(\gamma)} (f_1 - f_2)^2 + \cot{(\beta)}(f_1 - f_3)^2 + \cot{(\alpha)}(f_2 - f_3)^2 \right].
+\end{equation}

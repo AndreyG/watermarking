@@ -1,2 +1,172 @@
 \section{Непрерывный случай}
 \label{sec:continious}
+
+Рассмотрим некоторую односвязную открытую область $\Omega \subset \mathbb{R}^2$ и функцию 
+$f: \Omega \to \mathbb{R}^2$, $f = \begin{pmatrix} f_x(x, y) \\ f_y(x, y) \end{pmatrix}$. 
+Предположим, что функция $f$ дифференцируема, а значит сущетсвуют частные производные $f_x, f_y$ по $x$ и $y$. 
+Будем использовать следующие обозначения
+$$
+  \nabla f_x = \begin{pmatrix} \frac{\partial f_x}{\partial x} \\ \frac{\partial f_x}{\partial y} \end{pmatrix}, 
+  \nabla f_y = \begin{pmatrix} \frac{\partial f_y}{\partial x} \\ \frac{\partial f_y}{\partial y} \end{pmatrix}, 
+  \nabla f = \begin{pmatrix} 
+    \frac{\partial f_x}{\partial x} & \frac{\partial f_x}{\partial y} \\
+    \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} \\
+  \end{pmatrix}. 
+$$
+Оценим изменения локальных углов после применения функции $f$.
+Пусть $\vect{r}~=~\begin{pmatrix} x \\ y \end{pmatrix}$ произвольная точка, 
+$\vect{r_1}$ есть точка смещенная относительно $\vect{r}$ на произвольный малый вектор $\vect{dr}$ 
+\begin{figure}[htb]
+  \begin{minipage}[b]{1.0\linewidth}
+    \centering
+    \begin{tikzpicture} 
+      \coordinate[label=below:$r$]        (origin)      at (0, 0);
+      \coordinate[label=above:$r_1$]   (dxdy)        at origin + (30:2);
+      \coordinate[label=above:$r_2$]  (dxdyrot)     at origin + (100:2);
+
+      \draw[->] (origin)--(dxdy);
+      \draw[->] (origin)--(dxdyrot);
+
+      \draw (origin) -- (30:0.5) arc (30:100:0.5);
+      \draw (60:0.74) node {$\alpha$};
+  
+      \draw [help lines][ ->] (2.5, 1) -- (5.0, 1);
+
+      \begin{scope}[shift={(0:8.5cm)}]
+        \coordinate[label=below:$f(r)$]   (forigin)      at (0, 0);
+        \coordinate[label=above:$f(r_1)$] (fdxdy)        at ($(forigin) + (45:1.9)$);
+        \coordinate[label=above:$f(r_2)$] (fdxdyrot)     at ($(forigin) + (100:2.1)$);
+        \coordinate[label=left:$f(r) + R^\alpha df$] (rotfdxdy)    at ($(forigin) + (115:1.9)$);
+
+        \draw[->] (forigin)--(fdxdy);
+        \draw[->] (forigin)--(fdxdyrot);
+        \draw[->][dashed] (forigin)--(rotfdxdy);
+        \draw[very thick] (rotfdxdy)--(fdxdyrot);
+        \draw (forigin) -- (45:0.5) arc (45:115:0.5);
+        \draw (80:0.74) node {$\alpha$};
+      \end{scope}
+    \end{tikzpicture} 
+  \end{minipage}
+  
+  \caption{Изменение локальных углов}
+  \label{fig:local_angles}
+\end{figure}
+$$\vect{r_1} = \vect{r} + \vect{dr} = \begin{pmatrix} x + dx \\ y + dy \end{pmatrix}$$
+и $\vec{r_2}$ есть образ точки $\vec{r_1}$ при повороте относительно точки $\vec{r}$ 
+на произвольный угол $\alpha$,
+$$
+\vect{r_2} = \vect{r} + R^\alpha \vect{dr} = \begin{pmatrix} x \\ y \end{pmatrix} + 
+\begin{pmatrix} \cos \alpha & -\sin \alpha \\ \sin \alpha & \cos \alpha \end{pmatrix} \begin{pmatrix} dx \\ dy \end{pmatrix},
+$$
+где $R^\alpha$ --- оператор поворота на угол $\alpha$ (рис. \ref{fig:local_angles}). Эти точки будут переведены
+функцией $f$ в точки 
+\begin{multline*}
+  \vect{f(r)}, 
+  \vect{f(r_1)} = \vect{f(r + dr)} = \vect{f(r)} + \vect{df} \approx \vect{f(r)} + (\nabla f) \vect{dr}, \\
+  \vect{f(r_2)} = \vect{f(r + R^\alpha dr)} ~\approx \vect{f(r)} + (\nabla f)(R^\alpha \vect{dr}).
+\end{multline*}
+соответственно. Если $f$ сохраняет локальные углы, то точка $\vect{f(r_2)}$ должны быть равна точке 
+$\vect{f(r_1)}$ повернутой относительно точки~$\vect{f(r)}$ на угол $\alpha$. 
+Иначе мы можем использовать длину вектора $\vect{q(r, dr, \alpha)}$
+$$\vect{q(r, dr, \alpha)} = \left(\vect{f(r)} + R^\alpha \vect{df}\right) - \vect{f(r_2)}$$ 
+как меру изменения угла $\alpha$ в точке $r$ при действии функции $f$.
+\begin{multline}
+\label{formula:angle_change_vec}
+  \vect{q(r, dr, \alpha)} = \left(\vect{f(r)} + R^\alpha \vect{df} \right) - \vect{f(r_2)} \approx \\
+  \approx (\vect{f(r)} + R^\alpha (\nabla f) \vect{dr}) - (\vect{f(r)} + (\nabla f)(R^\alpha \vect{dr})) =  
+  \left[R^\alpha (\nabla f) - (\nabla f) R^\alpha \right] \vect{dr}. 
+\end{multline}
+\begin{multline}
+\label{formula:ugly_commutant}
+  R^\alpha (\nabla f) - (\nabla f) R^\alpha =\
+  \begin{pmatrix} 
+    \cos \alpha & -\sin \alpha \\ 
+    \sin \alpha & \cos \alpha 
+  \end{pmatrix} 
+  \begin{pmatrix} 
+    \frac{\partial f_x}{\partial x} & \frac{\partial f_x}{\partial y} \\
+    \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} 
+  \end{pmatrix} - \\
+  - \begin{pmatrix} 
+    \frac{\partial f_x}{\partial x} & \frac{\partial f_x}{\partial y} \\
+    \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} 
+  \end{pmatrix}
+  \begin{pmatrix} 
+    \cos \alpha & -\sin \alpha \\
+    \sin \alpha & \cos \alpha 
+  \end{pmatrix} = \\
+  = \begin{pmatrix}
+    \frac{\partial f_x}{\partial x} \cos \alpha - \frac{\partial f_y}{\partial x} \sin \alpha &
+    \frac{\partial f_x}{\partial y} \cos \alpha - \frac{\partial f_y}{\partial y} \sin \alpha \\
+    \frac{\partial f_x}{\partial x} \sin \alpha + \frac{\partial f_y}{\partial x} \cos \alpha &
+    \frac{\partial f_x}{\partial y} \sin \alpha + \frac{\partial f_y}{\partial y} \cos \alpha 
+  \end{pmatrix} - \\
+  - \begin{pmatrix} 
+    \frac{\partial f_x}{\partial x} \cos \alpha + \frac{\partial f_x}{\partial y} \sin \alpha &
+    - \frac{\partial f_x}{\partial x} \sin \alpha + \frac{\partial f_x}{\partial y} \cos \alpha \\
+    \frac{\partial f_y}{\partial x} \cos \alpha + \frac{\partial f_y}{\partial y} \sin \alpha &
+    - \frac{\partial f_y}{\partial x} \sin \alpha + \frac{\partial f_y}{\partial y} \cos \alpha 
+  \end{pmatrix} = \\
+  = \sin \alpha \begin{pmatrix}
+    -(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}) &
+    \frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y} \\
+    \frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y} &
+    \frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x} 
+  \end{pmatrix}.
+\end{multline}
+Подставляя (\ref{formula:ugly_commutant}) в формулу (\ref{formula:angle_change_vec}) получаем
+\begin{multline*} 
+  \left| \vect{q(r, dr, \alpha)} \right| = 
+  \left| \left[R^\alpha (\nabla f) - (\nabla f) R^\alpha \right] \vect{dr} \right| 
+  = \left| \sin \alpha \begin{pmatrix}
+    -(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}) &
+    \frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y} \\
+    \frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y} &
+    \frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x} 
+  \end{pmatrix} \vect{dr} \right| = \\
+  = |\sin \alpha| \sqrt{\left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2 + \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2} \left| dr \right|.
+\end{multline*}
+Легко видеть, что вектор $\vect{q(r, dr, \alpha)}$ обращается в 0 тогда и только тогда, когда
+$$\begin{cases}
+  \frac{\partial f_x}{\partial x} = \frac{\partial f_y}{\partial y} \\
+  \frac{\partial f_x}{\partial y} = -\frac{\partial f_y}{\partial x} 
+\end{cases}$$
+то есть функции $f_x, f_y$ удолетворяют уравнениям Коши-Римана, а значит $f$ --- голоморфна. 
+С другой стороны, если производная $f$ в смысле $\mathbb{C}$ в точке $\vect{r}$ обращается в 0, это значит, что
+$f$ переводит некоторую область карты в одну точку, то есть сильно искажает. Таким образом ''идеальная'' в
+смысле сохранения локальных углов функция должны быть голоморфна и ее производная в смысле $\mathbb{C}$ должна
+быть отлична от 0, то есть функция должна быть конформна, что естественно.
+
+Если $f$ не конформна длина вектора $\vect{q(r, dr, \alpha)}$ максимальна когда $\alpha = \pm \frac{\pi}{2}$ 
+и на зависит от направления $\vect{dr}$. 
+\begin{equation*}
+  \left(\frac{\left| {q(r, dr, \pm \frac{\pi}{2})} \right|}{|dr|}\right)^2 = 
+  \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2 + 
+  \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 
+\end{equation*}
+Предлагается использовать функционал 
+\begin{equation}
+\label{formula:EC_Def}
+  E_C(f) = \frac{1}{2} \int_{\Omega}\left[{ 
+    \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 + 
+    \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2} \right] d\Omega   
+\end{equation}
+называемый \textit{конформной энергией} (\cite{Polthier}) в качестве меры искажения области $\Omega$ после
+примнения к ней функции $f$. 
+
+Формулу~(\ref{formula:EC_Def}) удобно переписать в виде
+\begin{multline}
+\label{formula:EC}
+  E_C(f) = \frac{1}{2} \int_{\Omega}\left[{
+      \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 + 
+      \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2}\right] d\Omega = \\
+  = \frac{1}{2} \int_{\Omega}\left[\left(\frac{\partial f_x}{\partial x}\right)^2 + \left(\frac{\partial f_y}{\partial y}\right)^2 + \left(\frac{\partial f_x}{\partial y}\right)^2 + 
+  \left(\frac{\partial f_y}{\partial x}\right)^2 \right] d\Omega - \\
+  - \int_{\Omega}\left[\frac{\partial f_x}{\partial x} \frac{\partial f_y}{\partial y} - \frac{\partial f_x}{\partial y} \frac{\partial f_y}{\partial x}\right] d\Omega = \\
+  = \frac{1}{2} \int_{\Omega} \left[ \left| \nabla f_x \right| ^ 2 + \left| \nabla f_y \right| ^ 2 \right] d\Omega - \int_{\Omega} \det {\begin{pmatrix} 
+    \frac{\partial f_x}{\partial x} & \frac{\partial f_x}{\partial y} \\
+    \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} \\
+  \end{pmatrix}} d\Omega = \\
+  = E_D(f) - \int_{\Omega} \det (\nabla f) d\Omega,
+\end{multline}
+где $E_D(f)$ обозначает фукнционал, называемый \textit{энергией Дирихле}.
