@@ -15,7 +15,7 @@ $$
 $$
 Оценим изменения локальных углов после применения функции $f$.
 Пусть $\vect{r}~=~\begin{pmatrix} x \\ y \end{pmatrix}$ произвольная точка, 
-$\vect{r_1}$ есть точка смещенная относительно $\vect{r}$ на произвольный малый вектор $\vect{dr}$ 
+$\vect{r_1} = \vect{r} + \vect{dr} = \begin{pmatrix} x + dx \\ y + dy \end{pmatrix}$ есть точка смещенная относительно $\vect{r}$ на произвольный малый вектор $\vect{dr}$
 \begin{figure}[htb]
   \begin{minipage}[b]{1.0\linewidth}
     \centering
@@ -51,9 +51,8 @@ $\vect{r_1}$ есть точка смещенная относительно $\v
   \caption{Изменение локальных углов}
   \label{fig:local_angles}
 \end{figure}
-$$\vect{r_1} = \vect{r} + \vect{dr} = \begin{pmatrix} x + dx \\ y + dy \end{pmatrix}$$
 и $\vec{r_2}$ есть образ точки $\vec{r_1}$ при повороте относительно точки $\vec{r}$ 
-на произвольный угол $\alpha$,
+на произвольный угол~$\alpha$,
 $$
 \vect{r_2} = \vect{r} + R^\alpha \vect{dr} = \begin{pmatrix} x \\ y \end{pmatrix} + 
 \begin{pmatrix} \cos \alpha & -\sin \alpha \\ \sin \alpha & \cos \alpha \end{pmatrix} \begin{pmatrix} dx \\ dy \end{pmatrix},
@@ -138,7 +137,7 @@ $f$ переводит некоторую область карты в одну 
 быть отлична от 0, то есть функция должна быть конформна, что естественно.
 
 Если $f$ не конформна длина вектора $\vect{q(r, dr, \alpha)}$ максимальна когда $\alpha = \pm \frac{\pi}{2}$ 
-и на зависит от направления $\vect{dr}$. 
+и не зависит от направления $\vect{dr}$. 
 \begin{equation*}
   \left(\frac{\left| {q(r, dr, \pm \frac{\pi}{2})} \right|}{|dr|}\right)^2 = 
   \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2 + 
@@ -152,7 +151,7 @@ $f$ переводит некоторую область карты в одну 
     \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2} \right] d\Omega   
 \end{equation}
 называемый \textit{конформной энергией} (\cite{Polthier}) в качестве меры искажения области $\Omega$ после
-примнения к ней функции $f$. 
+применения к ней функции $f$. 
 
 Формулу~(\ref{formula:EC_Def}) удобно переписать в виде
 \begin{multline}
