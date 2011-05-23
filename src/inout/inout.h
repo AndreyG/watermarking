@@ -51,6 +51,10 @@ namespace inout
         double noise_lower_bound, noise_upper_bound, noise_step;
     };
 	
+    /*!
+     * \brief Parameters for watermarking::embedding_impl construction
+     * \sa watermarking::embegging_impl::embedding_impl
+     */
     struct factorization_params_t
     {
         explicit factorization_params_t(std::string const & filepath);

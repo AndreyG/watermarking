@@ -1,3 +1,7 @@
+/*!
+ * \file main.cpp
+ */
+
 #include "stdafx.h"
 
 #include "inout/inout.h"
@@ -14,6 +18,7 @@
 typedef geometry::planar_graph_t                         graph_t;
 typedef std::auto_ptr< watermarking::embedding_impl >    embedding_impl_ptr;
 
+/*! Wrapper for inout::read_graph */
 graph_t create_graph( std::string const & filepath )
 {
     std::ifstream in(filepath.c_str());
@@ -24,6 +29,7 @@ graph_t create_graph( std::string const & filepath )
     return graph;
 }
 
+/*! Function for creating embedding_impl from graph and factorization parameters */
 embedding_impl_ptr create_embedding( graph_t const & graph, std::string const & factorization_conf )
 {
     inout::factorization_params_t params(factorization_conf);
@@ -81,6 +87,7 @@ namespace
     }
 }
 
+/** Wrapper for inout::write_graph */
 void dump_graph(graph_t const & graph, std::string const & filepath)
 {
     std::ofstream out(filepath.c_str());

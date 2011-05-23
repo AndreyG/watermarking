@@ -1,6 +1,10 @@
 #ifndef _EMBEDDING_H_
 #define _EMBEDDING_H_
 
+/**
+ * \file watermarking/embedding.h
+ */
+
 #include "common.h"
 
 using boost::lexical_cast;
@@ -9,6 +13,10 @@ namespace watermarking
 {
     namespace WeightType
     {
+        //! Spectral analysers types
+        /*!
+         * To see supporting now types go to \link from_str(std::string const &) definition.
+         */
         enum Type
         {
             Unweighted, Conformal, Dirichlet, SinSum, ConstrainedSinSum, TypeSize
@@ -17,6 +25,9 @@ namespace watermarking
         Type from_str(std::string const & str);
     }
     
+    /*! 
+     * \brief Main class for embedding watermarking 
+     */
     struct embedding_impl
     {
         typedef geometry::planar_graph_t  								graph_t;
@@ -31,11 +42,21 @@ namespace watermarking
             SUBDIVIDE_PLANE, BUILD_TRIANGULATIONS, FACTORIZE, MODIFY_VERTICES, STEP_SIZE
         };
         
+        //! Main constructor
+        /*!
+         * \param graph input graph
+         * \param max_patch_size maximal number of vertices in one subarea
+         * \param type type of spectral analyser used for embedding
+         * \param use_edges defines if constrained or not triangulation will be used to constructing graph for spectral anaylysis
+         * \param step_by_step defines if following steps: {subdivide plane, build triangulations, factorize triangulation graphs}
+         *                              will be maked simultaneously
+         */
         embedding_impl( graph_t const & graph, size_t max_patch_size, 
-                        WeightType::Type, bool use_edges, bool step_by_step );
+                        WeightType::Type type, bool use_edges, bool step_by_step );
 
         void modify_vertices( message_t const & message, size_t chip_rate, int key, double alpha );
 
+        //! Reading constructor
         explicit embedding_impl( std::istream & in );
 
         void dump( std::ostream & out ) const;
