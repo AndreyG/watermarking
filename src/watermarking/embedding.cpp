@@ -121,7 +121,7 @@ namespace watermarking
 
         /*
         subdivided_plane_viewer_t viewer(&graph_, &subdivision_, res); 
-        vis_system::run_viewer(&viewer);
+        visualization::vis_system::run_viewer(&viewer);
         */
 
         return res;

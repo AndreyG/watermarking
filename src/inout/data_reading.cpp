@@ -1,5 +1,9 @@
 #include "../stdafx.h"
 
+/*!
+ * \file data_reading.cpp
+ */
+
 #include "inout.h"
 
 namespace inout
@@ -99,6 +103,8 @@ message_params_t::message_params_t(std::string const & filepath)
     read(vm, alpha,         "alpha");
 }
 
+//! graph reading
+/*! \param graph it's supposed that graph is empty */
 void read_graph( geometry::planar_graph_t & graph, std::istream & in )
 {
     size_t n, m;

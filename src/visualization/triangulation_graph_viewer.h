@@ -4,7 +4,7 @@
 #include "qtviewer.h"
 
 template< class Triangulation, class Scalar >
-struct triangulation_graph_viewer_t : viewer_t
+struct triangulation_graph_viewer_t : visualization::viewer_t
 {
     typedef geometry::triangulation_graph<Triangulation> graph_t;
 
@@ -13,7 +13,7 @@ struct triangulation_graph_viewer_t : viewer_t
         , weight_(weight)
     {}
 
-    void draw(drawer_t & drawer) const
+    void draw(visualization::drawer_t & drawer) const
     {
         const size_t N = graph_->vertices_num();
 
@@ -31,8 +31,22 @@ struct triangulation_graph_viewer_t : viewer_t
             point_t const & beg = graph_->vertex(edge.b);
             point_t const & end = graph_->vertex(edge.e); 
             drawer.draw_line(beg, end);
+        }
+    }
 
-            *drawer.global_stream((beg + end) / 2) << weight_[N * edge.e + edge.b];
+    void print(visualization::printer_t & prn) const
+    {
+        const size_t N = graph_->vertices_num();
+
+        using geometry::point_t;
+
+        for (size_t i = 0; i != graph_->edges_num(); ++i)
+        {
+            typename graph_t::edge_t const & edge = graph_->edge(i);
+            
+            point_t const & beg = graph_->vertex(edge.b);
+            point_t const & end = graph_->vertex(edge.e); 
+            *prn.global_stream((beg + end) / 2) << weight_[N * edge.e + edge.b];
         }
     }
 

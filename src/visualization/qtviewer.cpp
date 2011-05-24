@@ -5,9 +5,15 @@
 #include "../utility/debug_stream.h"
 #include "../geometry/point.h"
 #include "../inout/inout.h"
+#include "drawer_impl.h"
+#include "printer_impl.h"
+
+namespace visualization
+{
 
 stream_t::~stream_t() {}
 drawer_t::~drawer_t() {}
+printer_t::~printer_t() {}
 viewer_t::~viewer_t() {}
 
 boost::scoped_ptr<QApplication> vis_system::app;
@@ -21,116 +27,6 @@ void vis_system::init(int argc, char ** argv)
 namespace
 {
 using geometry::point_t;
-
-struct drawer_impl : drawer_t
-{
-    void set_color(QColor const & c);
-    void draw_line(point_t const & a, point_t const & b);
-    void draw_point(point_t const & pt, size_t radius);
-    std::unique_ptr<stream_t> corner_stream();
-    std::unique_ptr<stream_t> global_stream(point_t const & pt);
-
-    drawer_impl(boost::function<void (int, int, const char *)>          const & draw_string_corner,
-                boost::function<void (double, double, const char *)>    const & draw_string_global)
-        : current_color_ (Qt::black)
-        , corner_stream_height_indent_(15)
-        , draw_string_corner_(draw_string_corner)
-        , draw_string_global_(draw_string_global)
-    {}
-
-    struct point_buffer_t
-    {
-        std::vector<GLdouble> points;
-        QColor color;
-        size_t radius;
-    };
-
-    struct segment_buffer_t
-    {
-        std::vector<GLdouble> segments;
-        QColor color;
-    };
-
-    std::vector<point_buffer_t>     point_buffers;
-    std::vector<segment_buffer_t>   segment_buffers;
-
-private:
-    QColor current_color_;
-    int corner_stream_height_indent_;
-    boost::function<void (int, int, const char *)>          draw_string_corner_;
-    boost::function<void (double, double, const char *)>   draw_string_global_;
-};
-
-void drawer_impl::set_color(QColor const & c)
-{
-    current_color_ = c;
-}
-
-void drawer_impl::draw_line(point_t const & a, point_t const & b)
-{
-    if (segment_buffers.empty() || (segment_buffers.back().color != current_color_))
-    {
-        segment_buffers.push_back(segment_buffer_t());
-        segment_buffers.back().color = current_color_;
-    }
-    std::vector<GLdouble> & buffer = segment_buffers.back().segments;
-    buffer.push_back(a.x());
-    buffer.push_back(a.y());
-    buffer.push_back(b.x());
-    buffer.push_back(b.y());
-}
-
-void drawer_impl::draw_point(point_t const & pt, size_t radius)
-{
-    if (point_buffers.empty() || (point_buffers.back().color != current_color_) ||
-        (point_buffers.back().radius != radius))
-    {
-        point_buffers.push_back(point_buffer_t());
-        point_buffers.back().color = current_color_;
-        point_buffers.back().radius = radius;
-    }
-    std::vector<GLdouble> & buffer = point_buffers.back().points;
-    buffer.push_back(pt.x());
-    buffer.push_back(pt.y());
-}
-
-struct stream_impl : stream_t
-{
-    explicit stream_impl(boost::function<void (const char *)> const & write)    
-        : write_(write)
-    {}
-
-#define PRINT(type) \
-    stream_t & operator << (type t) \
-    { \
-        ss_ << t; \
-        return *this; \
-    }
-    PRINT(const char *)
-    PRINT(std::string const &)
-    PRINT(size_t)
-    PRINT(std::complex<double> const &)
-    PRINT(point_t const &)
-#undef PRINT
-
-    ~stream_impl() { write_(ss_.str().c_str()); }
-
-private:
-    std::stringstream ss_;
-    boost::function<void (const char*)> write_; 
-};
-
-std::unique_ptr<stream_t> drawer_impl::corner_stream()
-{
-    std::unique_ptr<stream_t> stream(new stream_impl(boost::bind(draw_string_corner_, 10, corner_stream_height_indent_, _1)));
-    corner_stream_height_indent_ += 15;
-    return stream;
-}
-
-std::unique_ptr<stream_t> drawer_impl::global_stream(point_t const & pt)
-{
-    return std::unique_ptr<stream_t>(new stream_impl(boost::bind(draw_string_global_, pt.x(), pt.y(), _1)));
-}
 
 struct main_window_t : QGLWidget
 {
@@ -152,9 +48,6 @@ private:
     void resize_impl(int, int);
     point_t screen_to_global(QPoint const & screen_pos) const;
 
-private slots:
-    void repaint();
-
 private:
     void draw_string(int x, int y, const char * s);
     void draw_string_global(double x, double y, const char * s);
@@ -167,6 +60,7 @@ private:
     point_t current_pos_;
     double  zoom_;
     boost::optional<point_t> start_point_;
+    drawer_impl     drawer_;
 };
 
 main_window_t::main_window_t(viewer_t * viewer)
@@ -176,6 +70,7 @@ main_window_t::main_window_t(viewer_t * viewer)
     , zoom_(1.0)
 {
     setMouseTracking(true);
+    viewer_->draw(drawer_);
 }
 
 void main_window_t::initializeGL()
@@ -183,11 +78,6 @@ void main_window_t::initializeGL()
 	assert(doubleBuffer());
     setAutoBufferSwap(true);
     qglClearColor(Qt::black);
-}
-
-void main_window_t::repaint()
-{
-    updateGL();
 }
 
 void main_window_t::resize_impl(int screen_w, int screen_h)
@@ -212,38 +102,47 @@ void main_window_t::resizeGL(int screen_w, int screen_h)
 
 void main_window_t::paintGL()
 {
+    util::stopwatch _("main_window_t::paintGL()");
+
     glClear(GL_COLOR_BUFFER_BIT);
-
-    drawer_impl drawer( boost::bind(&main_window_t::draw_string, this, _1, _2, _3),
-                        boost::bind(&main_window_t::draw_string_global, this, _1, _2, _3));
-
-    *drawer.corner_stream() << "Mouse pos: " << current_pos_;
     
-    viewer_->draw(drawer);
-
-    foreach (drawer_impl::point_buffer_t const & buffer, drawer.point_buffers)
+    foreach (drawer_impl::point_buffer_t const & buffer, drawer_.point_buffers)
     {
-        qglColor(buffer.color);
         glPointSize(buffer.radius);
 
         glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(2, GL_DOUBLE, 0, &buffer.points[0]);
+        glEnableClientState(GL_COLOR_ARRAY);
+        
+        glVertexPointer (2, GL_DOUBLE, 0, &buffer.points[0]);
+        glColorPointer  (3, GL_DOUBLE, 0, &buffer.colors[0]);
 
         glDrawArrays(GL_POINTS, 0, buffer.points.size() / 2);
 
         glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
     }
 
-    foreach (drawer_impl::segment_buffer_t const & buffer, drawer.segment_buffers)
+    foreach (drawer_impl::segment_buffer_t const & buffer, drawer_.segment_buffers)
     {
-        qglColor(buffer.color);
+        glLineWidth(buffer.width);
         
         glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(2, GL_DOUBLE, 0, &buffer.segments[0]);
+        glEnableClientState(GL_COLOR_ARRAY);
+
+        glVertexPointer (2, GL_DOUBLE, 0, &buffer.segments[0]);
+        glColorPointer  (3, GL_DOUBLE, 0, &buffer.colors[0]);
 
         glDrawArrays(GL_LINES, 0, buffer.segments.size() / 2);
+        
         glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
     }
+
+    printer_impl printer(   boost::bind(&main_window_t::draw_string, this, _1, _2, _3),
+                            boost::bind(&main_window_t::draw_string_global, this, _1, _2, _3));
+
+    *printer.corner_stream() << "Mouse pos: " << current_pos_;
+    viewer_->print(printer);
 }
 
 void main_window_t::wheelEvent(QWheelEvent * e)
@@ -305,7 +204,11 @@ void main_window_t::keyReleaseEvent(QKeyEvent * event)
         break;
     default:
         if (viewer_->on_key(event->key()))
+        {
+            drawer_.clear();
+            viewer_->draw(drawer_);
             updateGL();
+        }
     }
     event->accept();
 }
@@ -339,4 +242,6 @@ void vis_system::run_viewer(viewer_t * viewer)
     main_window_t * wnd = new main_window_t(viewer);
     wnd->show();
     app->exec(); 
+}
+
 }

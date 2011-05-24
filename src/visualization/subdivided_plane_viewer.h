@@ -1,7 +1,7 @@
 #include "qtviewer.h"
 #include "../geometry/rectangle.h"
 
-struct subdivided_plane_viewer_t : viewer_t
+struct subdivided_plane_viewer_t : visualization::viewer_t
 {
     typedef geometry::planar_graph_t graph_t;
 
@@ -17,7 +17,7 @@ struct subdivided_plane_viewer_t : viewer_t
             color_[i] = QColor(rand() % 256, rand() % 256, rand() % 256);
     }
 
-    void draw(drawer_t & drawer) const
+    void draw(visualization::drawer_t & drawer) const
     {
         size_t const areas_num = color_.size();
         

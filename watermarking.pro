@@ -34,6 +34,7 @@ HEADERS += src/statistics.h \
            src/visualization/planar_graph_viewer.h \
            src/visualization/subdivided_plane_viewer.h \
            src/visualization/qtviewer.h \
+           src/visualization/drawer_impl.h \
            src/visualization/graph_diff_viewer.h \
            src/watermarking/common.h \
            src/watermarking/embedding.h \
@@ -51,6 +52,8 @@ SOURCES += src/main.cpp \
            src/utility/graph_fixing.cpp \
            src/utility/stopwatch.cpp \
            src/visualization/qtviewer.cpp \
+           src/visualization/drawer_impl.cpp \
+           src/visualization/printer_impl.cpp \
            src/watermarking/embedding.cpp \
            src/watermarking/extracting.cpp
 

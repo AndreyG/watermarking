@@ -1,7 +1,7 @@
 #include "qtviewer.h"
 #include "../geometry/planar_graph.h"
 
-struct graph_diff_viewer_t : viewer_t
+struct graph_diff_viewer_t : visualization::viewer_t
 {
     typedef geometry::planar_graph_t graph_t;
 
@@ -27,12 +27,16 @@ struct graph_diff_viewer_t : viewer_t
         graph_name_[2] = third_graph_name;
     }
 
-    void draw(drawer_t & drawer) const
+    void draw(visualization::drawer_t & drawer) const
     {
         for (int i = 0; i != 3; ++i) if (draw_[i])
             draw_graph(drawer, graph_[i], vertex_color_[i], edge_color_[i]);
+    }
+
+    void print(visualization::printer_t & prn) const
+    {
         for (int i = 0; i != 3; ++i)
-            *drawer.corner_stream() << "key " << (i + 1) << ": " << graph_name_[i];
+            *prn.corner_stream() << "key " << (i + 1) << ": " << graph_name_[i];
     }
 
     bool on_key(int key)
@@ -47,7 +51,7 @@ struct graph_diff_viewer_t : viewer_t
     };
 
 private:
-    void draw_graph(drawer_t & drawer, graph_t const * graph, 
+    void draw_graph(visualization::drawer_t & drawer, graph_t const * graph, 
                     QColor const & vertex_color, QColor const & edge_color) const
     {
         drawer.set_color(vertex_color);

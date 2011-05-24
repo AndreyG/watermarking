@@ -43,7 +43,7 @@ namespace watermarking
                 if (info > 0)
                 {
                     triangulation_graph_viewer_t<Trg, complex_traits::scalar_t> viewer(&g, a);
-                    vis_system::run_viewer(&viewer);
+                    visualization::vis_system::run_viewer(&viewer);
 
 				    throw std::exception();
                 }

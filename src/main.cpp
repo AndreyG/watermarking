@@ -99,7 +99,7 @@ bool has_duplicate_vertices(graph_t const &);
 
 int main( int argc, char** argv )
 {
-    vis_system::init(argc, argv);
+    visualization::vis_system::init(argc, argv);
 
     using inout::config_t;
     config_t config(argc, argv);
