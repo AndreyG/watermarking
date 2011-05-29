@@ -25,7 +25,7 @@ namespace util
     {
         static const char * color[MESSAGE_TYPE_SIZE] =
         {
-            "\033[0;30m", 
+            "\033[0;37m", 
             "\033[1;34m" 
         };
 

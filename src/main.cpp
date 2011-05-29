@@ -119,7 +119,7 @@ int main( int argc, char** argv )
 
             /*
             planar_graph_viewer_t viewer(&graph);
-            vis_system::run_viewer(&viewer);
+            visualization::vis_system::run_viewer(&viewer);
             */
 
             ew = create_embedding(graph, config.factorization);
