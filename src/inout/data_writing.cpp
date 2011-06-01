@@ -9,7 +9,7 @@ namespace inout
     	out << graph.vertices_num() << "\t" << graph.edges_num() << "\n";
 		for ( auto v = graph.vertices_begin(); v != graph.vertices_end(); ++v )
     	{
-			out << *v << "\n";
+			out << std::setprecision(32) << *v << "\n";
     	}
 		for ( auto e = graph.edges_begin(); e != graph.edges_end(); ++e )
     	{

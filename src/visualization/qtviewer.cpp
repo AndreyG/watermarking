@@ -102,8 +102,6 @@ void main_window_t::resizeGL(int screen_w, int screen_h)
 
 void main_window_t::paintGL()
 {
-    util::stopwatch _("main_window_t::paintGL()");
-
     glClear(GL_COLOR_BUFFER_BIT);
     
     foreach (drawer_impl::point_buffer_t const & buffer, drawer_.point_buffers)
