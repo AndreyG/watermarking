@@ -43,8 +43,10 @@ using boost::make_tuple;
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
 
+#ifdef INCLUDE_QT_HEADERS
 #include <QApplication>
 #include <QColor>
 #include <QtOpenGL>
+#endif
 
 #endif /*_STDAFX_*/

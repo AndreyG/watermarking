@@ -4,7 +4,9 @@
 
 typedef geometry::planar_graph_t graph_t;
 
-void fix_graph( graph_t & graph );
+bool loops_exist(graph_t const &);
+bool has_duplicate_vertices(graph_t const &);
+void fix_graph(graph_t & graph);
 
 int main(int argc, char ** argv)
 {
@@ -17,6 +19,8 @@ int main(int argc, char ** argv)
     }
 
     fix_graph(g);
+    assert(!has_duplicate_vertices(g));
+    assert(!loops_exist(g));
 
     {
         std::ofstream out(argv[1]);

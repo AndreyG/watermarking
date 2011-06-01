@@ -14,8 +14,8 @@ OBJECTS_DIR = bin
 DESTDIR = bin
 
 # Input
-HEADERS += src/statistics.h \
-           src/stdafx.h \
+HEADERS += src/stdafx.h \
+           src/statistics.h \
            src/algorithms/median.h \
            src/algorithms/util.h \
            src/geometry/planar_graph.h \
@@ -44,19 +44,25 @@ HEADERS += src/statistics.h \
            src/watermarking/weights/conformal.h \
            src/watermarking/weights/dirichlet.h \
            src/watermarking/weights/unweighted.h
-SOURCES += src/main.cpp \
-           src/statistics.cpp \
-           src/inout/data_reading.cpp \
+
+preprocessing {
+    SOURCES +=  src/preprocessing.cpp
+} else {
+    SOURCES +=  src/main.cpp \
+                src/visualization/qtviewer.cpp \
+                src/visualization/drawer_impl.cpp \
+                src/visualization/printer_impl.cpp \
+                src/watermarking/embedding.cpp \
+                src/watermarking/extracting.cpp \
+                src/statistics.cpp 
+}
+
+SOURCES += src/inout/data_reading.cpp \
            src/inout/data_writing.cpp \
            src/utility/debug_stream.cpp \
            src/utility/graph_checking.cpp \
            src/utility/graph_fixing.cpp \
-           src/utility/stopwatch.cpp \
-           src/visualization/qtviewer.cpp \
-           src/visualization/drawer_impl.cpp \
-           src/visualization/printer_impl.cpp \
-           src/watermarking/embedding.cpp \
-           src/watermarking/extracting.cpp
+           src/utility/stopwatch.cpp 
 
 macx {
     QMAKE_CXX=g++-mp-4.5
@@ -73,25 +79,33 @@ macx {
     INCLUDEPATH+=/opt/local/include
 }
 
-QT += opengl
+!preprocessing {
+    QT += opengl
 
-macx {
-    MKLLIB=/opt/intel/mkl/lib 
-} else {
-    MKLLIB=/opt/intel/mkl/lib/intel64
-}
+    DEFINES += INCLUDE_QT_HEADERS
 
-macx {
-    LIBS += -L/usr/local/boost_1_46_1/stage/lib
-    LIBS += -L/opt/local/lib
-    LIBS += -L$$MKLLIB
-    LIBS += -lmkl_core -lmkl_intel -lmkl_intel_thread
-} else {
-    LIBS += -Wl,--start-group \
-            	"$$MKLLIB/libmkl_intel_lp64.a" \
-                "$$MKLLIB/libmkl_gnu_thread.a" \
-                "$$MKLLIB/libmkl_core.a" \
-            -Wl,--end-group 
+    macx {
+        MKLLIB=/opt/intel/mkl/lib 
+    } else {
+        MKLLIB=/opt/intel/mkl/lib/intel64
+    }
+
+    macx {
+        LIBS += -L/usr/local/boost_1_46_1/stage/lib
+        LIBS += -L/opt/local/lib
+        LIBS += -L$$MKLLIB
+        LIBS += -lmkl_core -lmkl_intel -lmkl_intel_thread
+    } else {
+        LIBS += -Wl,--start-group \
+                	"$$MKLLIB/libmkl_intel_lp64.a" \
+                    "$$MKLLIB/libmkl_gnu_thread.a" \
+                    "$$MKLLIB/libmkl_core.a" \
+                -Wl,--end-group 
+    }
 }
 
 LIBS += -lgomp -lgmp -lboost_program_options -lCGAL
+
+preprocessing {
+    TARGET = preprocessing
+}
