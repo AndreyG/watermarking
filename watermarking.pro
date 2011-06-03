@@ -31,9 +31,7 @@ HEADERS += src/stdafx.h \
            src/utility/stopwatch.h 
 
 main {
-    HEADERS += src/visualization/my_visualizer.h \
-               src/visualization/viewer.h \
-               src/visualization/planar_graph_viewer.h \
+    HEADERS += src/visualization/planar_graph_viewer.h \
                src/visualization/subdivided_plane_viewer.h \
                src/visualization/qtviewer.h \
                src/visualization/drawer_impl.h \
