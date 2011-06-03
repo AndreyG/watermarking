@@ -55,7 +55,6 @@ object GraphicViewer {
       }
       arguments.add(args)
       values.add(vals)
-      println(pairs.size)
     }
 	SwingUtilities.invokeLater(new Runnable() {
 	  override def run() {
@@ -63,6 +62,7 @@ object GraphicViewer {
 		  getContentPane.add(new GraphicPanel(arguments, values, titles, "noise", "success percent"))
 		  pack()
 		}
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(800, 600)
 		frame.setVisible(true)
 	  }

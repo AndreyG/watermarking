@@ -41,7 +41,8 @@ package common {
     object endl extends SpecialSymbol
 
     abstract sealed class Color
-    object black extends Color
+    object black extends Color  // тут под black подразумевается стандартный для
+                                // консоли цвет, то есть для моего ноутбука -- белый
     object green extends Color
     object red extends Color
     object blue extends Color
@@ -68,7 +69,7 @@ package common {
 
     def << (c: details.Color) : StreamWrapper = {
       out.print(c match {
-        case details.black  => "\033[0;30m"
+        case details.black  => "\033[0;37m"
         case details.red    => "\033[0;31m"
         case details.green  => "\033[0;32m"
         case details.blue   => "\033[0;34m"
