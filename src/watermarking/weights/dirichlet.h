@@ -20,19 +20,29 @@ namespace watermarking
 		{
 			util::stopwatch _("conformal_spectral_analyser::ctor");
 
-			fill_matrix( g );
+			fill_matrix(g);
 
 			std::vector< double > lambda( N );
 			vector_t a(e_);
+            vector_t a_copy(a);
 
-			{
-				util::stopwatch _("calculating eigenvectors");
+            MKL_INT eigenvalues_num = 0;
 
-				MKL_INT info = LAPACKE_dsyev( LAPACK_COL_MAJOR, 'V', 'L', N, &e_[0], N, &lambda[0] );
-				assert(info == 0);
-			}
+            {
+                util::stopwatch _("calculating eigenvectors");
 
-			check(e_, lambda, a);
+                std::vector<MKL_INT> isuppz(N);
+                MKL_INT il = 0, iu = 0;
+
+                MKL_INT info = LAPACKE_dsyevr(  LAPACK_COL_MAJOR, 'V', 'V', 'L', N, &a[0], N,
+                                                0.0, 1e6, il, iu, 1e-7,
+                                                &eigenvalues_num, &lambda[0], &e_[0], N, &isuppz[0] );
+			    assert(info == 0);
+            }               
+
+            K = eigenvalues_num;
+
+			check(e_, lambda, a_copy);
 		}
 
 	private:
@@ -85,19 +95,16 @@ namespace watermarking
 		{
 			util::stopwatch _("eigenvectors checking");
 
-			for ( size_t k = 0; k != N; ++k )
+			for ( size_t k = 0; k != K; ++k )
 			{
 				for ( size_t i = 0; i != N; ++i )
 				{
-					real_traits::scalar_t r = 0;
+					real_traits::scalar_t r = 0.0;
 					for ( size_t j = 0; j != N; ++j )
 					{
 						r += e[k * N + j] * ((i < j) ? a[i * N + j] : a[j * N + i]);
 					}
-					if (abs(e[k * N + i] * v[k] - r) / abs(v[k]) > 1e-3)
-						util::debug_stream() 	<< "achtung!!!		e[i] = " << e[k * N + i] 
-												<< ", v = " << v[k] << ", sum = " << r << ", diff = " << abs(e[k * N + i] * v[k] - r);  
-					assert(abs(e[k * N + i] * v[k] - r) / abs(v[k]) < 1e-3);
+					assert(abs(e[k * N + i] * v[k] - r) < 1e-3);
 				}
 			}
 		}

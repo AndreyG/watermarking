@@ -35,7 +35,6 @@ namespace watermarking
                 std::vector<MKL_INT> isuppz(N);
                 MKL_INT il = 0, iu = 0;
 
-				//MKL_INT info = LAPACKE_zheev( LAPACK_COL_MAJOR, 'V', 'L', N, &e_[0], N, &lambda[0] );
                 MKL_INT info = LAPACKE_zheevr(  LAPACK_COL_MAJOR, 'V', 'V', 'L', N, &a[0], N, 
                                                 0.0, 1e6, il, iu, 1e-7,
                                                 &eigenvalues_num, &lambda[0], &e_[0], N, &isuppz[0] );
@@ -80,12 +79,12 @@ namespace watermarking
 
 				size_t b = edge.b, e = edge.e;
 
-				using geometry::ctg;
-
-                size_t idx = (b < e) ? (b * N + e) : (e * N + b);
-
                 if (b < e)
                 {
+                    const size_t idx = b * N + e;
+
+				    using geometry::ctg;
+
 				    e_[idx] = -safe(ctg(g.vertex(b), g.vertex(edge.left), g.vertex(e)));
 				
 				    if (g.is_valid(edge.right))
