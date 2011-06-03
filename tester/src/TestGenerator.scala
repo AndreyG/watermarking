@@ -16,16 +16,17 @@ object TestGenerator {
   }
 
   /*
-  *   args(0) -- config file name
+  *     args(0) -- config file name
+  *     args(1) -- out file name (default value defined in script "generate-tests.sh" is "test-run.sh")
   */
   def main(args: Array[String]) {
-    assert(args.size == 1)
+    assert(args.size == 2)
     val attrs = new common.Attributes(new File(args(0)))
 
     val inputDir    = new DirWrapper(new File(attrs("input-dir")))
     val outputDir   = new DirWrapper(new File(attrs("output-dir")), toMake=true)
    
-    val out = new StreamWrapper(new PrintStream(new FileOutputStream(new File("test-run.sh"))))
+    val out = new StreamWrapper(new PrintStream(new FileOutputStream(new File(args(1)))))
 
     val noiseRange = genRange(parseDouble(attrs("noise-lower-bound")),
                               parseDouble(attrs("noise-upper-bound")),
