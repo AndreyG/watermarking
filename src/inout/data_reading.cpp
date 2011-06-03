@@ -111,7 +111,9 @@ void read_graph( geometry::planar_graph_t & graph, std::istream & in )
     in >> n >> m;
 	for ( size_t i = 0; i != n; ++i )
 	{
-		graph.add_vertex(read_point(in));
+        geometry::point_t pt;
+        in >> pt;
+		graph.add_vertex(pt);
 	}
 	for ( size_t i = 0; i != m; ++i )
 	{

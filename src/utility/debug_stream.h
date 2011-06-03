@@ -26,6 +26,7 @@ namespace util
 		~debug_stream();
 
 	private:
+        message_type type_;
 		std::stringstream ss_;
         static size_t tabs_num;
 		static std::stack< bool > is_first_;

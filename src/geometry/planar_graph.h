@@ -8,6 +8,7 @@ namespace geometry
 {
     struct planar_graph_t
     {
+        // -------------------- typedefs ------------------- //
         typedef point_t                     				vertex_t;
 		typedef std::vector< vertex_t >::const_iterator 	vertices_iterator;
 
@@ -15,22 +16,26 @@ namespace geometry
 		{
 			size_t b, e;
 		};
+
 		typedef std::vector< edge_t >::const_iterator 		edges_iterator;
 
-		size_t vertices_num() const { return vertices_.size(); }
+        // ---------------- constant accessors --------------- //
+		size_t vertices_num()   const { return vertices_.size();    }
+		size_t edges_num()      const { return edges_.size();       }
 
-		size_t edges_num() const { return edges_.size(); }
+		vertex_t const & vertex( size_t v ) const { return vertices_[v];        }
 
-		vertex_t const & vertex( size_t v ) const { return vertices_[v]; }
-		vertices_iterator vertices_begin() const { return vertices_.begin(); }
-		vertices_iterator vertices_end() const { return vertices_.end(); }
+		vertices_iterator vertices_begin()  const { return vertices_.begin();   }
+		vertices_iterator vertices_end()    const { return vertices_.end();     }
 		
-		edge_t const & edge( size_t e ) const { return edges_[e]; }
-		edges_iterator edges_begin() const { return edges_.begin(); }
-		edges_iterator edges_end() const { return edges_.end(); }
+		edge_t const & edge( size_t e ) const { return edges_[e];       }
+
+		edges_iterator edges_begin()    const { return edges_.begin();  }
+		edges_iterator edges_end()      const { return edges_.end();    }
 		
-		vertex_t & vertex( size_t v ) { return vertices_[v]; }
-		edge_t & edge( size_t e ) { return edges_[e]; }
+        // ------------------ mutators ---------------------- //
+		vertex_t    & vertex( size_t v ) { return vertices_[v]; }
+		edge_t      & edge  ( size_t e ) { return edges_[e];    }
 
 		size_t add_vertex( vertex_t const & v )
 		{

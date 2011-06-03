@@ -4,7 +4,6 @@
 #include "../utility/stopwatch.h"
 #include "../utility/debug_stream.h"
 #include "../geometry/point.h"
-#include "../inout/inout.h"
 #include "drawer_impl.h"
 #include "printer_impl.h"
 
@@ -195,7 +194,7 @@ void main_window_t::keyReleaseEvent(QKeyEvent * event)
         {
             std::stringstream ss;
             ss << QInputDialog::getText(this, "center selection", "type point: ").toStdString();
-            center_ = inout::read_point(ss);
+            ss >> center_;
             resize_impl(size().width(), size().height());
             updateGL();
         }

@@ -1,6 +1,8 @@
 #ifndef _POINT_H_
 #define _POINT_H_
 
+#include "../inout/util.h"
+
 namespace geometry
 {
     struct point_t
@@ -116,13 +118,6 @@ namespace geometry
         return a.x() * b.y() - a.y() * b.x();
     }
 
-	template<class Stream>
-	Stream& operator << (Stream & out, point_t const & pt)
-	{
-    	out << "(" << pt.x() << ", " << pt.y() << ")";
-    	return out;
-	}
-
 	inline double sqr( double x ) { return x * x; }
 
     inline double mod( point_t const & v )
@@ -134,6 +129,24 @@ namespace geometry
 	{
 		return point_t(r * cos(phi), r * sin(phi));
 	}
+    
+	template<class Stream>
+	Stream & operator << (Stream & out, geometry::point_t const & pt)
+	{
+    	out << "(" << pt.x() << ", " << pt.y() << ")";
+    	return out;
+	}
+
+    template< class Stream >
+    Stream & operator >> (Stream & in, geometry::point_t & pt)
+    {
+        inout::skip_char( in, '(' );
+        in >> pt.x();
+        inout::skip_char( in, ',' );
+        in >> pt.y();
+        inout::skip_char( in, ')' );   
+	    return in;
+    }
 }
 
 #endif /*_POINT_H_*/
