@@ -52,6 +52,7 @@ namespace watermarking
 
         void dump( std::ostream & out ) const
         {
+            out.precision(32);
 			out << N << " " << K << std::endl;
             for (size_t i = 0; i != K; ++i) 
             {
