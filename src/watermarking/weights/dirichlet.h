@@ -32,7 +32,7 @@ namespace watermarking
 				assert(info == 0);
 			}
 
-			//check(e_, lambda, a);
+			check(e_, lambda, a);
 		}
 
 	private:

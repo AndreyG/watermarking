@@ -1,8 +1,15 @@
+/**
+ * \file watermarking/weights/unweighted.h
+ */
+
 #include "../spectral_analysis.h"
 #include "../../geometry/triangulation_graph.h"
 
 namespace watermarking
 {
+    /*!
+     * \brief Spectral analysis by Ohbuchi
+     */
 	struct unweighted_spectral_analyser : spectral_analyser_impl< real_traits >
 	{
 		typedef spectral_analyser_impl< real_traits > 	base_t;
@@ -42,14 +49,15 @@ namespace watermarking
 			MKL_INT info = LAPACKE_dgeev(	LAPACK_COL_MAJOR, 'N', 'V', N, &e_[0], N, 
 											&lambda_real[0], &lambda_imag[0], 
 											&vectors_left[0], N, &vectors_right[0], N);
-			check(vectors_right, lambda_real, lambda_imag, e_);
 			assert(info == 0);
+			K = check(vectors_right, lambda_real, lambda_imag, e_);
 			e_.swap(vectors_right);
-
-            K = N;
 		}
 
-		void check(vector_t const & e, vector_t const & vr, vector_t const & vi, vector_t const & a)
+    private:
+
+        /*! \return number of correct calculated eigenvectors */
+		size_t check(vector_t const & e, vector_t const & vr, vector_t const & vi, vector_t const & a)
 		{
 			foreach ( double d, vi )
 				assert( d == 0 );
@@ -63,9 +71,20 @@ namespace watermarking
 					{
 						r += e[k * N + j] * a[i * N + j];
 					}
-					assert(abs(e[k * N + i] * vr[k] - r) < 1e-6);
+                    if (abs(e[k * N + i] * vr[k] - r) >= 1e-6)
+                    {
+                        util::debug_stream(util::debug_stream::WARNING) 
+                            << "r = " << r 
+                            << ", e[k, i] = " << e[k * N + i]
+                            << ", vr[k] = " << vr[k]
+                            << ", diff = " <<  abs(e[k * N + i] * vr[k] - r);
+                        util::debug_stream() << k << "-th vector";
+                        assert(k != 0);
+                        return k - 1;
+                    }
 				}
 			}
+            return N;
 		}
 	};
 }
