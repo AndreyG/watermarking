@@ -44,15 +44,8 @@ struct viewer_t
     virtual ~viewer_t();
 };
 
-struct vis_system
-{
-public:
-    static void init(int argc, char** argv);
-    static void run_viewer(viewer_t * viewer);
-private:
-    static boost::scoped_ptr<QApplication> app;
-};
+void run_viewer(viewer_t * viewer);
 
-}
+} // namespace visualization
 
 #endif

@@ -15,6 +15,8 @@
 #include "visualization/planar_graph_viewer.h"
 #include "visualization/graph_diff_viewer.h"
 
+#include "utility/debug_stream.h"
+
 typedef geometry::planar_graph_t                         graph_t;
 typedef std::auto_ptr< watermarking::embedding_impl >    embedding_impl_ptr;
 
@@ -99,7 +101,7 @@ bool has_duplicate_vertices(graph_t const &);
 
 int main( int argc, char** argv )
 {
-    visualization::vis_system::init(argc, argv);
+    QApplication app(argc, argv);
 
     using inout::config_t;
     config_t config(argc, argv);
@@ -151,10 +153,10 @@ int main( int argc, char** argv )
 
     for (double noise = config.noise_lower_bound; noise <= config.noise_upper_bound; noise += config.noise_step)
     {
-        //util::stopwatch _(boost::format("noise: %.3f") % noise);
+        util::stopwatch _(boost::format("noise: %.3f") % noise);
         for (size_t j = 0; j != config.attempts_num; ++j)
         {
-            //util::stopwatch _("attempt: " + boost::lexical_cast< std::string >(j));
+            util::stopwatch _("attempt: " + boost::lexical_cast< std::string >(j));
 
             std::string out_dir = (boost::format("%s/noise-%.3f/attempt-%d/") % config.result_dir % noise % j).str();
 
@@ -163,7 +165,7 @@ int main( int argc, char** argv )
             /*
             graph_diff_viewer_t viewer( &rearranged_graph, &modified_graph, &noised_graph,
                                         "original", "watermarked", "noised" );
-            vis_system::run_viewer(&viewer);
+            visualization::vis_system::run_viewer(&viewer);
             */
 
 	        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 
