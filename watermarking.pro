@@ -28,26 +28,33 @@ HEADERS += src/stdafx.h \
            src/inout/inout.h \
            src/utility/debug_stream.h \
            src/utility/random_generator.h \
-           src/utility/stopwatch.h \
-           src/visualization/my_visualizer.h \
-           src/visualization/viewer.h \
-           src/visualization/planar_graph_viewer.h \
-           src/visualization/subdivided_plane_viewer.h \
-           src/visualization/qtviewer.h \
-           src/visualization/drawer_impl.h \
-           src/visualization/printer_impl.h \
-           src/visualization/graph_diff_viewer.h \
-           src/watermarking/common.h \
-           src/watermarking/embedding.h \
-           src/watermarking/extracting.h \
-           src/watermarking/spectral_analysis.h \
-           src/watermarking/weights/conformal.h \
-           src/watermarking/weights/dirichlet.h \
-           src/watermarking/weights/unweighted.h
+           src/utility/stopwatch.h 
+
+main {
+    HEADERS += src/visualization/my_visualizer.h \
+               src/visualization/viewer.h \
+               src/visualization/planar_graph_viewer.h \
+               src/visualization/subdivided_plane_viewer.h \
+               src/visualization/qtviewer.h \
+               src/visualization/drawer_impl.h \
+               src/visualization/printer_impl.h \
+               src/visualization/graph_diff_viewer.h \
+               src/watermarking/common.h \
+               src/watermarking/embedding.h \
+               src/watermarking/extracting.h \
+               src/watermarking/spectral_analysis.h \
+               src/watermarking/weights/conformal.h \
+               src/watermarking/weights/dirichlet.h \
+               src/watermarking/weights/unweighted.h
+}
 
 preprocessing {
     SOURCES +=  src/preprocessing.cpp
-} else {
+} 
+converter {
+    SOURCES +=  src/converter.cpp    
+}
+main {
     SOURCES +=  src/main.cpp \
                 src/visualization/qtviewer.cpp \
                 src/visualization/drawer_impl.cpp \
@@ -79,7 +86,7 @@ macx {
     INCLUDEPATH+=/opt/local/include
 }
 
-!preprocessing {
+main {
     QT += opengl
 
     DEFINES += INCLUDE_QT_HEADERS
@@ -108,4 +115,7 @@ LIBS += -lgomp -lgmp -lboost_program_options -lCGAL
 
 preprocessing {
     TARGET = preprocessing
+}
+converter {
+    TARGET = converter
 }
