@@ -67,7 +67,8 @@ SOURCES += src/inout/data_reading.cpp \
            src/utility/debug_stream.cpp \
            src/utility/graph_checking.cpp \
            src/utility/graph_fixing.cpp \
-           src/utility/stopwatch.cpp 
+           src/utility/stopwatch.cpp \
+           src/utility/random_generator.cpp 
 
 macx {
     QMAKE_CXX=g++-mp-4.5

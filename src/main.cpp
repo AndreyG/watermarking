@@ -165,7 +165,7 @@ int main( int argc, char** argv )
             /*
             graph_diff_viewer_t viewer( &rearranged_graph, &modified_graph, &noised_graph,
                                         "original", "watermarked", "noised" );
-            visualization::vis_system::run_viewer(&viewer);
+            visualization::run_viewer(&viewer);
             */
 
 	        watermarking::message_t ex_message = watermarking::extract( rearranged_graph, noised_graph, subdivision, 

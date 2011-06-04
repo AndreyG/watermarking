@@ -2,7 +2,6 @@
 #define _RANDOM_GENERATOR_H_
 
 #include <boost/random.hpp>
-#include <ctime>
 
 namespace util
 {
@@ -11,18 +10,19 @@ namespace util
 
     struct random_generator
     {
-        random_generator( double radius )
-            : rng_( time( NULL ) )
-            , sampler_( rng_, normal_distribution( 0, radius ) )
-        {}
-
         double operator() ()
         {
             return sampler_();
         }
 
+        static random_generator & get(double radius);
+
     private:        
         typedef boost::normal_distribution< double > normal_distribution;
+        typedef std::map<double, std::unique_ptr<random_generator>> cache_t;
+        static cache_t cache_;
+
+        random_generator(double radius);
 
         mt19937 rng_;
         variate_generator< mt19937&, normal_distribution > sampler_;

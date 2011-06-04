@@ -71,7 +71,7 @@ namespace geometry
 
     inline planar_graph_t add_noise( planar_graph_t const & g, double radius )
     {
-        util::random_generator gen( radius );
+        util::random_generator & gen = util::random_generator::get(radius);
 
 		planar_graph_t res;
 		res.add_edges(g.edges_begin(), g.edges_end());
