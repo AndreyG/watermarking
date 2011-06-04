@@ -16,26 +16,26 @@
         f(u, v) = f_1 u + f_2 v + f_3(1-u-v) = (f_1 - f_3) u + (f_2 - f_3) v; \\
         \frac{\partial f}{\partial u} = f_1 - f_3 \mbox{, } \frac{\partial f}{\partial v} = f_2 - f_3. 
 \end{multline*} 
- \begin{multline*}
+ \begin{eqnarray*}
         \frac{\partial f}{\partial x} = \frac{\partial f}{\partial u} \frac{\partial u}{\partial x} + \frac{\partial f}{\partial v} \frac{\partial v}{\partial x} = 
             \frac{1}{\Delta}(y_2 - y_3)(f_1 - f_3) - \frac{1}{\Delta}(y_1 - y_3)(f_2 - f_3) = \\
             \frac{1}{\Delta}\left[(y_2 - y_3)(f_1 - f_3) - (y_1 - y_3)(f_2 - f_3)\right]. 
-    \end{multline*}
-    \begin{multline*}
+    \end{eqnarray*}
+    \begin{eqnarray*}
         \frac{\partial f}{\partial y} = \frac{\partial f}{\partial u} \frac{\partial u}{\partial y} + \frac{\partial f}{\partial v} \frac{\partial v}{\partial y} = 
             -\frac{1}{\Delta}(x_2 - y_3)(f_1 - f_3) + \frac{1}{\Delta}(x_1 - x_3)(f_2 - f_3) = \\
             \frac{1}{\Delta}\left[-(x_2 - x_3)(f_1 - f_3) + (x_1 - x_3)(f_2 - f_3)\right]. 
-    \end{multline*}
-    \begin{multline*}
+    \end{eqnarray*}
+    \begin{eqnarray*}
         \left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] = 
         \frac{1}{\Delta^2} 
         [
-            (f_1 - f_3)^2 [(y_2 - y_3)^2 + (x_2 - x_3)^2] + \\ + (f_2 - f_3)^2 [(y_1 - y_3)^2 + (x_1 - x_3)^2] % - \\
+            (f_1 - f_3)^2 [(y_2 - y_3)^2 + (x_2 - x_3)^2] + \\ + (f_2 - f_3)^2 [(y_1 - y_3)^2 + (x_1 - x_3)^2] - \\
             - 2 (f_1 - f_3)(f_2 - f_3)((y_2 - y_3)(y_1 - y_3) + (x_2 - x_3)(x_1 - x_3))
         ].
-    \end{multline*}
+    \end{eqnarray*}
     Введем обозначения: $\vect{AB} = \vect{c}$, $\vect{BC} = \vect{a}$, $\vect{CA} = \vect{b}$. Тогда предыдущую формулу можно записать следующим образом.
-    \begin{multline*}
+    \begin{eqnarray*}
         \left[\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2 \right] = 
         \frac{1}{\Delta^2} 
         \left[
@@ -48,7 +48,9 @@
         = \frac{1}{\Delta^2} 
         \left[
             a^2 (f_1 - f_3)^2 + b^2 (f_2 - f_3)^2 - (a^2 + b^2 - c^2)(f_1 f_2 - f_3(f_1 + f_2) + f_3^2)
-        \right] = \\
+        \right] = 
+        \end{eqnarray*}
+      \begin{multline*}
         = \frac{1}{2 \Delta^2} 
         [
             2 a^2 (f_1 - f_3)^2 + 2 b^2 (f_2 - f_3)^2 - (a^2 + b^2 - c^2) \times \\
