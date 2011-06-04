@@ -1,7 +1,8 @@
 import java.io.{File, PrintStream, FileOutputStream}
 import java.lang.Double.parseDouble
 import java.lang.Integer.parseInt
-import common.{StreamWrapper, DirWrapper, matchPattern}
+import common.{StreamWrapper, DirWrapper}
+import common.Util.matchPattern
 
 object TestGenerator {
   def genRange(start: Double, finish: Double, step: Double): Iterable[Double] = {

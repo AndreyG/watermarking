@@ -6,6 +6,7 @@ import java.util.ArrayList
 import javax.swing.{SwingUtilities, JFrame}
 
 import common._
+import common.Util.matchPattern
 
 object GraphicViewer {
   def main(args: Array[String]) {
@@ -16,8 +17,8 @@ object GraphicViewer {
     val graphDir = new DirWrapper(outputDir, attrs("graph-name"))
 
     val data = for {
-      factorizationDir <- graphDir.subdirs(matchPattern(attrs("factorization-name"))) 
-      embeddingDir = new DirWrapper(factorizationDir, attrs("embedding-name"))
+      factorizationDir <- graphDir.subdirs(matchPattern(attrs("factorization-name")));
+      embeddingDir <- factorizationDir.subdirs(matchPattern(attrs("embedding-name")))
       resultDir = new DirWrapper(embeddingDir, "result");
       pairs = for {
         noiseDir <- resultDir.subdirs(matchPattern("noise-*")) 
@@ -25,21 +26,37 @@ object GraphicViewer {
           val s = noiseDir.name
           parseDouble(s.substring(s.length - 5, s.length))              
         }
-        percent = {
-          var attemptsNum = 0
-          var successesNum = 0
+        (attemptsNum, percent) = {
+          var per = 0.0
+          var atn = 0
           for (attemptDir <- noiseDir.subdirs(matchPattern("attempt-*"))) {
             val messageFile = attemptDir / "message.txt"
-            val lines = Source.fromFile(messageFile).getLines.toArray
-            if (lines.size == 4) {
-              attemptsNum += 1
-              if (lines(1) == lines(3))                
-                successesNum += 1
+            if (messageFile.exists) {
+                val source = Source.fromFile(messageFile) 
+                val lines = source.getLines.toArray
+                if (lines.size == 4) {
+                  atn += 1
+
+                  def cut(s: String) = s.substring(19, s.length)
+
+                  def percentOfCommon(s1: String, s2: String) = {
+                    assert(s1.length == s2.length)
+
+                    val spacesNum = s1.count(_ == ' ')
+                    val commonNum = (s1 zip s2).count(t => (t._1 == t._2))
+
+                    (commonNum - spacesNum) * 1.0 / (s1.length - spacesNum)
+                  }
+
+                  per += percentOfCommon(cut(lines(0)), cut(lines(2)))
+                }
+                source.close()
             }
           }
-          successesNum * 1.0 / attemptsNum 
+          (atn, per)
         }
-      } yield (noise, percent)
+        if (attemptsNum > 0)
+      } yield (noise, percent / attemptsNum)
     } yield (factorizationDir.name, pairs)
 
     val arguments: ArrayList[ArrayList[JDouble]] = new ArrayList

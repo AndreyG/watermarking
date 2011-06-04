@@ -1,4 +1,4 @@
-<project name="Graphic" default="build">
+<project name="Graphic" default="all">
 
     <property environment="env"/>
     <property name="scala.home" value="${env.SCALA_HOME}"/>
@@ -16,14 +16,11 @@
       </classpath>
     </taskdef>
 
-    <target name="build" depends="compile">
-    </target>
-
     <path id="lib.path">
         <fileset dir="${lib}" includes="*.jar"/>
     </path>
 
-    <target name="compile">
+    <target name="all">
         <mkdir dir="${build}"/>
         <scalac
                 srcdir="src"
@@ -32,6 +29,7 @@
             <classpath>
                 <path refid="scala.lib.path"/>
                 <path refid="lib.path"/>
+                <pathelement location="${build}"/>
             </classpath>
         </scalac>
         <javac
@@ -46,9 +44,41 @@
             <classpath>
                 <path refid="scala.lib.path"/>
                 <path refid="lib.path"/>
+                <pathelement location="${build}"/>
             </classpath>
         </scalac>
     </target>
+
+    <target name="check-tests">
+        <mkdir dir="${build}"/>
+        <scalac
+                srcdir="src"
+                destdir="${build}"
+                >
+            <include name="TestChecker.scala"/>
+            <classpath>
+                <path refid="scala.lib.path"/>
+                <path refid="lib.path"/>
+                <pathelement location="${build}"/>
+            </classpath>
+        </scalac>
+    </target>
+
+    <target name="show-graphics">
+        <mkdir dir="${build}"/>
+        <scalac
+                srcdir="src"
+                destdir="${build}"
+                >
+            <include name="GraphicViewer.scala"/>
+            <classpath>
+                <path refid="scala.lib.path"/>
+                <path refid="lib.path"/>
+                <pathelement location="${build}"/>
+            </classpath>
+        </scalac>
+    </target>
+
 
     <target name="clean">
         <delete dir="${build}"/>
