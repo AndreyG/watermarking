@@ -214,7 +214,7 @@ namespace watermarking
 		}
 		for ( size_t i = 0, N = graph_.vertices_num(); i != N; ++i )
 		{
-			graph_.vertex(i) = graph_t::vertex_t((vertices_iterator[subdivision_[i]]++)->point());
+			assert( graph_.vertex(i) == graph_t::vertex_t((vertices_iterator[subdivision_[i]]++)->point()) );
 		}
 		for ( size_t i = 0; i != subareas_num; ++i )
 			assert( vertices_iterator[i] == trgs_[i].finite_vertices_end() );

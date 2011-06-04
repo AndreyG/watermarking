@@ -101,6 +101,11 @@ namespace geometry
         return tmp;
     }
 
+    inline point_t operator * (double d, point_t const & p)
+    {
+        return p * d;
+    }
+
     inline point_t operator / (point_t const & p, double d)
     {
         point_t tmp(p);

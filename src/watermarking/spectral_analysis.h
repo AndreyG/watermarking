@@ -4,6 +4,8 @@
 #include "../utility/stopwatch.h"
 #include "../geometry/point.h"
 
+#include <cmath>
+
 namespace watermarking
 {
     struct spectral_analyser
@@ -180,7 +182,7 @@ namespace watermarking
 
 		static geometry::point_t mult( double r, scalar_t e )
 		{
-			return geometry::point_t( r * e.real(), r * e.imag() );
+			return sqrt(2.0) * geometry::point_t( r * e.real(), r * e.imag() );
 		}
 
 		static double get_coeff( scalar_t const * e, const size_t N, points_to_flat_type const & pts )
