@@ -1,5 +1,6 @@
 import scala.io.Source
 import java.io.File
+import java.lang.Double.parseDouble
 
 import common._
 import common.Util.matchPattern
@@ -10,6 +11,8 @@ object TestChecker {
     val attrs = new common.Attributes(new File(args(0)))
 
     val outputDir = new DirWrapper(new File(attrs("output-dir")))
+    val noiseLowerBound = parseDouble(attrs("noise-lower-bound"))
+    val noiseUpperBound = parseDouble(attrs("noise-upper-bound"))
 
     val out = new StreamWrapper(System.out)
 
@@ -26,29 +29,33 @@ object TestChecker {
               for (noiseDir <- resultDir.subdirs(matchPattern("noise-*"))) {
                 val noise = {
                   val s = noiseDir.name
-                  s.substring(s.length - 5, s.length)
+                  parseDouble(s.substring(s.length - 5, s.length))
                 }
-                var attemptsNum = 0
-                var successesNum = 0
-                for (attemptDir <- noiseDir.subdirs(matchPattern("attempt-*"))) {
-                  val messageFile = attemptDir / "message.txt"
-                  if (messageFile.exists) {
-                      val source = Source.fromFile(messageFile) 
-                      val lines = source.getLines.toArray
-                      if (lines.size == 4) {
-                        attemptsNum += 1
-                        if (lines(1) == lines(3))                
-                          successesNum += 1
-                      }
-                      source.close()
-                  }
-                }
-                if (attemptsNum > 0) {
-                    out <<  details.black   << "            " << noise << ": (" <<
-                            details.green   << successesNum << 
-                            details.black   << "/"          << 
-                            details.red     << attemptsNum  <<
-                            details.black   << ")\n"
+                if ((noise >= noiseLowerBound) && (noise <= noiseUpperBound)) {
+                    var attemptsNum = 0
+                    var successesNum = 0
+                    for (attemptDir <- noiseDir.subdirs(matchPattern("attempt-*"))) {
+                      val messageFile = attemptDir / "message.txt"
+                      if (messageFile.exists) {
+                          val source = Source.fromFile(messageFile) 
+                          val lines = source.getLines.toArray
+                          if (lines.size == 4) {
+                            attemptsNum += 1
+                            if (lines(1) == lines(3))                
+                              successesNum += 1
+                          } else if (lines.size > 4) {
+                            attemptsNum += 1
+                          }
+                          source.close()
+                      } 
+                    }
+                    if (attemptsNum > 0) {
+                        out <<  details.black   << "            " << noise << ": (" <<
+                                details.green   << successesNum << 
+                                details.black   << "/"          << 
+                                details.red     << attemptsNum  <<
+                                details.black   << ")\n"
+                    }
                 }
               }
             }

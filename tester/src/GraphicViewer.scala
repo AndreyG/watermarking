@@ -13,6 +13,8 @@ object GraphicViewer {
     assert(args.size == 1)
     val attrs = new common.Attributes(new File(args(0)))
 
+    val noiseLowerBound = parseDouble(attrs("noise-lower-bound"))
+    val noiseUpperBound = parseDouble(attrs("noise-upper-bound"))
     val outputDir = new DirWrapper(new File(attrs("output-dir")))
     val graphDir = new DirWrapper(outputDir, attrs("graph-name"))
 
@@ -26,6 +28,7 @@ object GraphicViewer {
           val s = noiseDir.name
           parseDouble(s.substring(s.length - 5, s.length))              
         }
+        if ((noise >= noiseLowerBound) && (noise <= noiseUpperBound))
         (attemptsNum, percent) = {
           var per = 0.0
           var atn = 0

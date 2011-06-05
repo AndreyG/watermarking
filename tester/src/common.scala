@@ -59,6 +59,11 @@ package common {
       return this
     }
 
+    def << (d: Double) : StreamWrapper = {
+      out.print(d)
+      return this
+    }
+
     def << (s: details.SpecialSymbol) : StreamWrapper = {
       s match {
         case details.feed => out.println(" \\")

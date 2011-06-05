@@ -49,6 +49,21 @@
         </scalac>
     </target>
 
+    <target name="generate-tests">
+        <mkdir dir="${build}"/>
+        <scalac
+                srcdir="src"
+                destdir="${build}"
+                >
+            <include name="TestGenerator.scala"/>
+            <classpath>
+                <path refid="scala.lib.path"/>
+                <path refid="lib.path"/>
+                <pathelement location="${build}"/>
+            </classpath>
+        </scalac>
+    </target>
+
     <target name="check-tests">
         <mkdir dir="${build}"/>
         <scalac
