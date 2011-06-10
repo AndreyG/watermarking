@@ -61,8 +61,8 @@ $\triangle T' = f_i f_j f_k$.
 \begin{multline}
   \label{formula:det}
   \int_{\triangle T} \det (\nabla f) dT = \frac{1}{2} (f_i - f_k) \times (f_j - f_k) = \\
-  = \frac{1}{2} \left[(f_i - f_k)_x (f_j - f_k)_y - (f_i - f_k)_y (f_j - f_k)_y \right] = \\
-  = \frac{i}{4} \left[ (f_i - f_k)\conjugate{(f_j - f_k)} - (f_j - f_k) \conjugate{(f_i - f_k)} \right] = \\
+  \shoveleft{= \frac{1}{2} \left[(f_i - f_k)_x (f_j - f_k)_y - (f_i - f_k)_y (f_j - f_k)_y \right] =} \\
+  \shoveleft{= \frac{i}{4} \left[ (f_i - f_k)\conjugate{(f_j - f_k)} - (f_j - f_k) \conjugate{(f_i - f_k)} \right] = } \\
   = \frac{i}{4} \left[ (f_i \conjugate{f_j} - \conjugate{f_i} f_j) + (f_j \conjugate{f_k} - \conjugate{f_j} f_k) + 
     (f_k \conjugate{f_i} - \conjugate{f_k} f_i) \right].  
 \end{multline}
@@ -84,7 +84,7 @@ $(f_i \conjugate{f_j}~-~\conjugate{f_i} f_j)$ содержится в право
 триангуляции $\mathfrak{T}$ принадлежащих границе $\Omega$. 
 Если рассмотреть эрмитову матрицу $L'$ определенную следующим образом
 \begin{equation*}
-  L_{uv}' = \begin{cases}
+  \textstyle L_{uv}' = \begin{cases}
     i  & \text{if edge $uv \in \partial E$ and $\Omega$ is left of the line $(u, v)$;} \\ 
     -i & \text{if edge $uv \in \partial E$ and $\Omega$ is right of the line $(u, v)$;} \\ 
     0  & \text{otherwise}
@@ -102,5 +102,5 @@ $(f_i \conjugate{f_j}~-~\conjugate{f_i} f_j)$ содержится в право
   E_C(f) = \frac{1}{4}\conjugate{\mathbf{f}^T} L'' \mathbf{f},
 \end{equation*}
 где $L'' = L - L'$. Легко видеть, что оператор $L''$ --- эрмитов (как разность двух эрмитовых), 
-следовательно, его собственные числа вещественны и из его из его собственных векторов можно составить 
+следовательно, его собственные числа вещественны и из его собственных векторов можно составить 
 ортонормированный базис~$\mathbb{C}^n$.

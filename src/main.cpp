@@ -109,10 +109,8 @@ int main( int argc, char** argv )
             assert(!loops_exist(graph));
             assert(!has_duplicate_vertices(graph));
 
-            /*
             planar_graph_viewer_t viewer(&graph);
             vis_system::run_viewer(&viewer);
-            */
 
             ew = create_embedding(graph, config.factorization);
             std::ofstream out(config.dump_path.c_str()); 

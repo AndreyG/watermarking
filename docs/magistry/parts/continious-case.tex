@@ -77,16 +77,16 @@ $$\vect{q(r, dr, \alpha)} = \left(\vect{f(r)} + R^\alpha \vect{df}\right) - \vec
 \end{multline}
 \begin{multline}
 \label{formula:ugly_commutant}
-  R^\alpha (\nabla f) - (\nabla f) R^\alpha =\
-  \begin{pmatrix} 
+  \textstyle R^\alpha (\nabla f) - (\nabla f) R^\alpha = \\
+  \shoveleft \textstyle = \begin{pmatrix} 
     \cos \alpha & -\sin \alpha \\ 
     \sin \alpha & \cos \alpha 
   \end{pmatrix} 
   \begin{pmatrix} 
     \frac{\partial f_x}{\partial x} & \frac{\partial f_x}{\partial y} \\
     \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} 
-  \end{pmatrix} - \\
-  - \begin{pmatrix} 
+  \end{pmatrix} - 
+  \begin{pmatrix} 
     \frac{\partial f_x}{\partial x} & \frac{\partial f_x}{\partial y} \\
     \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} 
   \end{pmatrix}
@@ -94,19 +94,19 @@ $$\vect{q(r, dr, \alpha)} = \left(\vect{f(r)} + R^\alpha \vect{df}\right) - \vec
     \cos \alpha & -\sin \alpha \\
     \sin \alpha & \cos \alpha 
   \end{pmatrix} = \\
-  = \begin{pmatrix}
+  \shoveleft \textstyle = \begin{pmatrix}
     \frac{\partial f_x}{\partial x} \cos \alpha - \frac{\partial f_y}{\partial x} \sin \alpha &
     \frac{\partial f_x}{\partial y} \cos \alpha - \frac{\partial f_y}{\partial y} \sin \alpha \\
     \frac{\partial f_x}{\partial x} \sin \alpha + \frac{\partial f_y}{\partial x} \cos \alpha &
     \frac{\partial f_x}{\partial y} \sin \alpha + \frac{\partial f_y}{\partial y} \cos \alpha 
   \end{pmatrix} - \\
-  - \begin{pmatrix} 
+  \shoveright{ \textstyle- \begin{pmatrix} 
     \frac{\partial f_x}{\partial x} \cos \alpha + \frac{\partial f_x}{\partial y} \sin \alpha &
     - \frac{\partial f_x}{\partial x} \sin \alpha + \frac{\partial f_x}{\partial y} \cos \alpha \\
     \frac{\partial f_y}{\partial x} \cos \alpha + \frac{\partial f_y}{\partial y} \sin \alpha &
     - \frac{\partial f_y}{\partial x} \sin \alpha + \frac{\partial f_y}{\partial y} \cos \alpha 
-  \end{pmatrix} = \\
-  = \sin \alpha \begin{pmatrix}
+  \end{pmatrix} = } \\
+  = \textstyle \sin \alpha \begin{pmatrix}
     -(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}) &
     \frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y} \\
     \frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y} &
