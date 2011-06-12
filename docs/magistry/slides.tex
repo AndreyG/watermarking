@@ -18,19 +18,20 @@
     urlcolor=blue
 }
 
-\newcommand{\vect}{\overrightarrow}
+\graphicspath{{pic/}}
+
 \newcommand{\conjugate}{\overline}
 
 \theoremstyle{definition}
-\newtheorem{mydefinition}{Определение}
-\newtheorem{remark}{Замечание}[section]
-\newtheorem{hyphotesis}{Гипотеза}
-\newtheorem{noticement}{Наблюдение}
+\newtheorem{remark}{Замечание}
+\newtheorem{InputData}{Входные данные}
+\newtheorem{ProblemDef}{Задача}
+\newtheorem{hyphotesis}{Предположение}
 \newtheorem{statement}{Утверждение}
 
 \title[]{Применение методов спектральной теории графов для внедрения цифровых водяных знаков в двумерные векторные данные}
-\date{май 2011}
-\author[Давыдов А.А]{Давыдов А.А. \\ научный руководитель: Жуков С.Ю.}
+\date{июнь 2011}
+\author[Давыдов А.А]{Давыдов А.А. \\ научный руководитель: к.ф.-м.н. Жуков С.Ю.}
 \institute{СПбГУ ИТМО}
 
 \usetheme{Darmstadt}
@@ -42,269 +43,182 @@
 \maketitle
 
 \begin{frame}
-  \frametitle{Цифровые водяные знаки: общая информация}
+  \frametitle{Постановка задачи}
 
-  \begin{mydefinition}
-    Цифровые водяные знаки (ЦВЗ) --- технология внедрения некоторой информации в цифровые данные.
-  \end{mydefinition}
-
-  \pause
-  \begin{remark}
-  Будем считать, что цель применения ЦВЗ --- защита от копирования. 
-  \end{remark}
-
-  \pause
-  \begin{remark}
-  В дальнейшем мы будем говорить о невидимых ЦВЗ.
-  \end{remark}
-
-  \pause
-  Жизненный цикл ЦВЗ состоит из:
-  \begin{itemize}
+    \begin{InputData}
+    ГИС-данные --- геометрический планарный прямолинейный граф $G$, обладающий следующими свойствами:
+    \begin{itemize}
+        \pause \item кластеризованность;
+        \pause \item равномерное распределение вершин внутри кластера.
+    \end{itemize}
     \pause
-    \item модификации исходных данных (внедрения ЦВЗ);
+    Для данных характерен масштаб и допустимая погрешность.
+    \end{InputData}
+
     \pause
-    \item атаки модифицированных данных злоумышленником;
-    \pause
-    \item извлечения ЦВЗ из атакованных данных.
-  \end{itemize}
+    \begin{ProblemDef}
+    \begin{itemize}
+        \item Защитить авторские права на ГИС-данные, изменяя координаты вершин в пределах допустимой погрешности. 
+
+        Изменение координат вершин не должно нарушать топологии графа.
+        \pause
+        \item Сформулировать критерий $K$ степени искажения исходных данных.
+    \end{itemize}
+    \end{ProblemDef}
+
 \end{frame}
 
 \begin{frame}
-  \frametitle{ЦВЗ для двумерных векторных данных}
+  \frametitle{Формальная постановка задачи}
 
-  \begin{itemize}
-  \pause
-  \item Исходные данные --- планарный прямолинейный граф.
-  \pause
-  \begin{remark}
-    Вершины заданы в какой-то координатной системе.
-  \end{remark}
+    Найти $f(V_G, key, msg) \to V_G'$, такую что $\exists f^{-1}(g(V_G'), V_G, key) \to msg$, где
+    \begin{itemize}
+        \item $key$ --- секретный ключ;
+        \item $msg$ --- внедряемое сообщение, удостоверяющее наше авторство;
+        \item $g: V_G' \to V_G''$ --- атака злоумышленником.
+    \end{itemize}
+    Определить и минимизировать $K(G, V_G') \to \mathbb{R}$.
 
-  \pause
-  \item Внедрение ЦВЗ --- изменение координат вершин.
+    \pause
+    \begin{remark}
+        Функция $f$ называется цифровым водяным знаком (ЦВЗ). 
+        
+        Применение $f$ называется внедрением ЦВЗ.
+    \end{remark}
 
-  \pause
-  \item Виды атак:
-  \begin{itemize}
-    \pause \item переупорядочивание входных данных;
-    \pause \item преобразование подобия на множестве вершин;
-    \pause \item вставка и удаление вершин (упрощение и сглаживание конутров и полилиний);
-    \pause \item применение аддитивного случайного шума к координатам вершин;
-    \pause \item обрезка (cropping).
-  \end{itemize}
-
-  \pause 
-  \item Требования к внедрению ЦВЗ:
-  \begin{itemize}
-    \pause \item устойчивость к атакам;
-    \pause \item незначительное искажение исходных данных.
-  \end{itemize}
-
-  \end{itemize}    
+    \pause
+    Атаки бывает четырех видов:
+    \begin{itemize}
+        \pause \item переупорядочивание входных данных;
+        \pause \item преобразование подобия на множестве вершин;
+        \pause \item вставка и удаление вершин (упрощение и сглаживание конутров и полилиний);
+        \pause \item применение аддитивного шума к координатам вершин.
+    \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Классификация алгоритмов внедрения ЦВЗ}
+    \frametitle{Алгоритмы внедрения ЦВЗ}
 
-  \begin{itemize}
-  \pause
-  \item Использование исходных данных для извлечения ЦВЗ 
+    Алгоритмы внедрения ЦВЗ условно делятся на
     \begin{itemize}
-      \pause \item ``хорошо информированные'' (well-informed);
-      \pause \item ``ослепленные'' (blinded).
+        \item изменяющие непосредственно координаты вершин (пространстенная область), для этих алгоритмов легко контролировать сохранение топологии графа;
+        \item изменяющие некоторые взаимно-однозначно связанные с координатами вершин коеффициенты (частотная область), эти алгоритмы более устойчивы к атакам.
     \end{itemize}
-  
-  \pause
-  \item Область работы алгоритма
-    \begin{itemize}
-      \pause \item изменяются непосредственно координаты вершин (пространстенная область);
-      \pause \item изменяются некоторые взаимно-однозначно связанные с координатами вершин коеффициенты (частотная область).
-    \end{itemize}
-  \end{itemize}
+    \pause
 
-  \pause
-  \begin{remark}
-    Хорошо информированные частостные алгоритмы наиболее устойчивы к атакам. Лучший из известных автору --- алгоритм Обучи (Ohbuchi).
-  \end{remark}
+    \pause
+    Для сохранения топологии графа алгоритмами, работающими в частотной области, можно ограничить допустимые смещения вершин по обобщенной диаграмме Вороного. 
+    \begin{figure}
+       \includegraphics[scale=0.3]{huber.png}
+    \end{figure}
+    \pause
+
+    Из известных автору наиболее устойчив к атакам алгоритм Обучи.
+
 \end{frame}
 
 \begin{frame}
   \frametitle{Схема работы алгоритма Обучи}
 
   \begin{itemize}
-    \pause \item Разбиение плоскости на прямоугольные домены.
-    \pause
-    \begin{remark}
-      Дальнейшие шаги производятся независимо для каждого домена.
-    \end{remark}
-    \pause \item Построение триангуляции Делоне.
+    \pause \item Построение триангуляции Делоне множества $V_G$.
     \pause \item Вычисление частотных коэффициентов --- разложение вектора составленного из координат вершин, в базисе собственных векторов графа триангуляции.
-    \pause
-    \begin{remark}
-      СВ графа суть СВ невзвешенного лапласиана $R = I - D^{-1} A$.
-    \end{remark}
-    \pause \item Изменение частотных коэффициентов сообразно внедряемому сообщению.
-    \pause \item Вычисление новых координат вершин по измененным частотным коэффициентам.
+
+    СВ графа суть СВ невзвешенного лапласиана графа. %$R = I - D^{-1} A$, где $A$~---~матрица смежности, $D$ --- диагональная матрица из степеней вершин.
+    \pause \item Модуляция частотных коэффициентов внедряемым сообщениeм.
+    \pause \item Вычисление новых координат вершин по модулированным частотным коэффициентам.
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Искажение исходных данных при внедрении ЦВЗ}
-
-  \begin{itemize}
-    \pause \item Нарушение топологии графа.
-
-      Можно явно ограничить допустимые смещения вершин. 
-      \begin{figure}
-        \includegraphics[scale=0.3]{pic/huber.png}
-      \end{figure}
-    \pause \item Ухудшение визуального качества информации.
-    \pause
-    \begin{noticement}
-      Преобразование подобия не ухудшает восприятие информации.
-    \end{noticement}
-    \pause
+  \frametitle{Критерий степени искажение исходных данных}
     \begin{hyphotesis}
-      Изменение углов при вершинах контуров и полилиний есть разумная мера искажения.
+    Изменение углов между смежными ребрами графа $G$ есть разумный критерий степени искажения исходных данных.
     \end{hyphotesis}
-      
-  \end{itemize}
+
+    \pause
+    \begin{statement}
+    Пусть дана дифференцируемая функция $f: (\Omega \subset \mathbb{R}^2) \to \mathbb{R}^2$, тогда функционал  
+    $ E_C(f) = \frac{1}{2} \int_{\Omega}\left[{ \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 + 
+                                                \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2} \right] d\Omega$ 
+    измеряет изменение углов локальных под действием $f$. 
+    \end{statement}
+
+    \pause
+    \begin{statement}
+    Пусть дана функция $f: V_G \to \mathbb{R}^2$, $f_{\mathfrak{T}}: ConvexHull(V_G) \to \mathbb{R}^2$ есть кусочно-линейная интерполяция $f$ 
+    по триангуляции $\mathfrak{T}$ множества $V_G$, тогда функционал $E_C(f_{\mathfrak{T}})$ измеряет изменение углов $\mathfrak{T}$.
+    \end{statement}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Оценка искажения, непрерывный случай (1)}
-
-  $\Omega \subset \mathbb{R}^2$ \pause , $f: \Omega \to \mathbb{R}^2$ \pause, 
-  $f = \begin{pmatrix} f_x(x, y) \\ f_y(x, y) \end{pmatrix}$, 
-  $\nabla f_x = \begin{pmatrix} \frac{\partial f_x}{\partial x} \\ \frac{\partial f_x}{\partial y} \end{pmatrix}, 
-  \nabla f_y = \begin{pmatrix} \frac{\partial f_y}{\partial x} \\ \frac{\partial f_y}{\partial y} \end{pmatrix}$,
-  $\nabla f = \begin{pmatrix} 
-    \frac{\partial f_x}{\partial x} & \frac{\partial f_x}{\partial y} \\
-    \frac{\partial f_y}{\partial x} & \frac{\partial f_y}{\partial y} \\
-  \end{pmatrix}.$ 
-\pause
-\begin{figure}[htb]
-  \begin{minipage}[b]{1.0\linewidth}
-  \begin{center}
-    \begin{tikzpicture} 
-      \coordinate[label=below:$r$]        (origin)      at (0, 0);
-      \coordinate[label=above:$r_1$]   (dxdy)        at origin + (30:2);
-      \coordinate[label=above:$r_2$]  (dxdyrot)     at origin + (100:2);
-
-      \draw[->] (origin)--(dxdy);
-      \draw[->] (origin)--(dxdyrot);
-
-      \draw (origin) -- (30:0.5) arc (30:100:0.5);
-      \draw (60:0.74) node {$\alpha$};
-  
-      \draw [help lines][ ->] (2.5, 1) -- (5.0, 1);
-
-      \begin{scope}[shift={(0:8.5cm)}]
-        \coordinate[label=below:$f(r)$]   (forigin)      at (0, 0);
-        \coordinate[label=above:$f(r_1)$] (fdxdy)        at ($(forigin) + (45:1.9)$);
-        \coordinate[label=above:$f(r_2)$] (fdxdyrot)     at ($(forigin) + (100:2.1)$);
-        \coordinate[label=left:$f(r) + R^\alpha df$] (rotfdxdy)    at ($(forigin) + (115:1.9)$);
-
-        \draw[->] (forigin)--(fdxdy);
-        \draw[->] (forigin)--(fdxdyrot);
-        \draw[->][dashed] (forigin)--(rotfdxdy);
-        \draw[very thick] (rotfdxdy)--(fdxdyrot);
-        \draw (forigin) -- (45:0.5) arc (45:115:0.5);
-        \draw (80:0.74) node {$\alpha$};
-      \end{scope}
-    \end{tikzpicture} 
-  \end{center}
-  \end{minipage}
-\end{figure}
-
-  $\vect{r_1} = \vect{r} + \vect{dr}$, $\vect{r_2} = \vect{r} + R^\alpha \vect{dr}$,
-  $\vect{df} = \vect{r_1} - \vect{r}$.  
-  $$\vect{q(r, dr, \alpha)} = \left(\vect{f(r)} + R^\alpha \vect{df}\right) - \vect{f(r_2)}.$$
-
-\end{frame}
 
 \begin{frame}
-  \frametitle{Оценка искажения, непрерывный случай (2)}
-  \pause
+  \frametitle{Минимизация искажение исходных данных}
+
   \begin{statement}
-  $
-  \left(\frac{\left| {q(r, dr, \pm \frac{\pi}{2})} \right|}{|dr|}\right)^2 = 
-  \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2 + 
-  \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 
-  $
-  \end{statement}
-  \pause
-  \begin{statement}
-  Функционал
-   $E_C(f) = \frac{1}{2} \int_{\Omega}\left[{ \left(\frac{\partial f_x}{\partial x} - \frac{\partial f_y}{\partial y}\right)^2 + 
-                                            \left(\frac{\partial f_x}{\partial y} + \frac{\partial f_y}{\partial x}\right)^2} \right] d\Omega$,
-  называемый \textit{конформной энергией}, есть мера искажения функцией $f$ углов в области $\Omega$. 
+  Пусть $L$ --- взвешенный лапласиан графа триангуляции $\mathfrak{T}$, тогда $\textstyle E_C(f_{\mathfrak{T}}) = \conjugate{\mathbf{f}^T} L \mathbf{f}.$ 
   \end{statement}
 
   \pause
-  \begin{remark}
-    $$E_D(f) = E_C(f) - \int_{\Omega} \det (\nabla f) d\Omega = 
-    \frac{1}{2} \int_{\Omega} \left[ \left| \nabla f_x \right| ^ 2 + \left| \nabla f_y \right| ^ 2 \right] d\Omega$$ называется
-    \textit{энергия Дирихле}.
-  \end{remark}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Оценка искажения, дискретный случай (1)}
-
-  \pause
   \begin{statement}
-  Пусть даны:
-  \begin{itemize}
-    \pause \item Множества $V = \left\{v_1, v_2, ... , v_n\right\}$, $V' = \left\{v_1', v_2', ... , v_n'\right\}$, $v_i, v_i' \in \mathbb{R}^2$;
-    \pause \item $f: V \to V'$, $f(v_i) = v_i', 1 \le i \le n$; 
-    \pause \item Триангуляция $\mathfrak{T}$ множества $V$, $\Omega$ -- выпуклая оболочка $V$;
-  \end{itemize}
-  \pause тогда определена кусочно-линейная интерполяционная поверхность $f: \Omega \to \mathbb{R}^2$. 
-  \end{statement}
+    Для минимизации $E_C(f_{\mathfrak{T}})$ необходимо в алгоритме Обучи использовать взвешенный лапласиан $L$ и использовать частотные коэффициенты соответствующие 
+    младшим собственным векторам $L$ при модуляции.
 
-\pause
-Пусть $G$ --- граф триангуляции $\mathfrak{T}$, $w_{uv} = \cot \alpha_{uv} + \cot \alpha_{vu}$.
-\pause
-\begin{statement}
-\begin{equation*}
-  L_{uv} = \begin{cases}
-  \sum_{(v, x) \in E(G)}{w_{vx}}&\text{if $u = v,$} \\
-  -w_{uv}&\text{if $u \sim v,$} \\
-  0 &\text{otherwise;}
-\end{cases} 
-  E_D(f) = \frac{1}{4} \conjugate{\mathbf{f}^T} L \mathbf{f}.  
-\end{equation*}
-\end{statement}
+    \pause
+    \vspace{0.5cm}
 
-\end{frame}
-
-\begin{frame}
-  \frametitle{Оценка искажения, дискретный случай (2)}
-
-  \pause
-  $L_{uv}' = \begin{cases}
-    i  & \text{if edge $uv \in \partial E$ and $\Omega$ is left of the line $(u, v)$;} \\ 
-    -i & \text{if edge $uv \in \partial E$ and $\Omega$ is right of the line $(u, v)$;} \\ 
-    0  & \text{otherwise.}
-  \end{cases}$ 
-  \pause
-  \begin{statement}
-  $$\int_{\Omega} \det {\left( \nabla f \right) } d\Omega = \frac{1}{4} \conjugate{\mathbf{f}^T} L' \mathbf{f}, \mbox{   }L'' = L - L', \mbox{   } E_C(f) = \frac{1}{4} \conjugate{\mathbf{f}^T} L'' \mathbf{f}. $$
-  \end{statement}
-  \pause
-  \begin{statement}
-    Для минимизации коформной энергии вектор изменений координат должен быть линейной комбинацией младших собственных векторов эрмитовой матрицы $L''$.
+    Для минимизации предложенного критерия степени искажение исходных данных, необходимо выбрать $\mathfrak{T}$ как триангуляцию Делоне 
+    множества $V(G)$ с ребрами $E(G)$ в качестве ограничений.
   \end{statement}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Результаты}
+    \frametitle{Устойчивость к шуму. Граф рек}
 
-  \begin{itemize}
-    \pause \item Предложена мера оценки искажений для алгоритмов внедрения ЦВЗ.
-    \pause \item Выполнена модификация известного алгоритма, для минимизации предложенной меры.
-  \end{itemize}
+    $|V_G| = 44482$, $|E_G| = 44274$, коэффициент модуляции $0.2$, $|msg| = 119$.
+    \begin{figure}
+        \centerline {
+            \includegraphics[height=7cm]{rr-graphic.png}
+        }
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Устойчивость к шуму. Изолинии}
+
+    $|V_G| = 81099$, $|E_G| = 79339$, коэффициент модуляции $0.2$, $|msg| = 119$.
+    \begin{figure}
+        \centerline {
+            \includegraphics[height=7cm]{si-graphic.png}
+        }
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Результаты (1)}
+
+   Предложен критерий степени искажения исходных данных.
+    \begin{figure}
+        \centerline {
+            \mbox{\includegraphics[height=4cm]{angle-diff-small.png}}
+            \mbox{\includegraphics[height=4cm]{angle-diff-large.png}}
+        }
+    \end{figure}
+    \begin{description}
+        \item[Зеленый] Входные данные.
+        \item[Красный] Данные, подписанные алгоритмом Обучи.
+        \item[Синий] Данные, подписанные предложенной модификацией. 
+    \end{description}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Результаты (2)}
+     Для минимизации предложенного критерия модифицирован известный алгоритм.
+    \begin{figure}
+        \centerline {
+            \includegraphics[height=4cm]{histogram.png}
+        }
+    \end{figure}
 \end{frame}
 \end{document}
